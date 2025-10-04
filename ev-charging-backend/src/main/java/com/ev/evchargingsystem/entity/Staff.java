@@ -9,8 +9,13 @@ public class Staff {
     @Id
     @NotNull
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private String id;
+    private int id;
+
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="staff_id", referencedColumnName = "id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name="station_id", referencedColumnName = "id")
     private Station station;
 }

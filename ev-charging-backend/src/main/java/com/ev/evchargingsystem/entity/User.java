@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -27,5 +29,4 @@ public class User {
     private String phone;
     @Column(columnDefinition = "VARCHAR(10) CHECK (role IN ('USER', 'ADMIN', 'STAFF'))")
     private String role;
-
 }
