@@ -2,10 +2,12 @@ package com.ev.evchargingsystem.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Check;
 
 import java.util.Date;
 
 @Entity
+@Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED')")
 @Table(name="charging_sessions")
 public class ChargingSession {
     @Id
@@ -18,7 +20,6 @@ public class ChargingSession {
     @NotNull
     private int initBattery;
     @NotNull
-    @Column(columnDefinition = "VARCHAR(10) CHECK (status IN ('ONGOING', 'COMPLETED', 'CANCELLED'))")
     private String status;
 
     @OneToOne
