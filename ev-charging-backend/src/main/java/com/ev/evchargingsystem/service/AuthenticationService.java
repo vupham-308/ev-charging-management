@@ -1,7 +1,7 @@
 package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.User;
-import com.ev.evchargingsystem.model.request.LoginRequest;
+import com.ev.evchargingsystem.model.response.LoginRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.repository.AuthenticationRepository;
 import org.modelmapper.ModelMapper;

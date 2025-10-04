@@ -36,9 +36,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)     // tắt CSRF để POST từ Swagger không 403
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                .anyRequest()
-                                .permitAll()                // mở hết để test
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .anyRequest()
+                        .permitAll()                // mở hết để test
                 )
                 .httpBasic(b -> b.disable())
                 .formLogin(f -> f.disable());
