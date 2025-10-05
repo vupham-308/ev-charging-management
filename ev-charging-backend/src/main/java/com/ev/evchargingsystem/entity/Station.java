@@ -4,12 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "stations")
+@Data // Tự động tạo getters, setters, toString(), equals(), hashCode()
+@NoArgsConstructor // Tự động tạo constructor không tham số
+@AllArgsConstructor // Tự động tạo constructor có tất cả tham số
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
