@@ -1,23 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router";
-import App from "./App";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
+import { BrowserRouter } from "react-router-dom";
+import MainApp from "./App";
 import { AuthProvider } from "./contexts/AuthContext";
+import "antd/dist/reset.css";
+import { App } from "antd";
 
-const root = document.getElementById("root");
-
-ReactDOM.createRoot(root).render(
-  <AuthProvider>
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
-        <Route path="/ForgotPassword" element={<ForgotPassword />} />
-      </Routes>
+      <AuthProvider>
+        <App>
+          <MainApp />
+        </App>
+      </AuthProvider>
     </BrowserRouter>
-  </AuthProvider>
+  </React.StrictMode>
 );

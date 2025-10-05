@@ -1,62 +1,118 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const AuthContext = createContext({
-  isLoggedIn: false,
-  userEmail: null,
-  token: null,
-});
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState(null);
-  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const doLogin = (userEmail, password) => {
-    //1. truyen du lieu back-end
-    //2. backend tra lai ket qua
-    //3a. Neu dung back-end tra lai email kem' token
-    //3b. Neu sai bao loi
-    setIsLoggedIn(true);
-    setUserEmail(userEmail);
-    setToken("Token");
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      // Giả sử bạn có một API để xác thực token và lấy thông tin người dùng
+      // fetchUserInfo(savedToken).then(userInfo => {
+      //   setUser(userInfo);
+      //   setToken(savedToken);
+      // });
+      // Ở đây ta giả lập: nếu có token là user đã đăng nhập
+      setUser({ email: localStorage.getItem("userEmail") });
+      setToken(savedToken);
+    }
+    setIsLoading(false); 
+  }, []);
+
+  const doLogin = async (email, password) => {
+    console.log("Đang đăng nhập với:", email, password);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      if (email === "admin@test.com" && password === "123456") {
+        const fakeToken = "fake-jwt-token-" + Math.random();
+        const userInfo = { email: email };
+
+        localStorage.setItem("token", fakeToken);
+        localStorage.setItem("userEmail", email);
+
+        setToken(fakeToken);
+        setUser(userInfo);
+
+        navigate("/dashboard");
+        return { success: true };
+      } else {
+        throw new Error("Email hoặc mật khẩu không đúng!");
+      }
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error);
+      return { success: false, message: error.message };
+    }
   };
 
-  const doSignUp = (
-    userEmail,
-    phoneNumber,
-    fullName,
-    password,
-    confirmPassword
-  ) => {
-    //  validation (email dung format chua, sdt dung vung VN khong, cac field khong duoc bo trong. confirmPass co trung password khong?)
-    //  truyen du lieu len back-end
-    //  tra lai token
-    // Neu dung back-end tra lai email kem' token
-    // Neu sai bao loi
-    setUserEmail(userEmail);
-    setIsLoggedIn(true);
-    setToken("Token");
-  };
+// const doLogin = async (email, password) => {
+//     try {
+//       const response = await fetch("http://localhost:8080/api/account/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ email, password }),
+//       });
 
+//       if (response.ok) {
+//         const data = await response.json(); 
+
+//         const receivedToken = data.token; 
+//         const userInfo = { email: data.email };
+
+//         if (!receivedToken) {
+//           throw new Error("API không trả về token!");
+//         }
+
+//         localStorage.setItem("token", receivedToken);
+//         localStorage.setItem("userEmail", userInfo.email);
+
+//         setToken(receivedToken);
+//         setUser(userInfo);
+
+//         message.success("Đăng nhập thành công!");
+//         navigate("/dashboard");
+//         return { success: true };
+
+//       } else {
+//         const errorData = await response.json();
+//         throw new Error(errorData.message || "Email hoặc mật khẩu không đúng!");
+//       }
+//     } catch (error) {
+//       console.error("Lỗi đăng nhập:", error);
+//       return { success: false, message: error.message };
+//     }
+//   };
+
+  // Hàm đăng xuất
   const doLogout = () => {
-    setUserEmail(null);
-    setIsLoggedIn(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+
+    // Reset state
     setToken(null);
+    setUser(null);
+
+    navigate("/login");
+  };
+
+  const contextValue = {
+    isLoggedIn: !!token, 
+    token,
+    user,
+    isLoading,
+    doLogin,
+    doLogout,
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        doLogin,
-        doSignUp,
-        doLogout,
-        userEmail,
-        isLoggedIn,
-        token,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
