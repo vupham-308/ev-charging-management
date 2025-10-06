@@ -1,20 +1,17 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import MainApp from "./App";
-import { AuthProvider } from "./contexts/AuthContext";
-import "antd/dist/reset.css";
-import { App } from "antd";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App>
-          <MainApp />
-        </App>
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+createRoot(document.getElementById("root")).render(
+  <Provider store={store}>
+    <App />
+  </Provider>
 );
+
+// document.getElementById('root')
+// B1: tìm tới thẻ có tên là root
+// B2: render
+
+// chương trình sẽ chạy từ thằng main
