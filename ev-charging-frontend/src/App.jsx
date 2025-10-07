@@ -8,8 +8,7 @@ import ManageCategory from "./pages/category";
 import { ToastContainer } from "react-toastify";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
-import EbikeHomePage from "./pages/home";
-
+import EVChargingManagement from "./pages/home";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -32,7 +31,7 @@ function App() {
     },
     {
       path: "/",
-      element: <EbikeHomePage/>
+      element: <EVChargingManagement />,
     },
     {
       path: "/login",
