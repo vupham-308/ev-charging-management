@@ -9,6 +9,8 @@ import { ToastContainer } from "react-toastify";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import EbikeHomePage from "./pages/home";
+import UserHomePage from "./pages/home";
+import EVChargeHomePage from "./pages/home";
 
 // 1. Component
 // là 1 cái function
@@ -32,7 +34,7 @@ function App() {
     },
     {
       path: "/",
-      element: <EbikeHomePage/>
+      element: <EVChargeHomePage />,
     },
     {
       path: "/login",

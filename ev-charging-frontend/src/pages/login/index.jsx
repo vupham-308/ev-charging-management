@@ -17,14 +17,14 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 // If using AntD v5, remember to import base reset once in your app root:
 // import "antd/dist/reset.css";
-import { useDispatch } from 'react-redux'
+import { useDispatch } from "react-redux";
 import { login } from "../../redux/accountSlice";
 
 const LoginPage = () => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   /*
     1. Cập nhật => dispatch
@@ -44,7 +44,7 @@ const LoginPage = () => {
       localStorage.setItem("token", token);
 
       // lưu state
-      dispatch(login(response.data))
+      dispatch(login(response.data));
       navigate("/");
     } catch (e) {
       message.error("Login failed. Please try again.");
