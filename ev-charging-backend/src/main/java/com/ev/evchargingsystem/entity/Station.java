@@ -23,14 +23,14 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty
-    @Column(nullable = false, unique = true,columnDefinition = "Nvarchar(100)")
+    @NotEmpty (message = "Name cannot be empty!")
+    @Column(unique = true,columnDefinition = "Nvarchar(100)")
     private String name;
-    @NotEmpty
-    @Column(nullable = false, columnDefinition = "Nvarchar(200)")
+    @NotEmpty(message = "Address cannot be empty!")
+    @Column(columnDefinition = "Nvarchar(200)")
     private String address;
     @NotEmpty
-    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$")
+    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Phone is invalid!")
     @Column(unique = true)
     private String phone;
     @Email
