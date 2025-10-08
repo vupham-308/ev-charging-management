@@ -43,7 +43,7 @@ const EVChargingManagement = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const user = {
-    name: "Admin User",
+    name: "Quản Trị Viên",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=2080",
   }
 
@@ -64,45 +64,45 @@ const EVChargingManagement = () => {
 
   const stations = [
     {
-      name: "Downtown Hub",
-      location: "Main Street, City Center",
+      name: "Trạm Trung Tâm Thành Phố",
+      location: "Đường Chính, Trung Tâm Thành Phố",
       image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&q=80&w=2062",
-      description: "Our flagship charging station with 12 ultra-fast chargers in the heart of downtown.",
-      specs: { chargers: "12 ports", power: "350 kW", status: "Active" },
+      description: "Trạm sạc hàng đầu của chúng tôi với 12 bộ sạc siêu nhanh ngay tại trung tâm thành phố.",
+      specs: { chargers: "12 cổng", power: "350 kW", status: "Hoạt động" },
     },
     {
-      name: "Highway Rest Stop",
-      location: "Interstate 95, Mile 47",
+      name: "Trạm Nghỉ Cao Tốc",
+      location: "Cao Tốc 95, Cột Mốc 47",
       image: "https://images.unsplash.com/photo-1617704548623-340376564e68?auto=format&fit=crop&q=80&w=2062",
-      description: "Strategic location for long-distance travelers with 8 high-speed charging ports.",
-      specs: { chargers: "8 ports", power: "250 kW", status: "Active" },
+      description: "Vị trí chiến lược cho khách hàng di chuyển đường dài với 8 cổng sạc tốc độ cao.",
+      specs: { chargers: "8 cổng", power: "250 kW", status: "Hoạt động" },
     },
     {
-      name: "Shopping Mall",
-      location: "Westfield Plaza, Parking Level 2",
+      name: "Trung Tâm Thương Mại",
+      location: "Westfield Plaza, Tầng Đỗ Xe 2",
       image: "https://images.unsplash.com/photo-1621361365424-06f0e1eb5c49?auto=format&fit=crop&q=80&w=2062",
-      description: "Convenient charging while you shop, with 6 standard and fast chargers.",
-      specs: { chargers: "6 ports", power: "150 kW", status: "Active" },
+      description: "Sạc xe tiện lợi trong khi mua sắm, với 6 bộ sạc tiêu chuẩn và nhanh.",
+      specs: { chargers: "6 cổng", power: "150 kW", status: "Hoạt động" },
     },
   ]
 
   const testimonials = [
     {
       quote:
-        "The management system has transformed how we operate our charging network. Real-time monitoring and analytics have increased our efficiency by 40%.",
-      author: "Michael Chen, Network Manager",
+        "Hệ thống quản lý đã thay đổi hoàn toàn cách chúng tôi vận hành mạng lưới sạc. Giám sát thời gian thực và phân tích đã tăng hiệu quả của chúng tôi lên 40%.",
+      author: "Trần Minh Khoa, Quản Lý Mạng Lưới",
       rating: 5,
     },
     {
       quote:
-        "Outstanding platform! The intuitive dashboard makes it easy to track usage, manage maintenance, and optimize our charging station performance.",
-      author: "Sarah Johnson, Operations Director",
+        "Nền tảng xuất sắc! Bảng điều khiển trực quan giúp dễ dàng theo dõi mức sử dụng, quản lý bảo trì và tối ưu hóa hiệu suất trạm sạc.",
+      author: "Nguyễn Thu Hương, Giám Đốc Vận Hành",
       rating: 5,
     },
     {
       quote:
-        "Best investment we've made. The system pays for itself with improved uptime and better resource allocation across our 50+ stations.",
-      author: "David Martinez, Fleet Manager",
+        "Đầu tư tốt nhất mà chúng tôi từng thực hiện. Hệ thống tự hoàn vốn nhờ cải thiện thời gian hoạt động và phân bổ tài nguyên tốt hơn trên hơn 50 trạm của chúng tôi.",
+      author: "Lê Văn Đức, Quản Lý Đội Xe",
       rating: 5,
     },
   ]
@@ -166,20 +166,20 @@ const EVChargingManagement = () => {
       <header
         className={`fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 z-50 transition-all duration-300 ${isHeaderScrolled ? "bg-dark-bg/90 backdrop-blur-lg border-b border-border-color" : "bg-transparent border-transparent"}`}
       >
-        <div className="text-3xl font-bold tracking-widest cursor-pointer">EV CHARGE</div>
+        <div className="text-3xl font-bold tracking-widest cursor-pointer">SẠC XE ĐIỆN</div>
 
         <nav className="hidden md:flex gap-8 items-center">
           <a href="#dashboard" className="text-white hover:text-primary transition-colors">
-            Dashboard
+            Bảng Điều Khiển
           </a>
           <a href="#stations" className="text-white hover:text-primary transition-colors">
-            Stations
+            Trạm Sạc
           </a>
           <a href="#analytics" className="text-white hover:text-primary transition-colors">
-            Analytics
+            Phân Tích
           </a>
           <a href="#contact" className="text-white hover:text-primary transition-colors">
-            Contact
+            Liên Hệ
           </a>
         </nav>
 
@@ -195,7 +195,7 @@ const EVChargingManagement = () => {
                 <span className="hidden sm:inline font-semibold">{user.name}</span>
                 <img
                   src={user.avatar || "/placeholder.svg"}
-                  alt="User Avatar"
+                  alt="Ảnh Đại Diện"
                   className="w-10 h-10 rounded-full border-2 border-primary object-cover"
                 />
               </div>
@@ -206,20 +206,20 @@ const EVChargingManagement = () => {
                     href="#"
                     className="text-white flex items-center gap-3 px-4 py-2 text-sm text-text-color hover:bg-dark-bg transition-colors"
                   >
-                    <FiUser /> My Profile
+                    <FiUser /> Hồ Sơ Của Tôi
                   </a>
                   <a
                     href="#"
                     className="text-white flex items-center gap-3 px-4 py-2 text-sm text-text-color hover:bg-dark-bg transition-colors"
                   >
-                    <FiSettings /> Settings
+                    <FiSettings /> Cài Đặt
                   </a>
                   <div className="border-t border-border-color my-2"></div>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-dark-bg transition-colors"
                   >
-                    <FiLogOut /> Logout
+                    <FiLogOut /> Đăng Xuất
                   </button>
                 </div>
               )}
@@ -228,12 +228,12 @@ const EVChargingManagement = () => {
             <div className="text-white flex items-center gap-4">
               <a href="/login">
                 <button className="font-semibold px-5 py-2 rounded-full bg-transparent border border-border-color text-text-muted hover:border-primary hover:text-primary transition-all duration-300">
-                  Login
+                  Đăng Nhập
                 </button>
               </a>
               <a href="/register">
                 <button className="text-white font-semibold px-5 py-2 rounded-full bg-primary border-2 border-primary hover:bg-transparent hover:text-primary transition-all duration-300 transform hover:-translate-y-0.5">
-                  Register
+                  Đăng Ký
                 </button>
               </a>
             </div>
@@ -256,20 +256,19 @@ const EVChargingManagement = () => {
             className="text-5xl md:text-7xl font-bold mb-4 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.2s" }}
           >
-            Power the Future.
+            Nguồn Năng Lượng Tương Lai.
           </h1>
           <p
             className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-8 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.5s" }}
           >
-            Comprehensive EV charging station management. Monitor, analyze, and optimize your entire network from one
-            powerful platform.
+            Quản lý trạm sạc xe điện toàn diện. Giám sát, phân tích và tối ưu hóa toàn bộ mạng lưới của bạn từ một nền tảng mạnh mẽ.
           </p>
           <button
             className="bg-primary text-white font-semibold px-10 py-4 rounded-full hover:bg-white hover:text-primary hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.8s" }}
           >
-            View Dashboard
+            Xem Bảng Điều Khiển
           </button>
         </div>
         <div
@@ -283,23 +282,23 @@ const EVChargingManagement = () => {
       </section>
 
       <section id="dashboard" className={sectionClasses}>
-        <h2 className="text-4xl font-bold text-center mb-16 reveal">Why Choose Our Platform?</h2>
+        <h2 className="text-4xl font-bold text-center mb-16 reveal">Tại Sao Chọn Nền Tảng Của Chúng Tôi?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {[
             {
               icon: FiActivity,
-              title: "Real-Time Monitoring",
-              text: "Track station status, charging sessions, and energy consumption across your entire network in real-time.",
+              title: "Giám Sát Thời Gian Thực",
+              text: "Theo dõi trạng thái trạm, phiên sạc và mức tiêu thụ năng lượng trên toàn bộ mạng lưới của bạn theo thời gian thực.",
             },
             {
               icon: FiBarChart2,
-              title: "Advanced Analytics",
-              text: "Gain insights with comprehensive reports, usage patterns, and revenue analytics to optimize operations.",
+              title: "Phân Tích Nâng Cao",
+              text: "Có được cái nhìn sâu sắc với các báo cáo toàn diện, mẫu sử dụng và phân tích doanh thu để tối ưu hóa hoạt động.",
             },
             {
               icon: FiZap,
-              title: "Smart Alerts",
-              text: "Receive instant notifications for maintenance needs, outages, and performance issues to maximize uptime.",
+              title: "Cảnh Báo Thông Minh",
+              text: "Nhận thông báo ngay lập tức về nhu cầu bảo trì, sự cố và vấn đề hiệu suất để tối đa hóa thời gian hoạt động.",
             },
           ].map((feature, index) => (
             <div
@@ -318,7 +317,7 @@ const EVChargingManagement = () => {
       </section>
 
       <section id="stations" className={`${sectionClasses} bg-secondary-bg`}>
-        <h2 className="text-4xl font-bold text-center mb-16 reveal">Our Charging Network</h2>
+        <h2 className="text-4xl font-bold text-center mb-16 reveal">Mạng Lưới Sạc Của Chúng Tôi</h2>
         <div className="relative max-w-6xl mx-auto">
           <div className="overflow-hidden rounded-2xl">
             <div
@@ -348,21 +347,21 @@ const EVChargingManagement = () => {
                       <div className="text-center">
                         <FiBatteryCharging className="text-primary text-2xl mx-auto mb-1" />
                         <span className="font-bold text-lg">{station.specs.chargers}</span>
-                        <p className="text-sm text-text-muted">Chargers</p>
+                        <p className="text-sm text-text-muted">Bộ Sạc</p>
                       </div>
                       <div className="text-center">
                         <FiZap className="text-primary text-2xl mx-auto mb-1" />
                         <span className="font-bold text-lg">{station.specs.power}</span>
-                        <p className="text-sm text-text-muted">Max Power</p>
+                        <p className="text-sm text-text-muted">Công Suất Tối Đa</p>
                       </div>
                       <div className="text-center">
                         <FiActivity className="text-primary text-2xl mx-auto mb-1" />
                         <span className="font-bold text-lg">{station.specs.status}</span>
-                        <p className="text-sm text-text-muted">Status</p>
+                        <p className="text-sm text-text-muted">Trạng Thái</p>
                       </div>
                     </div>
                     <button className="bg-transparent text-primary font-semibold px-8 py-3 rounded-full border-2 border-primary hover:bg-primary hover:text-white transition-colors duration-300">
-                      View Details
+                      Xem Chi Tiết
                     </button>
                   </div>
                 </div>
@@ -386,7 +385,7 @@ const EVChargingManagement = () => {
 
       {/* --- Testimonials Section --- */}
       <section id="analytics" className={sectionClasses}>
-        <h2 className="text-4xl font-bold text-center mb-16 reveal">Trusted by Industry Leaders</h2>
+        <h2 className="text-4xl font-bold text-center mb-16 reveal">Được Tin Tưởng Bởi Các Nhà Lãnh Đạo Ngành</h2>
         <div className="relative max-w-3xl mx-auto h-72 reveal">
           <FaQuoteLeft className="absolute top-0 left-0 text-8xl text-border-color/50 -z-10" />
           {testimonials.map((testimonial, index) => (
@@ -427,15 +426,15 @@ const EVChargingManagement = () => {
           }}
         ></div>
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold mb-4 reveal">Ready to Optimize Your Network?</h2>
+          <h2 className="text-4xl font-bold mb-4 reveal">Sẵn Sàng Tối Ưu Hóa Mạng Lưới Của Bạn?</h2>
           <p className="text-xl text-text-muted mb-8 reveal" style={{ transitionDelay: "100ms" }}>
-            Start managing your EV charging stations more efficiently today with our comprehensive platform.
+            Bắt đầu quản lý trạm sạc xe điện của bạn hiệu quả hơn ngay hôm nay với nền tảng toàn diện của chúng tôi.
           </p>
           <button
             className="bg-primary text-white font-semibold px-10 py-4 rounded-full hover:bg-white hover:text-primary hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 reveal"
             style={{ transitionDelay: "200ms" }}
           >
-            Request a Demo
+            Yêu Cầu Demo
           </button>
         </div>
       </section>
@@ -443,56 +442,56 @@ const EVChargingManagement = () => {
       <footer id="contact" className="bg-dark-bg text-text-muted py-16 px-6 md:px-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <h3 className="text-2xl font-bold text-white mb-2">EV CHARGE</h3>
-            <p className="max-w-xs">Powering the future of electric mobility with intelligent charging solutions.</p>
+            <h3 className="text-2xl font-bold text-white mb-2">SẠC XE ĐIỆN</h3>
+            <p className="max-w-xs">Cung cấp năng lượng cho tương lai của di động điện với các giải pháp sạc thông minh.</p>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Platform</h4>
+            <h4 className="font-semibold text-white mb-4">Nền Tảng</h4>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Dashboard
+                  Bảng Điều Khiển
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Analytics
+                  Phân Tích
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Stations
+                  Trạm Sạc
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Reports
+                  Báo Cáo
                 </a>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
+            <h4 className="font-semibold text-white mb-4">Công Ty</h4>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  About Us
+                  Về Chúng Tôi
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Careers
+                  Tuyển Dụng
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-primary transition-colors">
-                  Partners
+                  Đối Tác
                 </a>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Follow Us</h4>
+            <h4 className="font-semibold text-white mb-4">Theo Dõi Chúng Tôi</h4>
             <div className="flex space-x-4">
               <a href="#" className="hover:text-primary transition-colors">
                 LinkedIn
@@ -507,7 +506,7 @@ const EVChargingManagement = () => {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border-color text-center text-sm">
-          <p>&copy; {new Date().getFullYear()} EV CHARGE Management System. All Rights Reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Hệ Thống Quản Lý Sạc Xe Điện. Tất Cả Các Quyền Được Bảo Lưu.</p>
         </div>
       </footer>
     </div>
