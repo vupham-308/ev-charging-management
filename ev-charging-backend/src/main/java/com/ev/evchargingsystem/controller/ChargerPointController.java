@@ -17,7 +17,7 @@ public class ChargerPointController {
     @Autowired
     ChargerPointService chargerPointService;
 
-    @PostMapping("/create/{stationId}")
+    @PostMapping("/ad/create/{stationId}")
     public ResponseEntity addChargerPoint(@Valid @RequestBody ChargerPointRequest chargerPointRequest, @PathVariable int stationId) {
         try {
             ChargerPoint point = chargerPointService.add(chargerPointRequest, stationId);
@@ -27,7 +27,7 @@ public class ChargerPointController {
         }
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/ad/delete")
     public ResponseEntity deleteChargerPoint(int chargerPointId) {
         try{
             boolean check = chargerPointService.delete(chargerPointId);
@@ -37,7 +37,7 @@ public class ChargerPointController {
         }
     }
 
-    @PutMapping("/update/{chargerPointId}")
+    @PutMapping("/ad/update/{chargerPointId}")
     public ResponseEntity updateChargerPoint(@Valid @RequestBody ChargerPointRequest p, @PathVariable int chargerPointId) {//id chargerPoint
         try {
             ChargerPoint update = chargerPointService.update(p, chargerPointId);
