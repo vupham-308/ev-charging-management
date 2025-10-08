@@ -2,6 +2,9 @@ package com.ev.evchargingsystem.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 import java.util.Date;
@@ -9,6 +12,9 @@ import java.util.Date;
 @Entity
 @Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED')")
 @Table(name="charging_sessions")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChargingSession {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

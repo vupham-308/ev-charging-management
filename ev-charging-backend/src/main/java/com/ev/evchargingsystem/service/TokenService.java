@@ -38,7 +38,7 @@ public class TokenService {
 
     public User extractToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSignInKey())
+                .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
