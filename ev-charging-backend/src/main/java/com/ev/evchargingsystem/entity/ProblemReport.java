@@ -15,8 +15,10 @@ public class ProblemReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NotEmpty
+    @Column(columnDefinition = "NVARCHAR(200)")
     private String title;
     @NotEmpty
+    @Column(columnDefinition = "NVARCHAR(3000)")
     private String description;
     private String status;
     @NotNull

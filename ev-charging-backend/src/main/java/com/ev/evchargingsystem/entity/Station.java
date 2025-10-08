@@ -3,13 +3,22 @@ package com.ev.evchargingsystem.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Check;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "stations")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Check(constraints = "status IN ('ACTIVE','INACTIVE')")
 public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +36,6 @@ public class Station {
     @Email
     @Column(unique = true)
     private String email;
+    @NotNull
+    private String status;
 }
