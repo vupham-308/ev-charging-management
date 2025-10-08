@@ -3,6 +3,9 @@ package com.ev.evchargingsystem.entity;
 import jakarta.persistence.*;
 import jakarta.validation.Constraint;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 import java.util.Date;
@@ -10,6 +13,9 @@ import java.util.Date;
 @Entity
 @Check(constraints = "payment_method IN ('BALANCE', 'VNPAY') AND payment_type IN ('TOPUP', 'WITHDRAW') AND status IN ('PENDING', 'COMPLETED', 'FAILED')")
 @Table(name = "transactions")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Transaction {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

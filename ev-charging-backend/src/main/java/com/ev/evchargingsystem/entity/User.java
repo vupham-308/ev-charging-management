@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -23,14 +22,14 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
-    @NotEmpty
+    @NotEmpty(message = "Password cannot be empty!")
     private String password;
-    @NotEmpty(message = "Fullname not empty!")
+    @NotEmpty(message = "Fullname cannot be empty!")
     private String fullName;
     @Email
     @Column(unique = true)
     private String email;
-    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$")
+    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Phone is invalid!")
     @Column(unique = true)
     private String phone;
     @Column(length = 10)
@@ -38,7 +37,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(this.role));
+        return null;
     }
 
     @Override

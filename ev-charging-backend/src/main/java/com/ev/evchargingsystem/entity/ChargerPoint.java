@@ -18,19 +18,19 @@ public class ChargerPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull
+    @NotEmpty (message = "Name cannot be empty!")
     @Column(columnDefinition = "NVARCHAR(30)")
     private String name;
-    @NotEmpty
+    @NotNull
     private int capacity;
-    @NotEmpty
-    private String portType;
-    @NotEmpty
-    private float cost;
     @NotEmpty
     private String status;
 
     @ManyToOne
     @JoinColumn(name="station_id", referencedColumnName = "id", nullable=false)
     private Station station;
+
+    @ManyToOne
+    @JoinColumn(name="port_type", referencedColumnName = "port_type", nullable = false)
+    private ChargerCost chargerCost;
 }
