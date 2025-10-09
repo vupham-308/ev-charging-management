@@ -61,9 +61,10 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/api/account/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/stations").hasAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/ad/stations").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/api/ad/stations/**").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/ad/stations/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )
