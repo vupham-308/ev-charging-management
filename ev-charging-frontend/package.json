@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.24.0",
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "antd": "^5.27.4",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",

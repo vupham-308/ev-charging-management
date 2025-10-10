@@ -4,18 +4,27 @@ import { ThunderboltOutlined, UserOutlined, LockOutlined, MailOutlined } from "@
 import AuthContext from "../contexts/AuthContext";
 import "./LoginForm.css";
 import AppFooter from "../pages/AppFooter";
+import { useNavigate } from "react-router-dom"; // Import useNavigate để chuyển hướng
+
+
 const { Title, Text, Link } = Typography;
 
 const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const { doLogin } = useContext(AuthContext);
+  const navigate = useNavigate(); // Khởi tạo useNavigate để chuyển hướng
 
   const onFinish = async (values) => {
     setLoading(true);
     const result = await doLogin(values.email, values.password);
-    if (!result.success) {
+
+    if (result.success) {
+      message.success("Đăng nhập thành công!");
+      navigate("/dashboard"); // Chuyển hướng người dùng đến Dashboard khi đăng nhập thành công
+    } else {
       message.error(result.message || "Đăng nhập thất bại. Vui lòng thử lại!");
     }
+
     setLoading(false);
   };
 

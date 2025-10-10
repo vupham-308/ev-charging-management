@@ -1,0 +1,9 @@
+.layout {
+    background-color: #f5f6fa;
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+}
+
+.content {
+    padding: 20px 40px;
+}

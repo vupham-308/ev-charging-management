@@ -13,15 +13,15 @@ export const AuthProvider = ({ children }) => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
       // Giả sử bạn có một API để xác thực token và lấy thông tin người dùng
-      // fetchUserInfo(savedToken).then(userInfo => {
-      //   setUser(userInfo);
-      //   setToken(savedToken);
-      // });
+      fetchUserInfo(savedToken).then(userInfo => {
+        setUser(userInfo);
+        setToken(savedToken);
+      });
       // Ở đây ta giả lập: nếu có token là user đã đăng nhập
-      setUser({ email: localStorage.getItem("userEmail") });
-      setToken(savedToken);
+      // setUser({ email: localStorage.getItem("userEmail") });
+      // setToken(savedToken);
     }
-    setIsLoading(false); 
+    setIsLoading(false);
   }, []);
 
   const doLogin = async (email, password) => {
@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (email === "admin@test.com" && password === "123456") {
+      if (email === "admin@demo.com" && password === "123456") {
         const fakeToken = "fake-jwt-token-" + Math.random();
         const userInfo = { email: email };
 
@@ -50,45 +50,45 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-// const doLogin = async (email, password) => {
-//     try {
-//       const response = await fetch("http://localhost:8080/api/account/login", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ email, password }),
-//       });
+  // const doLogin = async (email, password) => {
+  //     try {
+  //       const response = await fetch("http://localhost:8080/api/account/login", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ email, password }),
+  //       });
 
-//       if (response.ok) {
-//         const data = await response.json(); 
+  //       if (response.ok) {
+  //         const data = await response.json(); 
 
-//         const receivedToken = data.token; 
-//         const userInfo = { email: data.email };
+  //         const receivedToken = data.token; 
+  //         const userInfo = { email: data.email };
 
-//         if (!receivedToken) {
-//           throw new Error("API không trả về token!");
-//         }
+  //         if (!receivedToken) {
+  //           throw new Error("API không trả về token!");
+  //         }
 
-//         localStorage.setItem("token", receivedToken);
-//         localStorage.setItem("userEmail", userInfo.email);
+  //         localStorage.setItem("token", receivedToken);
+  //         localStorage.setItem("userEmail", userInfo.email);
 
-//         setToken(receivedToken);
-//         setUser(userInfo);
+  //         setToken(receivedToken);
+  //         setUser(userInfo);
 
-//         message.success("Đăng nhập thành công!");
-//         navigate("/dashboard");
-//         return { success: true };
+  //         message.success("Đăng nhập thành công!");
+  //         navigate("/dashboard");
+  //         return { success: true };
 
-//       } else {
-//         const errorData = await response.json();
-//         throw new Error(errorData.message || "Email hoặc mật khẩu không đúng!");
-//       }
-//     } catch (error) {
-//       console.error("Lỗi đăng nhập:", error);
-//       return { success: false, message: error.message };
-//     }
-//   };
+  //       } else {
+  //         const errorData = await response.json();
+  //         throw new Error(errorData.message || "Email hoặc mật khẩu không đúng!");
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi đăng nhập:", error);
+  //       return { success: false, message: error.message };
+  //     }
+  //   };
 
   // Hàm đăng xuất
   const doLogout = () => {
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const contextValue = {
-    isLoggedIn: !!token, 
+    isLoggedIn: !!token,
     token,
     user,
     isLoading,

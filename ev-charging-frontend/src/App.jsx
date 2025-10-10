@@ -1,34 +1,14 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import LoginForm from "./pages/LoginForm";
 import ProtectedRoute from "./pages/ProtectedRoute";
+import MainLayout from "./pages/MainLayout";
+import Dashboard from "./pages/admin/Dashboard"; // Import Dashboard từ file ./pages/Dashboard
+import ChargingStations from "./pages/admin/ChargingStations"; ///
+import User from "./pages/admin/Users"
 import AuthContext from "./contexts/AuthContext";
 import { Button, Layout, Space } from "antd";
-import MainLayout from "./pages/MainLayout";
-
-const { Header, Content } = Layout;
-
-const Dashboard = () => {
-  const { user, doLogout } = useContext(AuthContext);
-  return (
-    <Layout>
-      <Header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ color: 'white' }}>Dashboard</h2>
-        <Space>
-          <span style={{ color: 'white' }}>Chào, {user?.email}</span>
-          <Button type="primary" danger onClick={doLogout}>
-            Đăng xuất
-          </Button>
-        </Space>
-      </Header>
-      <Content style={{ padding: '24px' }}>
-        <h1>Chào mừng bạn đến trang quản trị!</h1>
-        <p>Đây là nội dung chỉ người đã đăng nhập mới thấy được.</p>
-        <Link to="/">Về trang chủ</Link>
-      </Content>
-    </Layout>
-  );
-};
+import LayoutADMIN from "./pages/admin/layoutADMIN";
 
 // Trang chủ (công khai)
 const Home = () => (
@@ -45,12 +25,15 @@ function MainApp() {
       {/* Route cho trang Login, không dùng layout chung */}
       <Route path="/login" element={<LoginForm />} />
 
-      <Route element={<MainLayout />}>
+      <Route element={<LayoutADMIN />}>
         <Route path="/" element={<Home />} />
 
+        {/* Bảo vệ route Dashboard */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/stations" element={<ChargingStations />} />
+          <Route path="/users" element={<User />} />
+
         </Route>
       </Route>
     </Routes>

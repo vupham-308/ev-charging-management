@@ -1,0 +1,33 @@
+.navbar-tabs {
+    display: flex;
+    background: #f2f3f5;
+    padding: 6px 40px;
+    justify-content: center;
+    /* căn giữa các tab */
+
+    border-bottom: 1px solid #ddd;
+    gap: 8px;
+}
+
+.tab {
+    background: none;
+    border: none;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: #555;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.tab:hover {
+    background: #e8e8e8;
+}
+
+.tab.active {
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.05);
+}
