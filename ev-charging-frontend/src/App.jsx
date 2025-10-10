@@ -11,6 +11,10 @@ import RegisterPage from "./pages/register";
 import EbikeHomePage from "./pages/home";
 import UserHomePage from "./pages/home";
 import EVChargeHomePage from "./pages/home";
+import AdminPage from "./pages/admin";
+import StaffDashboard from "./pages/staff";
+import AdminDashboard from "./pages/admin";
+import DriverDashboard from "./pages/driver";
 
 // 1. Component
 // là 1 cái function
@@ -40,6 +44,19 @@ function App() {
       path: "/login",
       element: <LoginPage />,
     },
+    {
+      path: "/admin",
+      element: <AdminDashboard />,
+    },
+    {
+      path: "/staff",
+      element: <StaffDashboard />,
+    },
+    {
+      path: "/driver",
+      element: <DriverDashboard />,
+    },
+
     {
       path: "/register",
       element: <RegisterPage />,

@@ -38,14 +38,23 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       const response = await api.post("/login", values);
-      toast.success("Successfully create new account!");
-      console.log(response);
-      const { token } = response.data;
+      
+      const { token, role } = response.data;
+      toast.success("Successfully login!")
       localStorage.setItem("token", token);
 
       // lưu state
       dispatch(login(response.data));
+     if (role === "Admin") {
+      navigate("/admin-dashboard");
+    } else if (role === "Staff") {
+      navigate("/staff-dashboard");
+    } else if (role === "Driver") {
+      navigate("/driver-dashboard");
+    } else {
+      // fallback nếu không xác định được role
       navigate("/");
+    }
     } catch (e) {
       message.error("Login failed. Please try again.");
     } finally {
