@@ -15,6 +15,7 @@ import AdminPage from "./pages/admin";
 import StaffDashboard from "./pages/staff";
 import AdminDashboard from "./pages/admin";
 import DriverDashboard from "./pages/driver";
+import ProfilePage from "./pages/profile";
 
 // 1. Component
 // là 1 cái function
@@ -56,7 +57,10 @@ function App() {
       path: "/driver",
       element: <DriverDashboard />,
     },
-
+    {
+      path: "/profile",
+      element: <ProfilePage />,
+    },
     {
       path: "/register",
       element: <RegisterPage />,

@@ -202,7 +202,7 @@ const EVChargeHomePage = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-[#111] rounded-lg shadow-lg border border-gray-700 py-2">
                   <a
-                    href="#"
+                    href="/profile"
                     className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
                   >
                     <FiUser /> Hồ sơ của tôi
@@ -258,15 +258,17 @@ const EVChargeHomePage = () => {
             className="text-5xl md:text-7xl font-bold mb-4 opacity-0 animate-fade-in-up text-white"
             style={{ animationDelay: "0.2s" }}
           >
-            Sạc Nhanh, Đi Xa.
-          </h1>
+            Sạc Tối Ưu, Vạn Dặm An Tâm.
+          </h1>{" "}
+          {/* CHỈNH CHU: Ngắn gọn, nhấn mạnh tối ưu và an tâm */}
           <p
             className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-8 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.5s" }}
           >
-            Mạng lưới trạm sạc xe điện hàng đầu Việt Nam. Tận hưởng hành trình
-            xanh không giới hạn.
-          </p>
+            Hệ thống trạm sạc thông minh toàn diện, mang đến trải nghiệm sạc xe
+            điện đẳng cấp và tiện lợi.
+          </p>{" "}
+          {/* CHỈNH CHU: Tập trung vào hệ thống thông minh và trải nghiệm đẳng cấp */}
           <button
             className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-white hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 opacity-0 animate-fade-in-up"
             style={{ animationDelay: "0.8s" }}
@@ -276,8 +278,9 @@ const EVChargeHomePage = () => {
                 .scrollIntoView({ behavior: "smooth" })
             }
           >
-            Tìm Trạm Ngay
-          </button>
+            Tìm Trạm Gần Nhất
+          </button>{" "}
+          {/* CHỈNH CHU: "Gần Nhất" cụ thể hơn */}
         </div>
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 animate-fade-in-up"
@@ -290,27 +293,28 @@ const EVChargeHomePage = () => {
       </section>
 
       {/* --- Why Choose Us Section (formerly "Why VOLT?") --- */}
-      <section id="PhienSac" className={sectionClasses}>
+      <section className={sectionClasses}>
         <h2 className="text-4xl font-bold text-center mb-16 reveal">
-          Tại Sao Chọn EV Charge?
-        </h2>
+          Vì Sao EV Charge Là Lựa Chọn Hàng Đầu?
+        </h2>{" "}
+        {/* CHỈNH CHU: Câu hỏi hấp dẫn hơn */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {[
             {
               icon: FiMapPin,
               title: "Mạng Lưới Rộng Khắp",
-              text: "Hàng trăm trạm sạc trên toàn quốc, dễ dàng tìm kiếm qua ứng dụng của chúng tôi.",
-            },
+              text: "Dễ dàng tìm kiếm và tiếp cận hàng trăm trạm sạc trên khắp các tỉnh thành Việt Nam.",
+            }, // CHỈNH CHU: Nhấn mạnh "dễ dàng" và "khắp các tỉnh thành"
             {
               icon: FiBatteryCharging,
               title: "Tốc Độ Sạc Vượt Trội",
-              text: "Cung cấp các loại sạc DC siêu nhanh và AC tiện lợi, phù hợp mọi nhu cầu.",
-            },
+              text: "Trải nghiệm công nghệ sạc nhanh DC và sạc AC tiện lợi, phù hợp cho mọi hành trình.",
+            }, // CHỈNH CHU: Nhấn mạnh "trải nghiệm" và "mọi hành trình"
             {
               icon: FiCreditCard,
-              title: "Thanh Toán Đơn Giản",
-              text: "Thanh toán linh hoạt qua ứng dụng, thẻ ngân hàng hoặc ví điện tử.",
-            },
+              title: "Thanh Toán Nhanh Gọn",
+              text: "Quy trình thanh toán đơn giản, linh hoạt qua ứng dụng, thẻ ngân hàng hoặc ví điện tử.",
+            }, // CHỈNH CHU: Nhấn mạnh "quy trình" và "nhanh gọn"
           ].map((feature, index) => (
             <div
               key={index}
@@ -328,10 +332,11 @@ const EVChargeHomePage = () => {
       </section>
 
       {/* --- Charging Features/Plans Section (formerly "Meet Your Next Ride") --- */}
-      <section id="bandotram" className={`${sectionClasses} bg-secondary-bg`}>
+      <section className={`${sectionClasses} bg-secondary-bg`}>
         <h2 className="text-4xl font-bold text-center mb-16 reveal">
-          Các Tính Năng Sạc Nổi Bật
-        </h2>
+          Khám Phá Các Giải Pháp Sạc Tiên Tiến
+        </h2>{" "}
+        {/* CHỈNH CHU: Tiêu đề chuyên nghiệp hơn */}
         <div className="relative max-w-6xl mx-auto">
           <div className="overflow-hidden rounded-2xl border border-border-color">
             <div
@@ -351,7 +356,7 @@ const EVChargeHomePage = () => {
                     />
                   </div>
                   <div className="p-8 md:p-12 flex flex-col justify-center">
-                    <h3 className="text-4xl font-bold mb-4 text-white">
+                    <h3 className="text-4xl font-bold mb-4 text-black">
                       {feature.name}
                     </h3>
                     <p className="text-text-muted mb-6 h-20">
@@ -360,14 +365,14 @@ const EVChargeHomePage = () => {
                     <div className="flex gap-8 mb-8 border-t border-b border-border-color py-4">
                       <div className="text-center">
                         <FiZap className="text-primary text-2xl mx-auto mb-1" />
-                        <span className="font-bold text-lg text-white">
+                        <span className="font-bold text-lg text-black">
                           {feature.specs.capacity}
                         </span>
                         <p className="text-sm text-text-muted">Công suất</p>
                       </div>
                       <div className="text-center">
                         <FiRefreshCw className="text-primary text-2xl mx-auto mb-1" />
-                        <span className="font-bold text-lg text-white">
+                        <span className="font-bold text-lg text-black">
                           {feature.specs.connectors}
                         </span>
                         <p className="text-sm text-text-muted">Đầu nối</p>
@@ -425,20 +430,20 @@ const EVChargeHomePage = () => {
               <p className="text-xl md:text-2xl italic text-text-muted mb-6">
                 "{testimonial.quote}"
               </p>
-              <p className="font-semibold text-lg text-white">
+              <p className="font-semibold text-lg text-black">
                 - {testimonial.author}
               </p>
             </div>
           ))}
           <button
             onClick={prevTestimonial}
-            className="absolute top-1/2 -translate-y-1/2 -left-12 text-2xl p-2 rounded-full hover:bg-secondary-bg transition-colors text-white"
+            className="absolute top-1/2 -translate-y-1/2 -left-12 text-2xl p-2 rounded-full hover:bg-secondary-bg transition-colors text-black"
           >
             <FiChevronLeft />
           </button>
           <button
             onClick={nextTestimonial}
-            className="absolute top-1/2 -translate-y-1/2 -right-12 text-2xl p-2 rounded-full hover:bg-secondary-bg transition-colors text-white"
+            className="absolute top-1/2 -translate-y-1/2 -right-12 text-2xl p-2 rounded-full hover:bg-secondary-bg transition-colors text-black"
           >
             <FiChevronRight />
           </button>
@@ -448,32 +453,38 @@ const EVChargeHomePage = () => {
       {/* --- Call to Action Section (Ưu đãi) --- */}
       <section
         id="uudai"
-        className="relative py-28 px-6 text-center bg-secondary-bg"
+        className="relative py-28 md:py-36 px-6 text-center overflow-hidden"
       >
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1511994294314-3c662760f3d5?auto=format&fit=crop&q=80&w=2670')",
+              "url('https://ecoswitch.vn/wp-content/uploads/2023_sac.jpg')",
           }}
-        ></div>
+        >
+          {/* Add a stronger gradient overlay for better text contrast */}
+          <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent"></div>
+        </div>
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold mb-4 reveal text-white">
-            Nhận Ngay Ưu Đãi Độc Quyền!
-          </h2>
+          <h2 className="text-4xl font-bold text-center mb-16 reveal">
+            Ưu Đãi Đặc Biệt Chờ Đón Bạn!
+          </h2>{" "}
+          {/* CHỈNH CHU: Ngắn gọn và mời gọi hơn */}
           <p
-            className="text-xl text-text-muted mb-8 reveal"
-            style={{ transitionDelay: "100ms" }}
+            className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-10 reveal"
+            style={{ transitionDelay: "150ms" }}
           >
-            Đăng ký thành viên EV Charge hôm nay để nhận các chương trình khuyến
-            mãi hấp dẫn.
-          </p>
+            Tham gia cộng đồng EV Charge ngay hôm nay để không bỏ lỡ những
+            chương trình khuyến mãi hấp dẫn và quyền lợi thành viên độc quyền.
+          </p>{" "}
+          {/* CHỈNH CHU: Thêm "cộng đồng" và "quyền lợi độc quyền" */}
           <button
-            className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-white hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 reveal"
-            style={{ transitionDelay: "200ms" }}
+            className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-black hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-xl shadow-primary/40 reveal"
+            style={{ transitionDelay: "300ms" }}
           >
-            Đăng Ký Thành Viên
-          </button>
+            Đăng Ký Ngay Để Nhận Ưu Đãi
+          </button>{" "}
+          {/* CHỈNH CHU: Cụ thể hóa hành động và lợi ích */}
         </div>
       </section>
 
