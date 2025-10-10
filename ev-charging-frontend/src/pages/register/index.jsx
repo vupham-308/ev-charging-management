@@ -37,7 +37,7 @@ const RegisterPage = () => {
   const onFinish = async (values) => {
     setIsLoading(true);
     try {
-      const response = await api.post("/register", values);
+      const response = await api.post("account/register", values);
       toast.success("Successfully create new account!");
       navigate("/login");
       console.log(response);
@@ -98,40 +98,6 @@ const RegisterPage = () => {
                     placeholder="Full name"
                     prefix={<UserOutlined />}
                     allowClear
-                  />
-                </Form.Item>
-              </Col>
-
-              {/* Gender */}
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Gender"
-                  name="gender"
-                  rules={[
-                    { required: true, message: "Please select a gender" },
-                  ]}
-                >
-                  <Select
-                    placeholder="Select gender"
-                    options={[
-                      {
-                        label: (
-                          <span>
-                            <ManOutlined /> Male
-                          </span>
-                        ),
-                        value: "MALE",
-                      },
-                      {
-                        label: (
-                          <span>
-                            <WomanOutlined /> Female
-                          </span>
-                        ),
-                        value: "FEMALE",
-                      },
-                      { label: "Other", value: "OTHER" },
-                    ]}
                   />
                 </Form.Item>
               </Col>

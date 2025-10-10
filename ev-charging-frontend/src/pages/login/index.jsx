@@ -37,15 +37,21 @@ const LoginPage = () => {
   const onFinish = async (values) => {
     setIsLoading(true);
     try {
-      const response = await api.post("/login", values);
-      toast.success("Successfully create new account!");
-      console.log(response);
-      const { token } = response.data;
+      const response = await api.post("account/login", values);
+
+      const { token, role } = response.data;
+      toast.success("Successfully login!");
       localStorage.setItem("token", token);
 
       // lưu state
       dispatch(login(response.data));
-      navigate("/");
+      if (role === "ADMIN") {
+        navigate("/admin");
+      } else if (role === "STAFF") {
+        navigate("/staff");
+      } else {
+        navigate("/");
+      }
     } catch (e) {
       message.error("Login failed. Please try again.");
     } finally {
