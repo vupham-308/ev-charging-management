@@ -45,14 +45,11 @@ const LoginPage = () => {
 
       // lưu state
       dispatch(login(response.data));
-      if (role === "Admin") {
-        navigate("/admin-dashboard");
-      } else if (role === "Staff") {
-        navigate("/staff-dashboard");
-      } else if (role === "Driver") {
-        navigate("/driver-dashboard");
+      if (role === "ADMIN") {
+        navigate("/admin");
+      } else if (role === "STAFF") {
+        navigate("/staff");
       } else {
-        // fallback nếu không xác định được role
         navigate("/");
       }
     } catch (e) {
