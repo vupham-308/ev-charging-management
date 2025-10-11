@@ -1,0 +1,134 @@
+/* Toàn bộ khung chứa */
+.charging-rates-container {
+    background-color: #f9fafb;
+    border-radius: 1rem;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.charging-rates-container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+/* Khung card chính */
+.rate-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+.rate-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* Bên trái: icon + thông tin */
+.rate-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rate-icon {
+    color: #f97316;
+    font-size: 28px;
+}
+
+.rate-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Hàng đầu: 7kW + AC */
+.rate-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rate-header span:first-child {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.rate-type {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* Hàng thứ 2: giá */
+.rate-price {
+    color: #16a34a;
+    font-weight: 700;
+    margin-top: 4px;
+    font-size: 20px;
+}
+
+/* Input sửa giá */
+.rate-edit input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 8px;
+    width: 90px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.rate-edit input:focus {
+    border-color: #15161f;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* Nút chỉnh sửa, lưu, hủy */
+.rate-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+    /* đẩy sát phải */
+}
+
+.rate-actions button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-edit,
+.btn-cancel {
+    border: 1px solid #d1d5db;
+    background-color: #fff;
+    color: #374151;
+    padding: 6px 12px;
+}
+
+.btn-edit:hover,
+.btn-cancel:hover {
+    background-color: #f9fafb;
+}
+
+.btn-save {
+    background-color: #312e81;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+}
+
+.btn-save:hover {
+    background-color: #4338ca;
+}

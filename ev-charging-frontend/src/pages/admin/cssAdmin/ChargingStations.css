@@ -36,13 +36,18 @@
 }
 
 /* Input tìm kiếm */
-.search-input {
+.search-inputt {
     width: 100%;
+    /* chiếm hết chiều ngang container cha */
+    max-width: 1500px;
+    /* giới hạn chiều rộng tối đa, bạn có thể điều chỉnh */
     padding: 12px 16px;
     border-radius: 8px;
     border: 1px solid #ddd;
     margin-bottom: 24px;
     font-size: 15px;
+    box-sizing: border-box;
+    /* để padding không làm rộng vượt */
 }
 
 /* Danh sách trạm */

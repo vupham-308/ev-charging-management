@@ -4,7 +4,7 @@ import "./cssAdmin/navbarAdmin.css";
 
 const Navbar = () => {
     const tabs = [
-        { name: "Tổng quan", path: "/" },
+        { name: "Tổng quan", path: "/dashboard" },
         { name: "Trạm sạc", path: "/stations" },
         { name: "Người dùng", path: "/users" },
         { name: "Quản lý sự cố", path: "/incidents" },

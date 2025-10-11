@@ -14,7 +14,14 @@ const Header = () => {
             </div>
             <div className="header-right">
                 <button className="btn">Đổi mật khẩu</button>
-                <button className="btn logout">Đăng xuất</button>
+                <button
+                    className="btn logout"
+                    onClick={() => {
+                        window.location.href = "/login";
+                    }}
+                >
+                    Đăng xuất
+                </button>
             </div>
         </header>
     );

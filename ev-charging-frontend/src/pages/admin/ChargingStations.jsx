@@ -57,7 +57,7 @@ const ChargingStations = () => {
             </div>
 
             <input
-                className="search-input"
+                className="search-inputt"
                 type="text"
                 placeholder="🔍 Tìm kiếm trạm sạc theo tên, địa chỉ hoặc mã..."
             />

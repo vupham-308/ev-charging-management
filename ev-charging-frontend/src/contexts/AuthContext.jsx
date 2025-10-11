@@ -8,18 +8,29 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+//test API
+  // useEffect(() => {
+  //   const savedToken = localStorage.getItem("token");
+  //   if (savedToken) {
+  //     // Giả sử bạn có một API để xác thực token và lấy thông tin người dùng
+  //     fetchUserInfo(savedToken).then(userInfo => {
+  //       setUser(userInfo);
+  //       setToken(savedToken);
+  //     });
+  //     // Ở đây ta giả lập: nếu có token là user đã đăng nhập
+  //     // setUser({ email: localStorage.getItem("userEmail") });
+  //     // setToken(savedToken);
+  //   }
+  //   setIsLoading(false);
+  // }, []);
 
+  //test chưa có API
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
-      // Giả sử bạn có một API để xác thực token và lấy thông tin người dùng
-      fetchUserInfo(savedToken).then(userInfo => {
-        setUser(userInfo);
-        setToken(savedToken);
-      });
-      // Ở đây ta giả lập: nếu có token là user đã đăng nhập
-      // setUser({ email: localStorage.getItem("userEmail") });
-      // setToken(savedToken);
+      // Giả lập: nếu có token, coi như đã đăng nhập
+      setUser({ email: localStorage.getItem("userEmail") });
+      setToken(savedToken);
     }
     setIsLoading(false);
   }, []);

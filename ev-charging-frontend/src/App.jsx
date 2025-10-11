@@ -5,7 +5,9 @@ import ProtectedRoute from "./pages/ProtectedRoute";
 import MainLayout from "./pages/MainLayout";
 import Dashboard from "./pages/admin/Dashboard"; // Import Dashboard từ file ./pages/Dashboard
 import ChargingStations from "./pages/admin/ChargingStations"; ///
-import User from "./pages/admin/Users"
+import User from "./pages/admin/Users";//
+import IncidentManagement from "./pages/admin/IncidentManagement";//
+import ChargingRates from "./pages/admin/ChargingRates"
 import AuthContext from "./contexts/AuthContext";
 import { Button, Layout, Space } from "antd";
 import LayoutADMIN from "./pages/admin/layoutADMIN";
@@ -33,7 +35,8 @@ function MainApp() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/stations" element={<ChargingStations />} />
           <Route path="/users" element={<User />} />
-
+          <Route path="/incidents" element={<IncidentManagement />} />
+          <Route path="/settings" element={<ChargingRates />} />
         </Route>
       </Route>
     </Routes>
