@@ -46,7 +46,7 @@ public class AuthenticationService implements UserDetailsService {
         //xác thực người dùng
         Authentication authentication;
         authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
+                loginRequest.getEmail(),
                 loginRequest.getPassword()
         ));
         User user= (User) authentication.getPrincipal();
