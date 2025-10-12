@@ -12,4 +12,6 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
 
     List<ChargerPoint> findChargerPointsByStationId(int stationId);
 
+    @Query("SELECT DISTINCT c.chargerCost.portType FROM ChargerPoint c WHERE c.station.id = :stationID")
+    List<String> findPortTypesByStationID(@Param("stationID") int stationID);
 }

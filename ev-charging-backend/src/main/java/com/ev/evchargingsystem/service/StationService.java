@@ -1,10 +1,16 @@
 package com.ev.evchargingsystem.service;
 
+import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.response.StationResponse;
+import com.ev.evchargingsystem.repository.ChargerPointRepository;
+import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -12,6 +18,10 @@ public class StationService {
 
     @Autowired
     private StationRepository stationRepository;
+    @Autowired
+    private ChargerPointRepository chargerPointRepository;
+    @Autowired
+    private ReviewStationRepository reviewStationRepository;
 
     public Station addStation(Station station) {
         return stationRepository.save(station);
@@ -47,5 +57,48 @@ public class StationService {
             return true;
         }
         return false;
+    }
+
+    //lấy danh sách Station đang có theo format
+    public List<StationResponse> getAllStations() {
+        List<StationResponse> stationResponseList = new ArrayList<>();
+        List<Station> stations = stationRepository.findAll();
+        for(Station station : stations) {
+            StationResponse rp = new StationResponse();
+            rp.setName(station.getName());
+            rp.setAddress(station.getAddress());
+            rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
+            rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
+            rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+            stationResponseList.add(rp);
+        }
+        return stationResponseList;
+    }
+
+    //lấy Station đang có theo format theo id
+    public StationResponse getStation(int stationId) {
+        Station station = stationRepository.findStationsById(stationId);
+        StationResponse rp = new StationResponse();
+        rp.setName(station.getName());
+        rp.setAddress(station.getAddress());
+        rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
+        rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
+        rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+        return rp;
+    }
+
+    public int getPointChargerTotalByStation(int stationID){
+        return chargerPointRepository.findChargerPointsByStationId(stationID).size();
+    }
+
+    public int getPointChargerAvailableByStation(int stationID){
+        int count=0;
+        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID);
+        for(ChargerPoint x: list){
+            if(x.getStatus().equals("AVAILABLE")){
+                count++;
+            }
+        }
+        return count;
     }
 }

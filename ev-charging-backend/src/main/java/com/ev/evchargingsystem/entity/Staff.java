@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name="staffs")
 @Data
@@ -24,4 +26,5 @@ public class Staff {
     @ManyToOne
     @JoinColumn(name="station_id", referencedColumnName = "id")
     private Station station;
+
 }

@@ -31,10 +31,6 @@ public class Transaction {
     @NotNull
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
-    private User user;
-
     @OneToOne
     @JoinColumn(name="reservation_id", referencedColumnName = "id",nullable = true)
     private Reservation reservation;

@@ -46,7 +46,7 @@ public class SecurityConfig {
     }
 
     @Autowired
-    private Filter filter;
+    private JwtFilter jwtFilter;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -60,16 +60,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/account/**").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/ad/stations").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/api/ad/stations/**").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/ad/stations/**").hasAuthority("ADMIN")
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
