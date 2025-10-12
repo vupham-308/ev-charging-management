@@ -26,6 +26,7 @@ public class User implements UserDetails {
     @NotEmpty(message = "Password cannot be empty!")
     private String password;
     @NotEmpty(message = "Fullname cannot be empty!")
+    @Column(columnDefinition = "NVARCHAR(100)")
     private String fullName;
     @Email
     @Column(unique = true)

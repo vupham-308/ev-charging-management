@@ -93,6 +93,6 @@ public class ChargerPointService {
     }
 
     public ChargerPoint get(int id){
-        return chargerPointRepository.getById(id);
+        return chargerPointRepository.findChargerPointById(id);
     }
 }

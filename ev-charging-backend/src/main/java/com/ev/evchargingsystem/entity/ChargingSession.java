@@ -28,7 +28,7 @@ public class ChargingSession {
     @NotNull
     private String status;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="charger_point_id", referencedColumnName = "id")
     private ChargerPoint chargerPoint;
 
@@ -36,7 +36,7 @@ public class ChargingSession {
     @JoinColumn(name="reservation_id", referencedColumnName = "id",nullable = true)
     private Reservation reservation;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="car_id", referencedColumnName = "id")
     private Car car;
 }

@@ -8,7 +8,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -17,44 +20,50 @@ public class ChargerPointController {
     @Autowired
     ChargerPointService chargerPointService;
 
-    @PostMapping("/ad/create/{stationId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/admin/create/{stationId}")
     public ResponseEntity addChargerPoint(@Valid @RequestBody ChargerPointRequest chargerPointRequest, @PathVariable int stationId) {
         try {
             ChargerPoint point = chargerPointService.add(chargerPointRequest, stationId);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Created!");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Đã tạo!");
         }catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/ad/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/admin/delete")
     public ResponseEntity deleteChargerPoint(int chargerPointId) {
         try{
             boolean check = chargerPointService.delete(chargerPointId);
-            return ResponseEntity.ok("Delete successfully!");
+            return ResponseEntity.ok("Xóa thành công!");
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @PutMapping("/ad/update/{chargerPointId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/admin/update/{chargerPointId}")
     public ResponseEntity updateChargerPoint(@Valid @RequestBody ChargerPointRequest p, @PathVariable int chargerPointId) {//id chargerPoint
         try {
             ChargerPoint update = chargerPointService.update(p, chargerPointId);
-            return ResponseEntity.ok("Updated!");
+            return ResponseEntity.ok("Đã cập nhật!");
         }catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity getAllChargerPoint(int station) {//id station
-        chargerPointService.getAllByStation(station);
-        return ResponseEntity.ok(chargerPointService.getAllByStation(station));
+    @GetMapping("/getAll/{stationID}")
+    public ResponseEntity getAllChargerPoint(@PathVariable int stationID) {//id station
+        List<ChargerPoint> list = chargerPointService.getAllByStation(stationID);
+        if(list.size()==0){
+            return ResponseEntity.badRequest().body("Hiện tại, trạm này không có trụ sạc nào!");
+        }
+        return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/get")
-    public ResponseEntity getChargerPoint(int id) {
-        return ResponseEntity.ok(chargerPointService.get(id));
+    @GetMapping("/get/{pointID}")
+    public ResponseEntity getChargerPoint(@PathVariable int pointID) {
+        return ResponseEntity.ok(chargerPointService.get(pointID));
     }
 }

@@ -18,7 +18,7 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping("/get")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserInfoResponse> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -27,7 +27,7 @@ public class ProfileController {
         return ResponseEntity.ok(userInfo);
     }
 
-    @PutMapping("/me")
+    @PutMapping("/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserInfoResponse> updateCurrentUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -37,6 +37,7 @@ public class ProfileController {
     }
 
     @PutMapping("/update-password")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordRequest request) {
         try {
             userService.updatePassword(request);

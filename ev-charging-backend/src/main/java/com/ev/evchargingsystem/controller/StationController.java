@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.response.StationResponse;
 import com.ev.evchargingsystem.repository.StationRepository;
 import com.ev.evchargingsystem.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +10,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/ad/stations")
+@RequestMapping("/api")
 public class StationController {
 
     @Autowired
     private StationService stationService;
 
-    @PostMapping
+    @PostMapping("/admin/create")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Station> addStation(@RequestBody Station station) {
         return ResponseEntity.ok(stationService.addStation(station));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Station> updateStation(@PathVariable Integer id, @RequestBody Station stationDetails) {
         Station updatedStation = stationService.updateStation(id, stationDetails);
@@ -36,7 +39,7 @@ public class StationController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteStation(@PathVariable Integer id) {
         boolean isDeleted = stationService.deleteStation(id);
@@ -47,5 +50,16 @@ public class StationController {
             // Trả về 404 Not Found nếu không tìm thấy Station để xóa
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy station với ID: " + id);
         }
+    }
+
+    @GetMapping("/getAllStations")
+    public ResponseEntity getStations(){
+        List<StationResponse> list = stationService.getAllStations();
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/get/{stationId}")
+    public ResponseEntity getStaion(@PathVariable int stationId){
+        return ResponseEntity.ok(stationService.getStation(stationId));
     }
 }
