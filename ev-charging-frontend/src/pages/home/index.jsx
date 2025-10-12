@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiBatteryCharging, // Sạc pin
   FiMapPin, // Bản đồ trạm
@@ -48,7 +48,7 @@ const EVChargeHomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Change to true to test logged in state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const user = {
-    fullName: "Alex Reid", // Using 'fullName' to match Redux example
+    fullName: "", // Using 'fullName' to match Redux example
     avatar:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=2080",
   };

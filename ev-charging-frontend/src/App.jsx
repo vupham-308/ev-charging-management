@@ -54,6 +54,10 @@ function App() {
       element: <StaffDashboard />,
     },
     {
+      path: "/driver",
+      element: <DriverDashboard />,
+    },
+    {
       path: "/profile",
       element: <ProfilePage />,
     },

@@ -45,6 +45,7 @@ const LoginPage = () => {
 
       // lưu state
       dispatch(login(response.data));
+
       if (role === "ADMIN") {
         navigate("/admin");
       } else if (role === "STAFF") {
@@ -62,7 +63,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative">
       {/* Background */}
-      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center bg-no-repeat">
+      <div className="absolute inset-0 z-0 bg-[url('https://genk.mediacdn.vn/139269124445442048/2023/6/29/o-to-dienthanhnien-2zzfj-1688012119644-16880121207971298916652.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
