@@ -86,7 +86,7 @@ const EVChargeHomePage = () => {
       name: "Sạc Nhanh DC",
       price: "1,200đ/kWh",
       image:
-        "https://ekoenergetyka.com/wp-content/uploads/2024/11/c46ebcb54e12c38e69ecab6aa5eb0986335215209f546097ffd7c25681aa9338.png",
+        "https://anfuenergy.com/wp-content/uploads/2024/06/EV_charging_stations_png-768x768.png",
       description:
         "Công nghệ sạc nhanh tiên tiến, đưa xe của bạn trở lại đường chỉ trong tích tắc.",
       specs: { capacity: "50-180 kW", connectors: "CCS, CHAdeMO" },
@@ -95,7 +95,7 @@ const EVChargeHomePage = () => {
       name: "Sạc AC Tiêu Chuẩn",
       price: "800đ/kWh",
       image:
-        "https://img.freepik.com/premium-photo/electric-car-charging-outdoor_114098-842.jpg",
+        "https://img.freepik.com/photos-premium/conception-neons-station-charge-voiture-electrique-voiture-ev-dans-concept-vehicule-futuriste-transport-futur-voiture-autonome-futuriste-ai-generative_159242-19719.jpg?w=2000",
       description:
         "Giải pháp sạc tiện lợi cho các điểm dừng dài hơn, lý tưởng cho sạc qua đêm.",
       specs: { capacity: "7-22 kW", connectors: "Type 2" },
@@ -104,7 +104,7 @@ const EVChargeHomePage = () => {
       name: "Sạc Thông Minh",
       price: "Giá linh hoạt",
       image:
-        "https://images.unsplash.com/photo-1627961958410-a9f4e2f5b355?auto=format&fit=crop&q=80&w=2062", // Reusing an e-bike image as a placeholder for "smart tech"
+        "https://img.freepik.com/premium-photo/3d-printed-electric-vehicle-charging-station-modern-futurism-background_962764-133019.jpg?w=996", // Reusing an e-bike image as a placeholder for "smart tech"
       description:
         "Quản lý sạc qua ứng dụng, lên lịch sạc và theo dõi mức tiêu thụ năng lượng.",
       specs: { capacity: "Tùy chọn", connectors: "Mọi loại" },

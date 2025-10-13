@@ -94,7 +94,7 @@ const DriverDashboard = () => {
       name: "Sạc Nhanh DC",
       price: "1,200đ/kWh",
       image:
-        "https://ekoenergetyka.com/wp-content/uploads/2024/11/c46ebcb54e12c38e69ecab6aa5eb0986335215209f546097ffd7c25681aa9338.png",
+        "https://img.freepik.com/premium-photo/futuristic-electric-car-is-connected-ev-charging-station-underground-parking-business-center-showroom-technology-alternative-energy-concept-3d-illustration-rendering_10307-2265.jpg",
       description:
         "Công nghệ sạc nhanh tiên tiến, đưa xe của bạn trở lại đường chỉ trong tích tắc.",
       specs: { capacity: "50-180 kW", connectors: "CCS, CHAdeMO" },
