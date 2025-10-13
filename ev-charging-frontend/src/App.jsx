@@ -16,7 +16,13 @@ import StaffDashboard from "./pages/staff";
 import AdminDashboard from "./pages/admin";
 import DriverDashboard from "./pages/driver";
 import ProfilePage from "./pages/profile";
-import ManageMap from "./pages/map";
+// Add
+import DashboardAdmin from "./pages/admin/DashboardAdmin";
+import Users from "./pages/admin/Users"
+import IncidentManagement from "./pages/admin/IncidentManagement";
+import ChargingRates from "./pages/admin/ChargingRates";
+import ChargingStations from "./pages/admin/ChargingStations";
+
 
 // 1. Component
 // là 1 cái function
@@ -30,11 +36,11 @@ function App() {
       children: [
         {
           path: "bike",
-          element: <ManageBike />, // Outlet
+          element: <ManageBike />,
         },
         {
           path: "category",
-          element: <ManageCategory />, // Outlet
+          element: <ManageCategory />,
         },
       ],
     },
@@ -47,8 +53,8 @@ function App() {
       element: <LoginPage />,
     },
     {
-      path: "/admin",
-      element: <AdminDashboard />,
+      path: "/register",
+      element: <RegisterPage />,
     },
     {
       path: "/staff",
@@ -57,22 +63,44 @@ function App() {
     {
       path: "/driver",
       element: <DriverDashboard />,
-      children: [
-        {
-          path: "map",
-          element: <ManageMap />,
-        },
-      ],
     },
     {
       path: "/profile",
       element: <ProfilePage />,
     },
+    //  Route dành cho Admin có layout dùng Outlet
     {
-      path: "/register",
-      element: <RegisterPage />,
+      path: "/admin",
+      element: <AdminDashboard />,
+      children: [
+        {
+          index: true, // khi vào /admin sẽ mặc định hiện DashboardAdmin
+          element: <DashboardAdmin />
+        },
+        {
+          path: "dashboardadmin",
+          element: <DashboardAdmin />
+        },
+        {
+          path: "users",
+          element: <Users />
+        },
+        {
+          path: "stations",
+          element: <ChargingStations />
+        },
+        {
+          path: "incidents",
+          element: <IncidentManagement />
+        },
+        {
+          path: "settings",
+          element: <ChargingRates />
+        },
+      ]
     },
   ]);
+
 
   return (
     <>
