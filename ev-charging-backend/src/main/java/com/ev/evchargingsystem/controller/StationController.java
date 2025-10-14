@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/station")
 public class StationController {
 
     @Autowired
@@ -62,4 +62,11 @@ public class StationController {
     public ResponseEntity getStaion(@PathVariable int stationId){
         return ResponseEntity.ok(stationService.getStation(stationId));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<StationResponse>> searchStations(@RequestParam("keyword") String keyword) {
+        List<StationResponse> stations = stationService.searchStations(keyword);
+        return ResponseEntity.ok(stations);
+    }
+
 }
