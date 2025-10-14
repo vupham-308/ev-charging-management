@@ -11,6 +11,7 @@ import java.util.Date;
 
 @Entity
 @Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED')")
+@Check(constraints = "payment_method IN ('CASH', 'BALANCE', 'WAITING_TO_PAY')")
 @Table(name="charging_sessions")
 @Data
 @AllArgsConstructor
@@ -24,9 +25,9 @@ public class ChargingSession {
     @NotNull
     private Date endTime;
     @NotNull
-    private int initBattery;
-    @NotNull
     private String status;
+    @NotNull
+    private String paymentMethod;
 
     @ManyToOne
     @JoinColumn(name="charger_point_id", referencedColumnName = "id")
