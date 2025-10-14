@@ -6,12 +6,14 @@ import com.ev.evchargingsystem.model.response.StationResponse;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StationService {
@@ -22,10 +24,14 @@ public class StationService {
     private ChargerPointRepository chargerPointRepository;
     @Autowired
     private ReviewStationRepository reviewStationRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     public Station addStation(Station station) {
         return stationRepository.save(station);
     }
+
+
 
     public Station updateStation(Integer id, Station stationDetails) {
         // 1. Tìm Station trong DB, kết quả trả về là một Optional
@@ -101,4 +107,12 @@ public class StationService {
         }
         return count;
     }
+
+    public List<StationResponse> searchStations(String keyword) {
+        List<Station> stations = stationRepository.searchStations(keyword);
+        return stations.stream()
+                .map(station -> modelMapper.map(station, StationResponse.class))
+                .collect(Collectors.toList());
+    }
+
 }
