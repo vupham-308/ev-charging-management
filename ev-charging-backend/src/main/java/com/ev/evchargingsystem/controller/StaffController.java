@@ -8,6 +8,7 @@ import com.ev.evchargingsystem.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -27,19 +28,19 @@ public class StaffController {
 
     @GetMapping("/station/status")
     @PreAuthorize("hasAuthority('STAFF')")
-    public ResponseEntity<?> getStationChargerStatus(@RequestParam int staffId) {
-        Staff staff = staffService.getStaffById(staffId);
+    public ResponseEntity<?> getStationChargerStatus(Authentication authentication) {
+        String email = authentication.getName(); // lấy email từ token
+        Staff staff = staffService.getByEmail(email);
+
         if (staff == null) {
-            return ResponseEntity.badRequest().body("Không tìm thấy staff có ID = " + staffId);
+            return ResponseEntity.badRequest().body("Không tìm thấy staff cho tài khoản này");
+        }
+        if (staff.getStation() == null) {
+            return ResponseEntity.badRequest().body("Staff chưa được gán trạm nào");
         }
 
-        Station station = staff.getStation();
-        if (station == null) {
-            return ResponseEntity.badRequest().body("Staff này chưa được gán trạm quản lý nào.");
-        }
-
-        Map<String, Long> statusCount = chargerPointService.getChargerPointStatusByStation(station.getId());
-        return ResponseEntity.ok(statusCount);
+        // Truyền id trạm của staff để lấy thống kê
+        return stationService.getStationChargerStatus(staff.getStation().getId());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

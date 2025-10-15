@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.repository.StaffRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,5 +26,8 @@ public class StaffService {
         staffRepository.save(staff);
     }
 
-
+    public Staff getByEmail(String email) {
+        Optional<Staff> staffOpt = staffRepository.findByUserEmail(email);
+        return staffOpt.orElse(null);
+    }
 }
