@@ -23,4 +23,9 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
 
     @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.status = 'OCCUPIED'")
     long countOccupiedPoints();
+
+    List<ChargerPoint> findByStationId(int stationId);
+
+    // Lấy trụ sạc theo trạm + trạng thái (nếu cần lọc)
+    List<ChargerPoint> findByStationIdAndStatus(int stationId, String status);
 }

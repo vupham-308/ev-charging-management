@@ -123,4 +123,8 @@ public class StationService {
         long inactive = stationRepository.countInactiveStations();
         return new StationStatsResponseForAdmin(total, active, inactive);
     }
+
+    public Station getStationById(int id) {
+        return stationRepository.findById(id).orElse(null);
+    }
 }
