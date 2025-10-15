@@ -10,8 +10,8 @@ import org.hibernate.annotations.Check;
 import java.util.Date;
 
 @Entity
-@Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED')")
-@Check(constraints = "payment_method IN ('CASH', 'BALANCE', 'WAITING_TO_PAY')")
+@Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED','WAITING_TO_PAY)")
+@Check(constraints = "payment_method IN ('CASH', 'BALANCE')")
 @Table(name="charging_sessions")
 @Data
 @AllArgsConstructor

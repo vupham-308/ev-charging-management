@@ -16,5 +16,4 @@ public class ProblemRequest {
     @NotEmpty (message = "Description cannot be empty!")
     @Column(columnDefinition = "NVARCHAR(3000)")
     private String description;
-    private int chargerPoint;
 }

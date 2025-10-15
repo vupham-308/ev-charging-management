@@ -17,7 +17,7 @@ public class ChargerCostController {
     @Operation(
             summary = "ADMIN: thay đổi giá trạm sạc phụ thuộc vào cổng sạc"
     )
-    @PatchMapping("edit-cost/{portType}")
+    @PutMapping("edit-cost/{portType}")
     public ResponseEntity editChargerPointCost(float newCost, @PathVariable("portType") String chargerType){
         try{
             if(chargerCostService.editCost(newCost, chargerType)) {

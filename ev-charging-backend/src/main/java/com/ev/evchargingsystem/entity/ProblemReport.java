@@ -35,14 +35,6 @@ public class ProblemReport {
     @Column(columnDefinition = "NVARCHAR(3000)")
     private String response;
 
-    @ManyToMany
-    @JoinTable(
-            name = "ProblemReport_AssignedStaff",
-            joinColumns = @JoinColumn(name = "problem_report_id"),
-            inverseJoinColumns = @JoinColumn(name = "staff_id")
-    )
-    private List<Staff> assignedStaff;
-
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
