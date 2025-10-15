@@ -3,7 +3,9 @@ package com.ev.evchargingsystem.controller;
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.request.ChargerPointRequest;
+import com.ev.evchargingsystem.model.response.ChargerPointStatsResponseForAdmin;
 import com.ev.evchargingsystem.service.ChargerPointService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -65,5 +67,13 @@ public class ChargerPointController {
     @GetMapping("/get/{pointID}")
     public ResponseEntity getChargerPoint(@PathVariable int pointID) {
         return ResponseEntity.ok(chargerPointService.get(pointID));
+    }
+
+    @Operation(summary = "Admin xem các thống kê về trụ sạc")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/charger-point-stats")
+    public ResponseEntity<ChargerPointStatsResponseForAdmin> getChargerPointStats() {
+        ChargerPointStatsResponseForAdmin stats = chargerPointService.getChargerPointStats();
+        return ResponseEntity.ok(stats);
     }
 }

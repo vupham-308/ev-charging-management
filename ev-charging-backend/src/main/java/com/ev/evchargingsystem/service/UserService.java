@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
+import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,5 +87,14 @@ public class UserService {
 
     public List<User> searchUsersByName(String name) {
         return userRepository.findByFullNameContainingIgnoreCase(name);
+    }
+
+    public UserStatsResponseForAdmin getUserStats() {
+        long total = userRepository.countTotalUsers();
+        long drivers = userRepository.countNormalUsers();
+        long staffs = userRepository.countStaffs();
+        long admins = userRepository.countAdmins();
+
+        return new UserStatsResponseForAdmin(total, drivers, staffs, admins);
     }
 }

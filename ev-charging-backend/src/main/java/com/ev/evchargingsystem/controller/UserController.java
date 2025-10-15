@@ -4,8 +4,10 @@ import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
+import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.UserRepository;
 import com.ev.evchargingsystem.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,4 +55,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Admin xem thống kê user")
+    @GetMapping("/user-stats")
+    public ResponseEntity<UserStatsResponseForAdmin> getUserStats() {
+        UserStatsResponseForAdmin stats = userService.getUserStats();
+        return ResponseEntity.ok(stats);
+    }
 }

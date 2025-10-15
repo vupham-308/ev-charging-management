@@ -3,6 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.response.StationResponse;
+import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
@@ -26,6 +27,7 @@ public class StationService {
     private ReviewStationRepository reviewStationRepository;
     @Autowired
     private ModelMapper modelMapper;
+
 
     public Station addStation(Station station) {
         return stationRepository.save(station);
@@ -115,4 +117,10 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public StationStatsResponseForAdmin getStationStats() {
+        long total = stationRepository.countTotalStations();
+        long active = stationRepository.countActiveStations();
+        long inactive = stationRepository.countInactiveStations();
+        return new StationStatsResponseForAdmin(total, active, inactive);
+    }
 }

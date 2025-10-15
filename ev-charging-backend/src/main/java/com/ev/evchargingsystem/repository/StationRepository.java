@@ -10,7 +10,16 @@ import java.util.List;
 
 public interface StationRepository extends JpaRepository<Station, Integer> {
     Station findStationsById(int id);
+
     @Query("SELECT s FROM Station s WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(s.address) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Station> searchStations(@Param("keyword") String keyword);
 
+    @Query("SELECT COUNT(s) FROM Station s")
+    long countTotalStations();
+
+    @Query("SELECT COUNT(s) FROM Station s WHERE s.status = 'ACTIVE'")
+    long countActiveStations();
+
+    @Query("SELECT COUNT(s) FROM Station s WHERE s.status = 'INACTIVE'")
+    long countInactiveStations();
 }
