@@ -63,6 +63,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/api/account/**").permitAll()
                                 .requestMatchers("api/station/search").permitAll()
+                                .requestMatchers("api/station/getAllStations").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
