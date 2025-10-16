@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.service.ChargerPointService;
 import com.ev.evchargingsystem.service.StaffService;
 import com.ev.evchargingsystem.service.StationService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +27,7 @@ public class StaffController {
     @Autowired
     private StationService stationService;
 
+    @Operation(summary = "STAFF xem trạng thái các trụ sạc thuộc trạm mình quản lý")
     @GetMapping("/station/status")
     @PreAuthorize("hasAuthority('STAFF')")
     public ResponseEntity<?> getStationChargerStatus(Authentication authentication) {
@@ -43,6 +45,7 @@ public class StaffController {
         return stationService.getStationChargerStatus(staff.getStation().getId());
     }
 
+    @Operation(summary = "ADMIN gán trạm cho staff")
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{staffId}/assign-station/{stationId}")
     public ResponseEntity<?> assignStationToStaff(

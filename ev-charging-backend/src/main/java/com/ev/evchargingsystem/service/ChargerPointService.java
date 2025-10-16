@@ -108,19 +108,5 @@ public class ChargerPointService {
         return new ChargerPointStatsResponseForAdmin(total, available, occupied);
     }
 
-    //thống kê số lượng trụ sạc theo trạng thái
-    public Map<String, Long> getChargerPointStatusByStation(int stationId) {
-        List<ChargerPoint> chargerPoints = chargerPointRepository.findByStationId(stationId);
-
-        if (chargerPoints.isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        return chargerPoints.stream()
-                .collect(Collectors.groupingBy(
-                        ChargerPoint::getStatus,
-                        Collectors.counting()
-                ));
-    }
 
 }
