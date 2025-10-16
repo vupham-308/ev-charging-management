@@ -10,7 +10,8 @@ import org.hibernate.annotations.Check;
 import java.util.Date;
 
 @Entity
-@Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED')")
+@Check(constraints = "status IN ('ONGOING', 'COMPLETED', 'CANCELLED','WAITING_TO_PAY','PAID')")
+@Check(constraints = "payment_method IN ('CASH', 'BALANCE')")
 @Table(name="charging_sessions")
 @Data
 @AllArgsConstructor
@@ -24,9 +25,11 @@ public class ChargingSession {
     @NotNull
     private Date endTime;
     @NotNull
-    private int initBattery;
-    @NotNull
     private String status;
+    @NotNull
+    private String paymentMethod;
+    @NotNull
+    private int goalBattery;
 
     @ManyToOne
     @JoinColumn(name="charger_point_id", referencedColumnName = "id")
