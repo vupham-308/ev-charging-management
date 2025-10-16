@@ -2,8 +2,10 @@ package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.response.StationResponse;
+import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.StationRepository;
 import com.ev.evchargingsystem.service.StationService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +54,7 @@ public class StationController {
         }
     }
 
+    @Operation(summary = "Hiển thị danh sách trạm cho driver chọn")
     @GetMapping("/getAllStations")
     public ResponseEntity getStations(){
         List<StationResponse> list = stationService.getAllStations();
@@ -69,4 +72,10 @@ public class StationController {
         return ResponseEntity.ok(stations);
     }
 
+    @Operation(summary = "Amin xem thống kê trạm")
+    @GetMapping("/station-stats")
+    public ResponseEntity<StationStatsResponseForAdmin> getStationStats() {
+        StationStatsResponseForAdmin stats = stationService.getStationStats();
+        return ResponseEntity.ok(stats);
+    }
 }

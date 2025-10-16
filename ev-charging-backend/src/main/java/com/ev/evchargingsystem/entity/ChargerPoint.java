@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 @Entity
-@Check(constraints = "port_type IN ('AC', 'CCS', 'CHAdeMO') AND status IN ('AVAILABLE', 'OCCUPIED', 'OUT_OF_SERVICE')")
+@Check(constraints = "port_type IN ('AC', 'CCS', 'CHAdeMO') AND status IN ('AVAILABLE', 'OCCUPIED', 'OUT_OF_SERVICE', 'RESERVED')")
 @Table(name="charger_points")
 @Data
 @AllArgsConstructor

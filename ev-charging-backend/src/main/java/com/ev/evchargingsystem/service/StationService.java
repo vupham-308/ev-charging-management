@@ -2,17 +2,18 @@ package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.response.CPointStatusResponseForStaff;
 import com.ev.evchargingsystem.model.response.StationResponse;
+import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +27,7 @@ public class StationService {
     private ReviewStationRepository reviewStationRepository;
     @Autowired
     private ModelMapper modelMapper;
+
 
     public Station addStation(Station station) {
         return stationRepository.save(station);
@@ -115,4 +117,43 @@ public class StationService {
                 .collect(Collectors.toList());
     }
 
+    public StationStatsResponseForAdmin getStationStats() {
+        long total = stationRepository.countTotalStations();
+        long active = stationRepository.countActiveStations();
+        long inactive = stationRepository.countInactiveStations();
+        return new StationStatsResponseForAdmin(total, active, inactive);
+    }
+
+    public Station getStationById(int id) {
+        return stationRepository.findById(id).orElse(null);
+    }
+
+    public ResponseEntity<?> getStationChargerStatus(int stationId) {
+        List<ChargerPoint> chargerPoints = chargerPointRepository.findByStationId(stationId);
+
+        if (chargerPoints.isEmpty()) {
+            return ResponseEntity.badRequest().body("Trạm này chưa có trụ sạc nào");
+        }
+
+        // Đếm số lượng theo trạng thái
+        long available = chargerPoints.stream()
+                .filter(cp -> "AVAILABLE".equalsIgnoreCase(cp.getStatus()))
+                .count();
+        long occupied = chargerPoints.stream()
+                .filter(cp -> "OCCUPIED".equalsIgnoreCase(cp.getStatus()))
+                .count();
+        long reserved = chargerPoints.stream()
+                .filter(cp -> "RESERVED".equalsIgnoreCase(cp.getStatus()))
+                .count();
+        long outOfService = chargerPoints.stream()
+                .filter(cp -> "OUT_OF_SERVICE".equalsIgnoreCase(cp.getStatus()))
+                .count();
+
+        // Trả về kết quả dạng JSON
+        CPointStatusResponseForStaff response = new CPointStatusResponseForStaff(
+                available, occupied, reserved, outOfService
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }

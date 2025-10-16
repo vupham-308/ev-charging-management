@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.ChargerCost;
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.request.ChargerPointRequest;
+import com.ev.evchargingsystem.model.response.ChargerPointStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.ChargerCostRepository;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ChargerPointService {
@@ -95,4 +99,14 @@ public class ChargerPointService {
     public ChargerPoint get(int id){
         return chargerPointRepository.findChargerPointById(id);
     }
+
+    public ChargerPointStatsResponseForAdmin getChargerPointStats() {
+        long total = chargerPointRepository.countTotalPoints();
+        long available = chargerPointRepository.countAvailablePoints();
+        long occupied = chargerPointRepository.countOccupiedPoints();
+
+        return new ChargerPointStatsResponseForAdmin(total, available, occupied);
+    }
+
+
 }

@@ -1,9 +1,11 @@
 package com.ev.evchargingsystem.service;
 
+import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.LoginRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.repository.AuthenticationRepository;
+import com.ev.evchargingsystem.repository.StaffRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,12 +35,24 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     TokenService tokenService;
 
+    @Autowired
+    private StaffRepository staffRepository;
+
     public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if(user.getRole()==null){
             user.setRole("USER");//mặc định role USER
         }
-        return authenticationRepository.save(user);
+        User savedUser = authenticationRepository.save(user);
+
+        // nếu là STAFF thì tạo Staff tương ứng
+        if ("STAFF".equalsIgnoreCase(savedUser.getRole())) {
+            Staff staff = new Staff();
+            staff.setUser(savedUser);
+            staffRepository.save(staff);
+        }
+
+        return savedUser;
     }
 
     public UserResponse login(LoginRequest loginRequest) {
