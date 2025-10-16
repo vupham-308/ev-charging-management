@@ -1,17 +1,18 @@
 package com.ev.evchargingsystem.service;
 
-import com.ev.evchargingsystem.entity.Car;
-import com.ev.evchargingsystem.entity.ChargerPoint;
-import com.ev.evchargingsystem.entity.ChargingSession;
+import com.ev.evchargingsystem.entity.*;
 import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
 import com.ev.evchargingsystem.model.response.ChargingResponse;
 import com.ev.evchargingsystem.repository.CarRepository;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ChargingSessionRepository;
+import com.ev.evchargingsystem.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,24 +25,119 @@ public class ChargingSessionService {
     CarRepository carRepository;
     @Autowired
     ChargerPointRepository chargerPointRepository;
+    @Autowired
+    TransactionService transactionService;
 
-//    public ChargingResponse charge(ChargingSessionRequest rq) {
-//        ChargingSession charge = createSession(rq);
-//        ChargingResponse c = new ChargingResponse();
-//
-//    }
 
-//    @Scheduled(fixedRate = 5000)//reload mỗi 5s
-//    public void updateChargingSession(){
-//        //lấy ra tất cả danh sách đang sạc
-//        List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
-//        for (ChargingSession c : charging){
-//            //kiểm tra xem đã đạt được hạn mức cần sạc chưa
-//            if(c.getCar().getInitBattery()==c.)
-//        }
-//    }
+    public ChargingSession charge(int sessionId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ChargingSession c = chargingSessionRepository.findChargingSessionById(sessionId);
+        if(c.getStatus().equals("COMPLETED")) {
+            throw new RuntimeException("Phiên sạc đã hoàn thành");
+        }
+        int time = caculateTimeToReachGoalBattery(c.getChargerPoint().getChargerCost().getPortType(),
+                c.getCar().getInitBattery(),c.getGoalBattery());
+        double total = time*c.getChargerPoint().getChargerCost().getCost();
+        //nếu CASH thì check xem KH đã thanh toán chưa
+        if(c.getPaymentMethod().equals("CASH")&&c.getStatus().equals("WAITING_TO_PAY")){
+            throw new RuntimeException("Vui lòng liên hệ nhân viên thanh toán để tiếp tục!");
+        }
+        //BALANCE thì lưu vào transaction
+        if(c.getPaymentMethod().equals("BALANCE")){
+            Transaction t = transactionService.createTransaction(c,total);
+            if(t.getStatus().equals("COMPLETED")){
+                c.setStatus("PAID");
+            }
+        }
+        //CASH + PAID thì lưu vào transaction
+        if(c.getPaymentMethod().equals("CASH")&&c.getStatus().equals("PAID")){
+            Transaction t = transactionService.createTransaction(c,total);
+        }
+        c.setStatus("ONGOING");
+        c.getChargerPoint().setStatus("OCCUPIED");
+        chargerPointRepository.save(c.getChargerPoint());
+        return chargingSessionRepository.save(c);
+    }
 
-    public ChargingSession createSession(ChargingSessionRequest rq) {
+    @Scheduled(fixedRate = 18000)//reload mỗi 18s
+    public void updateChargingSessionCCS(){
+        //lấy ra tất cả danh sách đang sạc
+        List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
+        List<ChargingSession> ccs = new ArrayList<>();
+        for (ChargingSession c : charging){
+            //lấy danh sách portType CCS
+            String portType = c.getChargerPoint().getChargerCost().getPortType();
+            if(portType.equalsIgnoreCase("CCS")){
+                 ccs.add(c);
+            }
+        }
+        for(ChargingSession list : ccs){
+            //18s tăng 1%
+            list.getCar().setInitBattery(list.getCar().getInitBattery()+1);
+            if(list.getCar().getInitBattery()>=list.getGoalBattery()){
+                list.setStatus("COMPLETED");
+                list.getChargerPoint().setStatus("AVAILABLE");
+                list.setEndTime(new Date(System.currentTimeMillis()));
+            }
+            chargerPointRepository.save(list.getChargerPoint());
+            chargingSessionRepository.save(list);
+            carRepository.save(list.getCar());
+        }
+    }
+
+    @Scheduled(fixedRate = 48000)//reload mỗi 48s
+    public void updateChargingSessionCHAdeMO(){
+        //lấy ra tất cả danh sách đang sạc
+        List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
+        List<ChargingSession> cha = new ArrayList<>();
+        for (ChargingSession c : charging){
+            //lấy danh sách portType CHAdeMO
+            String portType = c.getChargerPoint().getChargerCost().getPortType();
+            if(portType.equalsIgnoreCase("CHAdeMO")){
+                cha.add(c);
+            }
+        }
+        for(ChargingSession list : cha){
+            //48s tăng 1%
+            list.getCar().setInitBattery(list.getCar().getInitBattery()+1);
+            if(list.getCar().getInitBattery()>=list.getGoalBattery()){
+                list.setStatus("COMPLETED");
+                list.getChargerPoint().setStatus("AVAILABLE");
+                list.setEndTime(new Date(System.currentTimeMillis()));
+            }
+            chargerPointRepository.save(list.getChargerPoint());
+            chargingSessionRepository.save(list);
+            carRepository.save(list.getCar());
+        }
+    }
+
+    @Scheduled(fixedRate = 108000)//reload mỗi 1,8p=108s
+    public void updateChargingSessionAC(){
+        //lấy ra tất cả danh sách đang sạc
+        List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
+        List<ChargingSession> ac = new ArrayList<>();
+        for (ChargingSession c : charging){
+            //lấy danh sách portType AC
+            String portType = c.getChargerPoint().getChargerCost().getPortType();
+            if(portType.equalsIgnoreCase("AC")){
+                ac.add(c);
+            }
+        }
+        for(ChargingSession list : ac){
+            //108s tăng 1%
+            list.getCar().setInitBattery(list.getCar().getInitBattery()+1);
+            if(list.getCar().getInitBattery()>=list.getGoalBattery()){
+                list.setStatus("COMPLETED");
+                list.getChargerPoint().setStatus("AVAILABLE");
+                list.setEndTime(new Date(System.currentTimeMillis()));
+            }
+            chargerPointRepository.save(list.getChargerPoint());
+            chargingSessionRepository.save(list);
+            carRepository.save(list.getCar());
+        }
+    }
+
+    public ChargingResponse createSession(ChargingSessionRequest rq) {
         Car car = carRepository.findById(rq.getCarId()).orElse(null);
         ChargerPoint point = chargerPointRepository.findById(rq.getPointId()).orElse(null);
         if(car==null||point==null){
@@ -51,21 +147,31 @@ public class ChargingSessionService {
         ChargingSession charge = new ChargingSession();
         charge.setCar(car);
         charge.setStartTime(current);
-        //time cần phải sạc
+        //time cần phải sạc (phút)
         int timeCharge = caculateTimeToReachGoalBattery(point.getChargerCost().getPortType(),
                 car.getInitBattery(),rq.getGoalBattery());
         //đổi sang mili giây
         charge.setEndTime(new Date(current.getTime() + timeCharge*60*1000));
         charge.setPaymentMethod(rq.getPaymentMethod());
-        //nếu CASH thì set trạng thái về WAITING TO PAY
-        if(rq.getPaymentMethod().equals("CASH")){
-            charge.setStatus("WAITING_TO_PAY");
-        }
-        if(rq.getPaymentMethod().equals("BALANCE")){
-            charge.setStatus("ONGOING");
-        }
+        //set trạng thái về WAITING TO PAY
+        charge.setStatus("WAITING_TO_PAY");
         charge.setChargerPoint(point);
-        return chargingSessionRepository.save(charge);
+        if(rq.getGoalBattery()<=car.getInitBattery()){
+            throw new RuntimeException("Không thể sạc với mục tiêu sạc thấp hơn pin của bạn!");
+        }
+        charge.setGoalBattery(rq.getGoalBattery());
+        chargingSessionRepository.save(charge);
+        //======================================
+        //trả về ChargingResponse
+        ChargingResponse rs = new ChargingResponse();
+        rs.setFee(timeCharge*charge.getChargerPoint().getChargerCost().getCost());
+        rs.setMinute(timeCharge);
+        rs.setGoalBattery(charge.getGoalBattery());
+        rs.setInitBattery(charge.getCar().getInitBattery());
+        rs.setPoint(charge.getChargerPoint());
+        rs.setPaymentMethod(charge.getPaymentMethod());
+        rs.setCarName(charge.getCar().getBrand());
+        return rs;
     }
 
     public int caculateTimeToReachGoalBattery(String portType, int initBattery, int goalBattery){

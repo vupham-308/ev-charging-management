@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ChargingSessionRepository extends JpaRepository<ChargingSession,Long> {
     List<ChargingSession> findChargingSessionByStatus(String status);
+
+    ChargingSession findChargingSessionById(int sessionId);
 }

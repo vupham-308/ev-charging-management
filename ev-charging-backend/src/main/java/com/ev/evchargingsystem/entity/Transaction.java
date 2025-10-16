@@ -11,7 +11,7 @@ import org.hibernate.annotations.Check;
 import java.util.Date;
 
 @Entity
-@Check(constraints = "payment_method IN ('BALANCE', 'VNPAY') AND payment_type IN ('TOPUP', 'WITHDRAW') AND status IN ('PENDING', 'COMPLETED', 'FAILED')")
+@Check(constraints = "payment_method IN ('CASH','BALANCE', 'ONLINE') AND payment_type IN ('TOPUP', 'WITHDRAW') AND status IN ('PENDING', 'COMPLETED', 'FAILED')")
 @Table(name = "transactions")
 @Data
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class Transaction {
     @NotNull
     private Date date;
     @NotNull
-    private float totalAmount;
+    private double totalAmount;
     @NotNull
     private String paymentMethod;
     @NotNull
@@ -32,10 +32,10 @@ public class Transaction {
     private String status;
 
     @OneToOne
-    @JoinColumn(name="reservation_id", referencedColumnName = "id",nullable = true)
-    private Reservation reservation;
-
-    @OneToOne
     @JoinColumn(name="charging_session_id", referencedColumnName = "id")
     private ChargingSession chargingSession;
+
+    @ManyToOne
+    @JoinColumn(name="user_id", referencedColumnName = "id")
+    private User user;
 }
