@@ -1,0 +1,319 @@
+:root {
+    --bg-main: #f5f6fa;
+    --white: #fff;
+    --border: #e0e0e0;
+    --text-gray: #666;
+    --text-light: #999;
+    --primary: #6c63ff;
+}
+
+/* === Layout === */
+.dashboard-container {
+    background: var(--bg-main);
+    min-height: 100vh;
+    color: #333;
+    font-family: "Segoe UI", sans-serif;
+}
+
+/* === Header === */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+.header h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 14px;
+}
+
+.user-name {
+    font-weight: 600;
+}
+
+.user-role {
+    background: #f3e8ff;
+    color: #7b2cbf;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    border: 1px solid var(--border);
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn:hover {
+    background: #f3f3f3;
+}
+
+.logout {
+    background: #f44336;
+    color: #fff;
+    border: none;
+}
+
+/* === Tabs === */
+.tabs {
+    display: flex;
+    background: #f2f3f7;
+    padding: 6px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    transition: 0.2s;
+}
+
+.tab-btn.active {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+/* === Main === */
+.main {
+    padding: 24px 32px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+/* === Summary Cards === */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eee;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin-right: 14px;
+    font-size: 20px;
+    margin-left: auto;
+    /* Đẩy icon sát về bên phải */
+}
+
+.card-icon.blue {
+    background: #007bff;
+}
+
+.card-icon.yellow {
+    background: #ffb300;
+}
+
+.card-icon.purple {
+    background: #8e24aa;
+}
+
+.card-icon.green {
+    background: #43a047;
+}
+
+.card-info h4 {
+    font-size: 14px;
+    color: var(--text-gray);
+}
+
+.card-info h2 {
+    font-size: 24px;
+    margin: 6px 0;
+}
+
+.card-info p {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.increase {
+    color: #2e7d32;
+}
+
+/* === Bottom Panels === */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 26px;
+}
+
+.panel {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.panel h4 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.panel p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #f9fafc;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.active {
+    background: #4caf50;
+}
+
+.maintenance {
+    background: #ff9800;
+}
+
+.role-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.role-card.driver {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.role-card.manager {
+    background: #f3e8ff;
+    color: #7b2cbf;
+}
+
+.role-card i {
+    margin-right: 8px;
+}
+
+/* === Top Stations Panel === */
+.top-stations {
+    margin-top: 26px;
+}
+
+.station-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.station-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafc;
+    border-radius: 8px;
+    padding: 10px 12px;
+    border: 1px solid #eee;
+}
+
+.station-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.station-rank {
+    width: 28px;
+    height: 28px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.station-info h5 {
+    font-size: 14px;
+    margin-bottom: 2px;
+    color: #1a237e;
+}
+
+.station-info span {
+    font-size: 12px;
+    color: #777;
+}
+
+.revenue {
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 14px;
+}

@@ -1,0 +1,275 @@
+/* --- Trang chính --- */
+.stations-page {
+    background: #f5f6fa;
+    padding: 20px;
+    border-radius: 12px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.stations-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.stations-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+}
+
+.btn.add {
+    background-color: #2e7d32;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s;
+}
+
+.btn.add:hover {
+    background-color: #27672a;
+}
+
+/* Input tìm kiếm */
+.search-inputt {
+    width: 100%;
+    /* chiếm hết chiều ngang container cha */
+    max-width: 1500px;
+    /* giới hạn chiều rộng tối đa, bạn có thể điều chỉnh */
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-bottom: 24px;
+    font-size: 15px;
+    box-sizing: border-box;
+    /* để padding không làm rộng vượt */
+}
+
+/* Danh sách trạm */
+.stations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Card mỗi trạm */
+.station-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    gap: 20px;
+}
+
+/* Phần bên trái: thông tin trạm */
+.station-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* sát trái toàn bộ nội dung bên trái */
+}
+
+/* Trạng thái (badge) */
+.status-text {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 16px;
+    background-color: #f5f5f5;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+/* Màu trạng thái */
+.status-text.green {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+}
+
+.status-text.red {
+    color: #d32f2f;
+    background-color: #fdecea;
+}
+
+/* --- Dòng 2: Địa chỉ --- */
+.station-address {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 14px;
+}
+
+/* --- Dòng 3: Thống kê --- */
+.station-stats {
+    display: flex;
+    gap: 240px;
+    /* khoảng cách giữa các .stat */
+    margin-bottom: 16px;
+    justify-content: flex-start;
+    padding-left: 50px;
+    /* đẩy cả vùng thống kê cách trái 50px */
+}
+
+.stat {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 14px 8px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: 700;
+    font-size: 20px;
+    color: #000;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    transition: transform 0.2s;
+}
+
+.stat span {
+    font-weight: 600;
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+    white-space: nowrap;
+    /* tránh xuống dòng giữa chữ */
+}
+
+.stat.green {
+    color: #2e7d32;
+}
+
+.stat.orange {
+    color: #ef6c00;
+}
+
+.stat.red {
+    color: #d32f2f;
+}
+
+.stat.total {
+    color: #000;
+}
+
+/* Hover hiệu ứng nhẹ */
+.stat:hover {
+    transform: translateY(-3px);
+}
+
+/* --- Dòng 4: Doanh thu --- */
+.revenue {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2e7d32;
+    margin: 0;
+    padding-top: 4px;
+}
+
+.revenue b {
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+/* --- Dòng 1: Tên + trạng thái + nút hành động --- */
+.station-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* đẩy tên sang trái, nút sang phải */
+    gap: 20px;
+    margin-bottom: 12px;
+    width: 100%;
+    /* chiếm toàn bộ chiều ngang */
+}
+
+.station-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+    /* không xuống dòng */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    /* giới hạn rộng để nút có chỗ */
+}
+
+.station-header h4 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.station-actions {
+    display: flex;
+    /* thành hàng ngang */
+    gap: 10px;
+    align-items: center;
+}
+
+/* Các nút */
+.station-actions button {
+    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.station-actions button:active {
+    transform: scale(0.95);
+}
+
+/* Hover các nút */
+.btn-view:hover {
+    background-color: #e0f7fa;
+    border-color: #00bcd4;
+}
+
+.btn-edit:hover {
+    background-color: #fff3e0;
+    border-color: #ffb74d;
+}
+
+.btn-delete {
+    color: #d32f2f;
+    border-color: #f1c0c0;
+}
+
+.btn-delete:hover {
+    background-color: #ffeaea;
+    border-color: #d32f2f;
+    color: #b71c1c;
+}
+
+/* Responsive - nhỏ hơn 600px thì xếp dọc */
+@media (max-width: 600px) {
+    .station-card {
+        flex-direction: column;
+    }
+
+    .station-actions {
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-top: 14px;
+        min-width: auto;
+    }
+}
