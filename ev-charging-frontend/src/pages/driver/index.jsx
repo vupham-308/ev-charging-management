@@ -175,10 +175,7 @@ const DriverDashboard = () => {
         }`}
       >
         {/* Logo */}
-        <div
-          className="text-3xl font-bold tracking-widest text-white cursor-pointer"
-          onClick={() => navigate("/driver")}
-        >
+        <div className="text-3xl font-bold tracking-widest text-white cursor-pointer">
           EV Charge
         </div>
 
