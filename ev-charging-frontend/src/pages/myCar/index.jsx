@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
-import { Button, Card, Table, Tag, message, Spin } from "antd";
-import { CarOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Card, Progress, message, Spin } from "antd";
+import {
+  CarOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 
@@ -8,7 +13,7 @@ const ManageMyCar = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ đặt dòng này lên trên cùng
+  const location = useLocation();
 
   // ✅ Kiểm tra xem có đang ở trang con (add/edit) không
   const isChildRoute = location.pathname !== "/driver/myCar";
@@ -44,13 +49,14 @@ const ManageMyCar = () => {
   useEffect(() => {
     fetchCars();
   }, []);
+
   useEffect(() => {
     if (location.state?.updated) {
       fetchCars();
-      navigate("/driver/myCar", { replace: true }); // Xóa state tránh gọi lại liên tục
+      navigate("/driver/myCar", { replace: true });
     }
   }, [location.state]);
-  // ✅ Khi có xe mới được thêm từ trang AddCar
+
   useEffect(() => {
     if (location.state?.newCar) {
       setCars((prevCars) => {
@@ -66,109 +72,156 @@ const ManageMyCar = () => {
     }
   }, [location.state]);
 
-  // 🔹 Chuyển hướng đến trang thêm/sửa xe
+  // 🔹 Điều hướng
   const handleAddCar = () => navigate("/driver/myCar/addCar");
   const handleEditCar = (id) => navigate(`/driver/myCar/editCar/${id}`);
   const handleDeleteCar = (id) => navigate(`/driver/myCar/deleteCar/${id}`);
 
-  // 🔹 Cấu hình bảng
-  const columns = [
-    {
-      title: "🚘 Hãng Xe",
-      dataIndex: "brand",
-      key: "brand",
-      render: (text) => <b>{text}</b>,
-    },
-    {
-      title: "🎨 Màu Sắc",
-      dataIndex: "color",
-      key: "color",
-      render: (color) => (
-        <Tag color="blue" style={{ fontSize: "0.95rem" }}>
-          {color}
-        </Tag>
-      ),
-    },
-    {
-      title: "🔋 Mức Pin",
-      dataIndex: "initBattery",
-      key: "initBattery",
-      render: (battery) => (
-        <Tag
-          color={battery >= 80 ? "green" : battery >= 50 ? "gold" : "red"}
-          style={{ fontSize: "0.95rem" }}
-        >
-          {battery || 0}%
-        </Tag>
-      ),
-    },
-    {
-      title: "⚙️ Thao Tác",
-      key: "actions",
-      render: (_, record) => (
-        <div style={{ display: "flex", gap: "10px" }}>
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            onClick={() => handleEditCar(record.id)}
-          >
-            Sửa
-          </Button>
-          <Button danger onClick={() => handleDeleteCar(record.id)}>
-            Xóa
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  // 🔹 Nếu đang ở trang con
+  if (isChildRoute) return <Outlet />;
 
-  if (isChildRoute) {
-    return <Outlet />;
-  }
-
+  // 🔹 Giao diện
   return (
     <div
       style={{
-        padding: "40px",
-        backgroundColor: "#f5f7fa",
+        padding: "40px 60px",
+        backgroundColor: "#f7f8fb",
         minHeight: "100vh",
       }}
     >
-      <Card
-        title={
-          <span style={{ fontSize: "1.3rem" }}>
-            <CarOutlined style={{ color: "#1890ff" }} /> Xe của tôi
-          </span>
-        }
-        bordered={false}
+      {/* Header */}
+      <div
         style={{
-          maxWidth: 1000,
-          margin: "0 auto",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 30,
         }}
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddCar}>
-            Thêm xe
-          </Button>
-        }
       >
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "40px" }}>
-            <Spin size="large" />
-          </div>
-        ) : cars.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888", padding: "40px" }}>
-            🚘 Chưa có xe nào trong danh sách.
+        <div>
+          <h2 style={{ fontSize: "1.6rem", margin: 0 }}>Xe của tôi</h2>
+          <p style={{ color: "#555", margin: 0 }}>
+            Quản lý thông tin các xe điện
           </p>
-        ) : (
-          <Table
-            dataSource={cars}
-            columns={columns}
-            rowKey="id"
-            pagination={{ pageSize: 5 }}
-          />
-        )}
-      </Card>
+        </div>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAddCar}
+          style={{
+            backgroundColor: "#00021f",
+            border: "none",
+            height: 40,
+            fontWeight: 500,
+          }}
+        >
+          Thêm xe
+        </Button>
+      </div>
+
+      {/* Danh sách xe */}
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <Spin size="large" />
+        </div>
+      ) : cars.length === 0 ? (
+        <p style={{ textAlign: "center", color: "#888", padding: "40px" }}>
+          🚘 Chưa có xe nào trong danh sách.
+        </p>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
+            gap: "24px",
+          }}
+        >
+          {cars.map((car) => (
+            <Card
+              key={car.id}
+              style={{
+                borderRadius: "12px",
+                border: "2px solid #0a0a23",
+                background: "white",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                padding: "10px 25px 25px",
+              }}
+              bodyStyle={{ padding: "0" }}
+            >
+              <div>
+                <h3 style={{ fontSize: "1.1rem", marginBottom: 4 }}>
+                  {car.brand || "Tên xe"}
+                </h3>
+                <p style={{ color: "#666", marginBottom: 16 }}>
+                  {car.color || "Màu"} • {car.licensePlate || "Biển số"}
+                </p>
+
+                <div style={{ color: "#333", marginBottom: 8 }}>Mức pin</div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 20,
+                  }}
+                >
+                  <Progress
+                    percent={car.initBattery || 0}
+                    showInfo={false}
+                    strokeColor="#00021f"
+                    trailColor="#d9d9d9"
+                    style={{ flex: 1 }}
+                  />
+                  <span
+                    style={{
+                      marginLeft: 10,
+                      fontWeight: 600,
+                      color: "#00021f",
+                    }}
+                  >
+                    {car.initBattery || 0}%
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={() => handleEditCar(car.id)}
+                    style={{
+                      borderRadius: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      width: "120px",
+                    }}
+                  >
+                    Sửa
+                  </Button>
+
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => handleDeleteCar(car.id)}
+                    style={{
+                      borderRadius: "8px",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "40px",
+                      height: "40px",
+                    }}
+                  />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

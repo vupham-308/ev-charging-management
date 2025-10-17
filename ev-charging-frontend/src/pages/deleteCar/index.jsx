@@ -52,9 +52,17 @@ const ManageDeleteCar = () => {
     }
   };
 
-  if (loading || !car) {
+  if (loading && !car) {
     return (
-      <div style={{ textAlign: "center", padding: "100px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          backgroundColor: "#f5f7fa",
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -63,45 +71,68 @@ const ManageDeleteCar = () => {
   return (
     <div
       style={{
-        padding: "40px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: "#f5f7fa",
         minHeight: "100vh",
+        padding: "20px",
       }}
     >
       <Card
         title={
           <span
-            style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#ff4d4f" }}
+            style={{
+              fontSize: "1.4rem",
+              fontWeight: "bold",
+              color: "#ff4d4f",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
           >
-            <ExclamationCircleOutlined /> Xác nhận xóa xe
+            <ExclamationCircleOutlined />
+            Xác nhận xóa xe
           </span>
         }
         bordered={false}
         style={{
+          width: "100%",
           maxWidth: 600,
-          marginLeft: "80px",
           textAlign: "left",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-          borderRadius: "12px",
+          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+          borderRadius: "14px",
+          background: "#fff",
+          padding: "10px 20px 20px 20px",
         }}
       >
-        <p style={{ fontSize: "1.1rem" }}>
-          Bạn có chắc chắn muốn xóa xe này không? Hành động này không thể hoàn
-          tác.
+        <p style={{ fontSize: "1.1rem", color: "#333", marginBottom: "20px" }}>
+          Bạn có chắc chắn muốn xóa xe này không?
+          <br />
+          <span style={{ color: "#ff4d4f", fontWeight: 500 }}>
+            Hành động này không thể hoàn tác.
+          </span>
         </p>
 
-        <div style={{ marginTop: "20px" }}>
+        <div
+          style={{
+            backgroundColor: "#fafafa",
+            padding: "15px",
+            borderRadius: "10px",
+            marginBottom: "25px",
+          }}
+        >
           <p>
-            <b>🚘 Hãng xe:</b> {car.brand}
+            <b>🚘 Hãng xe:</b> {car?.brand}
           </p>
           <p>
-            <b>🎨 Màu sắc:</b> {car.color}
+            <b>🎨 Màu sắc:</b> {car?.color}
           </p>
           <p>
-            <b>🚗 Biển số:</b> {car.licensePlate}
+            <b>🚗 Biển số:</b> {car?.licensePlate}
           </p>
           <p>
-            <b>🔋 Mức pin khởi tạo:</b> {car.initBattery}%
+            <b>🔋 Mức pin khởi tạo:</b> {car?.initBattery}%
           </p>
         </div>
 
@@ -110,7 +141,6 @@ const ManageDeleteCar = () => {
             display: "flex",
             justifyContent: "flex-end",
             gap: "10px",
-            marginTop: "30px",
           }}
         >
           <Button

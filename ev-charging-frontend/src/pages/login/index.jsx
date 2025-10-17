@@ -55,8 +55,11 @@ const LoginPage = () => {
       } else {
         navigate("/");
       }
+
+      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       message.error("Login failed. Please try again.");
+      toast.warning("Login failed!!!");
     } finally {
       setIsLoading(false);
     }
@@ -144,6 +147,16 @@ const LoginPage = () => {
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </Form.Item>
+
+            <div className="text-center mt-3">
+              <span className="text-gray-600">Don’t have an account? </span>
+              <a
+                className="text-blue-600 hover:underline font-medium cursor-pointer"
+                onClick={() => navigate("/register")}
+              >
+                Register now
+              </a>
+            </div>
 
             <Divider>Or continue with</Divider>
 

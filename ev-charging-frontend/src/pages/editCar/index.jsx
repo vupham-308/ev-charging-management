@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Button, message, Input, InputNumber } from "antd";
+import { Card, Button, message, Input, InputNumber, Spin } from "antd";
 import { ArrowLeftOutlined, SaveOutlined } from "@ant-design/icons";
 import api from "../../config/axios";
 
@@ -12,12 +12,13 @@ const ManageEditCar = () => {
   const [licensePlate, setLicensePlate] = useState("");
   const [initBattery, setInitBattery] = useState(100);
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
   // ✅ Lấy thông tin xe cần chỉnh sửa
   useEffect(() => {
     const fetchCar = async () => {
       try {
-        setLoading(true);
+        setLoadingData(true);
         const token = localStorage.getItem("token");
         const response = await api.get(`/cars/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -31,7 +32,7 @@ const ManageEditCar = () => {
         console.error("❌ Lỗi khi tải thông tin xe:", error);
         message.error("Không thể tải thông tin xe!");
       } finally {
-        setLoading(false);
+        setLoadingData(false);
       }
     };
     fetchCar();
@@ -60,31 +61,51 @@ const ManageEditCar = () => {
     }
   };
 
+  if (loadingData) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f5f7fa",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
-        padding: "40px",
         backgroundColor: "#f5f7fa",
         minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "20px",
       }}
     >
       <Card
         title={
-          <span style={{ fontSize: "1.3rem", fontWeight: "bold" }}>
+          <span style={{ fontSize: "1.4rem", fontWeight: "bold" }}>
             🛠️ Chỉnh sửa xe
           </span>
         }
         bordered={false}
         style={{
-          maxWidth: 600,
-          marginLeft: "80px", // 👈 Căn thẻ card sang trái
-          textAlign: "left", // 👈 Căn trái toàn bộ nội dung
+          width: "100%",
+          maxWidth: "600px",
+          textAlign: "left",
           boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
           borderRadius: "12px",
+          background: "#fff",
         }}
       >
-        <form onSubmit={handleUpdateCar} className="space-y-4">
-          <div>
+        <form onSubmit={handleUpdateCar}>
+          <div style={{ marginBottom: "15px" }}>
             <label className="block font-semibold mb-1">🚘 Hãng xe</label>
             <Input
               value={brand}
@@ -93,7 +114,7 @@ const ManageEditCar = () => {
             />
           </div>
 
-          <div>
+          <div style={{ marginBottom: "15px" }}>
             <label className="block font-semibold mb-1">🎨 Màu sắc</label>
             <Input
               value={color}
@@ -102,7 +123,7 @@ const ManageEditCar = () => {
             />
           </div>
 
-          <div>
+          <div style={{ marginBottom: "15px" }}>
             <label className="block font-semibold mb-1">🚗 Biển số xe</label>
             <Input
               value={licensePlate}
@@ -111,7 +132,7 @@ const ManageEditCar = () => {
             />
           </div>
 
-          <div>
+          <div style={{ marginBottom: "15px" }}>
             <label className="block font-semibold mb-1">
               🔋 Mức pin khởi tạo (%)
             </label>
@@ -121,6 +142,7 @@ const ManageEditCar = () => {
               value={initBattery}
               onChange={(value) => setInitBattery(value)}
               className="w-full"
+              style={{ width: "100%" }}
             />
           </div>
 
