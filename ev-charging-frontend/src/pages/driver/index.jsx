@@ -15,7 +15,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setAccount } from "../../redux/accountSlice";
 
@@ -174,15 +174,15 @@ const DriverDashboard = () => {
 
         {/* Navigation Menu */}
         <nav className="hidden md:flex gap-8 items-center text-white font-medium">
-          <a href="#bandotram" className="hover:text-primary transition-colors">
+          <Link to="map" className="hover:text-primary transition-colors">
             Bản đồ trạm
-          </a>
+          </Link>
           <a href="#PhienSac" className="hover:text-primary transition-colors">
             Phiên Sạc
           </a>
-          <a href="#xecuatoi" className="hover:text-primary transition-colors">
+          <Link to="myCar" className="hover:text-primary transition-colors">
             Xe Của Tôi
-          </a>
+          </Link>
           <a href="#datcho" className="hover:text-primary transition-colors">
             Đặt Chỗ
           </a>
@@ -278,17 +278,13 @@ const DriverDashboard = () => {
           </p>{" "}
           {/* CHỈNH CHU: Tập trung vào hệ thống thông minh và trải nghiệm đẳng cấp */}
           <button
+            onClick={() => navigate("/driver/map")}
             className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-white hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 opacity-0 animate-fade-in-up"
-            style={{ animationDelay: "0.8s" }}
-            onClick={() =>
-              document
-                .getElementById("bandotram")
-                .scrollIntoView({ behavior: "smooth" })
-            }
           >
             Tìm Trạm Gần Nhất
-          </button>{" "}
+          </button>
           {/* CHỈNH CHU: "Gần Nhất" cụ thể hơn */}
+          <Outlet />
         </div>
         <div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 animate-fade-in-up"

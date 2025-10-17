@@ -16,6 +16,7 @@ import StaffDashboard from "./pages/staff";
 import AdminDashboard from "./pages/admin";
 import DriverDashboard from "./pages/driver";
 import ProfilePage from "./pages/profile";
+<<<<<<< Updated upstream
 // Add
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
 import Users from "./pages/admin/Users"
@@ -23,6 +24,13 @@ import IncidentManagement from "./pages/admin/IncidentManagement";
 import ChargingRates from "./pages/admin/ChargingRates";
 import ChargingStations from "./pages/admin/ChargingStations";
 
+=======
+import ManageMap from "./pages/map";
+import ManageMyCar from "./pages/myCar";
+import ManageAddCar from "./pages/addCar";
+import ManageEditCar from "./pages/editCar";
+import ManageDeleteCar from "./pages/deleteCar";
+>>>>>>> Stashed changes
 
 // 1. Component
 // là 1 cái function
@@ -47,6 +55,12 @@ function App() {
     {
       path: "/",
       element: <EVChargeHomePage />,
+      children: [
+        {
+          path: "map",
+          element: <ManageMap />,
+        },
+      ],
     },
     {
       path: "/login",
@@ -63,6 +77,33 @@ function App() {
     {
       path: "/driver",
       element: <DriverDashboard />,
+<<<<<<< Updated upstream
+=======
+      children: [
+        {
+          path: "map",
+          element: <ManageMap />,
+        },
+        {
+          path: "myCar",
+          element: <ManageMyCar />,
+          children: [
+            {
+              path: "addCar",
+              element: <ManageAddCar />,
+            },
+            {
+              path: "editCar/:id",
+              element: <ManageEditCar />,
+            },
+            {
+              path: "deleteCar/:id",
+              element: <ManageDeleteCar />,
+            },
+          ],
+        },
+      ],
+>>>>>>> Stashed changes
     },
     {
       path: "/profile",

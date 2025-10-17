@@ -50,6 +50,8 @@ const LoginPage = () => {
         navigate("/admin");
       } else if (role === "STAFF") {
         navigate("/staff");
+      } else if (role === "USER") {
+        navigate("/driver");
       } else {
         navigate("/");
       }
