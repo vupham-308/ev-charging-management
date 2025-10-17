@@ -33,7 +33,31 @@ public class ChargingSessionController {
     @PostMapping("/charging/{sessionId}")
     public ResponseEntity charging(@PathVariable("sessionId") int sessionId) {
         try {
-            return ResponseEntity.ok(chargingSessionService.charge(sessionId));
+            chargingSessionService.charge(sessionId);
+            return ResponseEntity.ok("Đang sạc, vui lòng kiểm tra chi tiết tại 'Phiên sạc của tôi'");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Driver: Hiển thị tất cả phiên sạc đang sạc")
+    @PreAuthorize("hasAuthority('USER')")
+    @GetMapping("/chargingsessions")
+    public ResponseEntity viewSession() {
+        try {
+            return ResponseEntity.ok(chargingSessionService.view());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Driver: Dừng phiên sạc")
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping("/stop/{sessionId}")
+    public ResponseEntity stop(@PathVariable("sessionId") int sessionId) {
+        try {
+            chargingSessionService.stopCharge(sessionId);
+            return ResponseEntity.ok("Đã dừng phiên sạc!");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

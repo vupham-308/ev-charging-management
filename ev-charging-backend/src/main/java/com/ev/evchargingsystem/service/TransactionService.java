@@ -37,4 +37,9 @@ public class TransactionService {
         transaction.setUser(user);
         return transactionRepository.save(transaction);
     }
+
+    public double getBalance(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.getUserBalance(user.getId());
+    }
 }

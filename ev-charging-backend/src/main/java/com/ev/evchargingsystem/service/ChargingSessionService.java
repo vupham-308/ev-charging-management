@@ -27,6 +27,8 @@ public class ChargingSessionService {
     ChargerPointRepository chargerPointRepository;
     @Autowired
     TransactionService transactionService;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
 
     public ChargingSession charge(int sessionId) {
@@ -45,9 +47,6 @@ public class ChargingSessionService {
         //BALANCE thì lưu vào transaction
         if(c.getPaymentMethod().equals("BALANCE")){
             Transaction t = transactionService.createTransaction(c,total);
-            if(t.getStatus().equals("COMPLETED")){
-                c.setStatus("PAID");
-            }
         }
         //CASH + PAID thì lưu vào transaction
         if(c.getPaymentMethod().equals("CASH")&&c.getStatus().equals("PAID")){
@@ -190,5 +189,42 @@ public class ChargingSessionService {
             return (int)Math.round(needCharge*0.3);
         }
         return 0;
+    }
+
+    public List<ChargingResponse> view() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<ChargingSession> list = chargingSessionRepository.findOngoingSessionsByUser(user.getId());
+        List<ChargingResponse> rsList = new ArrayList<>();
+        for(ChargingSession c : list) {
+            int time = caculateTimeToReachGoalBattery(c.getChargerPoint().getChargerCost().getPortType(),
+                    c.getCar().getInitBattery(), c.getGoalBattery());
+            double total = 0;
+            ChargingResponse rs = new ChargingResponse(c.getChargerPoint(),
+                    c.getCar().getBrand(), c.getPaymentMethod(), time, total,
+                    c.getCar().getInitBattery(), c.getGoalBattery());
+            rsList.add(rs);
+        }
+        return rsList;
+    }
+
+    public boolean stopCharge(int sessionId){
+        ChargingSession s = chargingSessionRepository.findChargingSessionById(sessionId);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(user.getRole().equals("USER")&&(s.getCar().getUser().getId()!=user.getId())){
+            throw new RuntimeException("Bạn không có quyền dừng phiên sạc này!");
+        }
+
+        //sửa lại thông tin session thực tế
+        s.setEndTime(new Date(System.currentTimeMillis()));
+        s.setStatus("COMPLETED");
+        chargingSessionRepository.save(s);
+        //sửa transaction mới tương ứng
+        Transaction tranNew = transactionRepository.findTransactionByChargingSession(s);
+        Date current = new Date(System.currentTimeMillis());
+        int timeCharged = (int) (current.getTime()-s.getStartTime().getTime())/36000;
+        double total = timeCharged*s.getChargerPoint().getChargerCost().getCost();
+        tranNew.setTotalAmount(total);
+        transactionRepository.save(tranNew);
+        return true;
     }
 }
