@@ -27,4 +27,11 @@ public class Reservation {
     @NotNull
     private Date endDate;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "charger_point_id")
+    private ChargerPoint chargerPoint;
 }

@@ -13,9 +13,6 @@ public class CarCreateRequest {
     @NotEmpty(message = "Color cannot be empty!")
     private String color;
 
-    @NotNull
-    private Integer initBattery;
-
     @NotNull(message = "licensePlate cannot be empty!")
     @Pattern(regexp = "^\\d{2}[A-Z]-\\d{4,5}$", message = "Invalid license plate format. Example: 51F-12345")
     private String licensePlate;
