@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,9 +53,13 @@ public class CarService {
         Car car = new Car();
         car.setBrand(req.getBrand());
         car.setColor(req.getColor());
-        car.setInitBattery(req.getInitBattery());
         car.setLicensePlate(req.getLicensePlate());
-        car.setUser(currentUser); // gán theo user đăng nhập
+
+        // Random pin từ 1 đến 100
+        int randomBattery = new Random().nextInt(100) + 1;
+        car.setInitBattery(randomBattery);
+
+        car.setUser(currentUser);
         return carRepository.save(car);
     }
 
@@ -88,7 +93,6 @@ public class CarService {
         // cập nhật thông tin từ request
         car.setBrand(req.getBrand());
         car.setColor(req.getColor());
-        car.setInitBattery(req.getInitBattery());
         car.setLicensePlate(req.getLicensePlate());
 
         Car updated = carRepository.save(car);
