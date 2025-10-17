@@ -16,21 +16,18 @@ import StaffDashboard from "./pages/staff";
 import AdminDashboard from "./pages/admin";
 import DriverDashboard from "./pages/driver";
 import ProfilePage from "./pages/profile";
-<<<<<<< Updated upstream
 // Add
 import DashboardAdmin from "./pages/admin/DashboardAdmin";
-import Users from "./pages/admin/Users"
+import Users from "./pages/admin/Users";
 import IncidentManagement from "./pages/admin/IncidentManagement";
 import ChargingRates from "./pages/admin/ChargingRates";
 import ChargingStations from "./pages/admin/ChargingStations";
 
-=======
 import ManageMap from "./pages/map";
 import ManageMyCar from "./pages/myCar";
 import ManageAddCar from "./pages/addCar";
 import ManageEditCar from "./pages/editCar";
 import ManageDeleteCar from "./pages/deleteCar";
->>>>>>> Stashed changes
 
 // 1. Component
 // là 1 cái function
@@ -38,20 +35,6 @@ import ManageDeleteCar from "./pages/deleteCar";
 
 function App() {
   const router = createBrowserRouter([
-    {
-      path: "/dashboard",
-      element: <Dashboard />,
-      children: [
-        {
-          path: "bike",
-          element: <ManageBike />,
-        },
-        {
-          path: "category",
-          element: <ManageCategory />,
-        },
-      ],
-    },
     {
       path: "/",
       element: <EVChargeHomePage />,
@@ -77,8 +60,6 @@ function App() {
     {
       path: "/driver",
       element: <DriverDashboard />,
-<<<<<<< Updated upstream
-=======
       children: [
         {
           path: "map",
@@ -103,7 +84,6 @@ function App() {
           ],
         },
       ],
->>>>>>> Stashed changes
     },
     {
       path: "/profile",
@@ -116,32 +96,31 @@ function App() {
       children: [
         {
           index: true, // khi vào /admin sẽ mặc định hiện DashboardAdmin
-          element: <DashboardAdmin />
+          element: <DashboardAdmin />,
         },
         {
           path: "dashboardadmin",
-          element: <DashboardAdmin />
+          element: <DashboardAdmin />,
         },
         {
           path: "users",
-          element: <Users />
+          element: <Users />,
         },
         {
           path: "stations",
-          element: <ChargingStations />
+          element: <ChargingStations />,
         },
         {
           path: "incidents",
-          element: <IncidentManagement />
+          element: <IncidentManagement />,
         },
         {
           path: "settings",
-          element: <ChargingRates />
+          element: <ChargingRates />,
         },
-      ]
+      ],
     },
   ]);
-
 
   return (
     <>
