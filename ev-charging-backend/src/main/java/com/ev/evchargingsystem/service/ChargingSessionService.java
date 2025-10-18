@@ -136,7 +136,7 @@ public class ChargingSessionService {
         }
     }
 
-    public ChargingResponse createSession(ChargingSessionRequest rq) {
+    public ChargingSession createSession(ChargingSessionRequest rq) {
         Car car = carRepository.findById(rq.getCarId()).orElse(null);
         ChargerPoint point = chargerPointRepository.findById(rq.getPointId()).orElse(null);
         if(car==null||point==null){
@@ -159,18 +159,18 @@ public class ChargingSessionService {
             throw new RuntimeException("Không thể sạc với mục tiêu sạc thấp hơn pin của bạn!");
         }
         charge.setGoalBattery(rq.getGoalBattery());
-        chargingSessionRepository.save(charge);
+        return chargingSessionRepository.save(charge);
         //======================================
-        //trả về ChargingResponse
-        ChargingResponse rs = new ChargingResponse();
-        rs.setFee(timeCharge*charge.getChargerPoint().getChargerCost().getCost());
-        rs.setMinute(timeCharge);
-        rs.setGoalBattery(charge.getGoalBattery());
-        rs.setInitBattery(charge.getCar().getInitBattery());
-        rs.setPoint(charge.getChargerPoint());
-        rs.setPaymentMethod(charge.getPaymentMethod());
-        rs.setCarName(charge.getCar().getBrand());
-        return rs;
+//        //trả về ChargingResponse
+//        ChargingResponse rs = new ChargingResponse();
+//        rs.setFee(timeCharge*charge.getChargerPoint().getChargerCost().getCost());
+//        rs.setMinute(timeCharge);
+//        rs.setGoalBattery(charge.getGoalBattery());
+//        rs.setInitBattery(charge.getCar().getInitBattery());
+//        rs.setPoint(charge.getChargerPoint());
+//        rs.setPaymentMethod(charge.getPaymentMethod());
+//        rs.setCarName(charge.getCar().getBrand());
+//        return rs;
     }
 
     public int caculateTimeToReachGoalBattery(String portType, int initBattery, int goalBattery){
