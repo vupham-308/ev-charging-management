@@ -21,6 +21,7 @@ public class StationResponse {
     private String address;
     @NotNull
     private int pointChargerAvailable;
+    private int pointChargerOutOfService;
     @NotNull
     private int pointChargerTotal;
     @NotNull

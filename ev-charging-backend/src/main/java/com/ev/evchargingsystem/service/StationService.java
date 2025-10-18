@@ -77,6 +77,7 @@ public class StationService {
             rp.setAddress(station.getAddress());
             rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
             rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
+            rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
             rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
             stationResponseList.add(rp);
         }
@@ -91,6 +92,7 @@ public class StationService {
         rp.setAddress(station.getAddress());
         rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
         rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
+        rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
         rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
         return rp;
     }
@@ -110,11 +112,31 @@ public class StationService {
         return count;
     }
 
-    public List<StationResponse> searchStations(String keyword) {
+    public int getPointChargerOutOfServiceByStation(int stationID){
+        int count=0;
+        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID);
+        for(ChargerPoint x: list){
+            if(x.getStatus().equals("OUT_OF_SERVICE")){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public List<StationResponse> searchStations(String keywor
+        List<StationResponse> stationResponseList = new ArrayList<>();
         List<Station> stations = stationRepository.searchStations(keyword);
-        return stations.stream()
-                .map(station -> modelMapper.map(station, StationResponse.class))
-                .collect(Collectors.toList());
+        for(Station station : stations) {
+            StationResponse rp = new StationResponse();
+            rp.setName(station.getName());
+            rp.setAddress(station.getAddress());
+            rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
+            rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
+            rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
+            rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+            stationResponseList.add(rp);
+        }
+        return stationResponseList;
     }
 
     public StationStatsResponseForAdmin getStationStats() {

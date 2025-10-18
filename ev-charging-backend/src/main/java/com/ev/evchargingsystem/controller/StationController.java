@@ -54,7 +54,7 @@ public class StationController {
         }
     }
 
-    @Operation(summary = "Hiển thị danh sách trạm cho driver chọn")
+    @Operation(summary = "Hiển thị danh sách trạm")
     @GetMapping("/getAllStations")
     public ResponseEntity getStations(){
         List<StationResponse> list = stationService.getAllStations();
