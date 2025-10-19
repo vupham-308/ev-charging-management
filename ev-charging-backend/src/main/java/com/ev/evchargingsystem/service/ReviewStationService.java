@@ -55,4 +55,9 @@ public class ReviewStationService {
         reviewRepo.save(review);
         return "Review created successfully";
     }
+
+    public String deleteReview(int id) {
+        reviewRepo.deleteById(id);
+        return "Review deleted successfully";
+    }
 }
