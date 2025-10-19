@@ -6,15 +6,21 @@
   <component name="ChangeListManager">
     <list default="true" id="a2085b48-584c-48d1-b759-f3255501025d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/StationResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/StationResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ChargerPointController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ChargerPointController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ChargingSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ChargingSessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ReservationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ChargingSessionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ChargingSessionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargerPointService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargerPointService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ReservationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/StationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/StationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ChargingSessionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ChargingSessionController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ReservationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ReservationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ChargerPointController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ChargerPointController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ChargingSessionRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ChargingSessionRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ReservationRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ReservationRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargerPointService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargerPointService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargingSessionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargingSessionService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ReservationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ReservationService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,6 +91,11 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlserver&quot;
+    ]
   }
 }</component>
   <component name="RunManager">
@@ -120,7 +131,12 @@
       <workItem from="1760692961299" duration="2973000" />
       <workItem from="1760756282437" duration="300000" />
       <workItem from="1760764382034" duration="312000" />
-      <workItem from="1760776508932" duration="545000" />
+      <workItem from="1760776508932" duration="1694000" />
+      <workItem from="1760792853821" duration="779000" />
+      <workItem from="1760798347302" duration="54000" />
+      <workItem from="1760857637518" duration="6443000" />
+      <workItem from="1760864190499" duration="1471000" />
+      <workItem from="1760891380291" duration="12000" />
     </task>
     <servers />
   </component>

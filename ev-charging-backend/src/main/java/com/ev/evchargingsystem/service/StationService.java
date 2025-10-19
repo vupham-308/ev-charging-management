@@ -123,7 +123,7 @@ public class StationService {
         return count;
     }
 
-    public List<StationResponse> searchStations(String keywor
+    public List<StationResponse> searchStations(String keyword) {
         List<StationResponse> stationResponseList = new ArrayList<>();
         List<Station> stations = stationRepository.searchStations(keyword);
         for(Station station : stations) {

@@ -19,7 +19,8 @@ public class ChargingSessionController {
     @Operation(summary = "Driver: tạo 1 phiên sạc (chưa bắt đầu)")
     @PreAuthorize("hasAuthority('USER')")
     @PostMapping("/charge")
-    public ResponseEntity charge(@RequestBody ChargingSessionRequest chargingSessionRequest) {
+    public ResponseEntity charge(
+                                 @RequestBody ChargingSessionRequest chargingSessionRequest) {
         try {
             return ResponseEntity.ok(chargingSessionService.createSession(chargingSessionRequest));
         } catch (RuntimeException e) {
