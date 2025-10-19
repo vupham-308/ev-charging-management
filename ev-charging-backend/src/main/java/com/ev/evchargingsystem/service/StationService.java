@@ -80,6 +80,11 @@ public class StationService {
             rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
             rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
             rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+
+            rp.setPhone(station.getPhone());
+            rp.setEmail(station.getEmail());
+            rp.setStatus(station.getStatus());
+
             stationResponseList.add(rp);
         }
         return stationResponseList;
@@ -96,6 +101,10 @@ public class StationService {
         rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
         rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
         rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+
+        rp.setPhone(station.getPhone());
+        rp.setEmail(station.getEmail());
+        rp.setStatus(station.getStatus());
         return rp;
     }
 

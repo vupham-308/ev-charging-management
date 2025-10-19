@@ -28,4 +28,8 @@ public class StationResponse {
     private int pointChargerTotal;
     @NotNull
     private List<String> portType;
+
+    private String phone;
+    private String email;
+    private String status;
 }

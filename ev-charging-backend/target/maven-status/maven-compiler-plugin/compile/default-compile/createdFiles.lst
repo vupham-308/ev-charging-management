@@ -10,6 +10,7 @@ com\ev\evchargingsystem\controller\ChargingSessionController.class
 com\ev\evchargingsystem\repository\ReviewStationRepository.class
 com\ev\evchargingsystem\entity\ReviewStation.class
 com\ev\evchargingsystem\controller\AuthenticationController.class
+com\ev\evchargingsystem\service\ReviewStationService.class
 com\ev\evchargingsystem\entity\ProblemReport.class
 com\ev\evchargingsystem\service\ProblemReportService.class
 com\ev\evchargingsystem\entity\Transaction.class
@@ -27,6 +28,7 @@ com\ev\evchargingsystem\service\ChargerCostService.class
 com\ev\evchargingsystem\service\TokenService.class
 com\ev\evchargingsystem\config\SecurityConfig.class
 com\ev\evchargingsystem\model\request\ProblemResponseRequest.class
+com\ev\evchargingsystem\model\request\ReviewStationRequest.class
 com\ev\evchargingsystem\controller\CarController.class
 com\ev\evchargingsystem\controller\StationController.class
 com\ev\evchargingsystem\controller\TransactionController.class
@@ -55,6 +57,7 @@ com\ev\evchargingsystem\model\request\UpdatePasswordRequest.class
 com\ev\evchargingsystem\repository\AuthenticationRepository.class
 com\ev\evchargingsystem\model\request\ChargingSessionRequest.class
 com\ev\evchargingsystem\service\StaffService.class
+com\ev\evchargingsystem\controller\ReviewController.class
 com\ev\evchargingsystem\entity\Car.class
 com\ev\evchargingsystem\model\response\CPointStatusResponseForStaff.class
 com\ev\evchargingsystem\EvChargingSystemApplication.class
