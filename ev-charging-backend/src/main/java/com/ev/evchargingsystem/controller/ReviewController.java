@@ -2,6 +2,7 @@ package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.model.request.ReviewStationRequest;
 import com.ev.evchargingsystem.service.ReviewStationService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,13 +16,14 @@ public class ReviewController {
     @Autowired
     private ReviewStationService reviewService;
 
+    @Operation(summary = "Tạo đánh giá cho trạm")
     @PostMapping("/create")
     public ResponseEntity<?> createReview(@RequestBody ReviewStationRequest request) {
         String message = reviewService.createReview(request);
         return ResponseEntity.ok(message);
     }
 
-
+    @Operation(summary = "Xóa đánh giá theo id (Admin only)")
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReview(@PathVariable int id) {
@@ -29,6 +31,7 @@ public class ReviewController {
         return ResponseEntity.ok(message);
     }
 
+    @Operation(summary = "Lấy đánh giá theo trạm")
     @GetMapping("/station/{stationId}")
     public ResponseEntity<?> getReviewsByStation(@PathVariable int stationId) {
         return ResponseEntity.ok(reviewService.getReviewsByStation(stationId));
