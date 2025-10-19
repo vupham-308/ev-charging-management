@@ -175,7 +175,10 @@ const DriverDashboard = () => {
         }`}
       >
         {/* Logo */}
-        <div className="text-3xl font-bold tracking-widest text-white cursor-pointer">
+        <div
+          className="text-3xl font-bold tracking-widest text-white cursor-pointer"
+          onClick={() => navigate("/driver")}
+        >
           EV Charge
         </div>
 
@@ -193,7 +196,7 @@ const DriverDashboard = () => {
           <Link to="myCar" className="hover:text-primary transition-colors">
             Xe Của Tôi
           </Link>
-          <Link to="booking" className="hover:text-primary transition-colors">
+          <Link to="myBooking" className="hover:text-primary transition-colors">
             Đặt Chỗ
           </Link>
           <Link
