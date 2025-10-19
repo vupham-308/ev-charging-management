@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.ReviewStation;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.ReviewStationRequest;
+import com.ev.evchargingsystem.model.response.ReviewResponse;
 import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
@@ -13,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,5 +62,22 @@ public class ReviewStationService {
     public String deleteReview(int id) {
         reviewRepo.deleteById(id);
         return "Review deleted successfully";
+    }
+
+    public List<ReviewResponse> getReviewsByStation(int stationId) {
+        List<ReviewStation> reviews = reviewRepo.findByStationId(stationId);
+        List<ReviewResponse> list = new ArrayList<>();
+
+        for (ReviewStation r : reviews) {
+            ReviewResponse dto = new ReviewResponse();
+            dto.setId(r.getId());
+            dto.setUserName(r.getUser().getFullName());
+            dto.setRating(r.getRating());
+            dto.setDescription(r.getDescription());
+            dto.setReviewDate(r.getReviewDate());
+            list.add(dto);
+        }
+
+        return list;
     }
 }

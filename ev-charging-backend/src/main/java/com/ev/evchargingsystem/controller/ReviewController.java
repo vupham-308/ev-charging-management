@@ -28,4 +28,9 @@ public class ReviewController {
         String message = reviewService.deleteReview(id);
         return ResponseEntity.ok(message);
     }
+
+    @GetMapping("/station/{stationId}")
+    public ResponseEntity<?> getReviewsByStation(@PathVariable int stationId) {
+        return ResponseEntity.ok(reviewService.getReviewsByStation(stationId));
+    }
 }
