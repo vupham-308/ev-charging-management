@@ -96,6 +96,20 @@ public class ChargerPointService {
         return list;
     }
 
+    //lấy tất cả trụ sạc đang Available của trạm sạc đó
+    public List<ChargerPoint> getAllByStationAvailable(int stationId){
+        List<ChargerPoint> list = new ArrayList<>();
+        List<ChargerPoint> avai = new ArrayList<>();
+        chargerPointRepository.findChargerPointsByStationId(stationId).forEach(list::add);
+        for(ChargerPoint x: list){
+            if(x.getStatus().equals("AVAILABLE")){
+                avai.add(x);
+            }
+        }
+        return avai;
+    }
+
+
     public ChargerPoint get(int id){
         return chargerPointRepository.findChargerPointById(id);
     }

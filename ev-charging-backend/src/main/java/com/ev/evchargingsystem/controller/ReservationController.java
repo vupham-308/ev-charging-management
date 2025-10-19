@@ -36,4 +36,5 @@ public class ReservationController {
         List<ReservationResponse> reservations = reservationService.getUserReservations(email);
         return ResponseEntity.ok(reservations);
     }
+
 }

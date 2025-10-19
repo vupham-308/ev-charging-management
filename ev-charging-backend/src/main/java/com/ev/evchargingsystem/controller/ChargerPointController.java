@@ -64,6 +64,16 @@ public class ChargerPointController {
         return ResponseEntity.ok(list);
     }
 
+    @Operation(summary = "Lấy danh sách trụ sạc theo trạm, chỉ lấy trụ nào Available")
+    @GetMapping("/getAllAvailable/{stationID}")
+    public ResponseEntity getAllChargerPointAvailable(@PathVariable int stationID) {//id station
+        List<ChargerPoint> list = chargerPointService.getAllByStationAvailable(stationID);
+        if(list.size()==0){
+            return ResponseEntity.badRequest().body("Hiện tại, trạm này không có trụ sạc nào!");
+        }
+        return ResponseEntity.ok(list);
+    }
+
     @GetMapping("/get/{pointID}")
     public ResponseEntity getChargerPoint(@PathVariable int pointID) {
         return ResponseEntity.ok(chargerPointService.get(pointID));
