@@ -28,6 +28,9 @@ import ManageMyCar from "./pages/myCar";
 import ManageAddCar from "./pages/addCar";
 import ManageEditCar from "./pages/editCar";
 import ManageDeleteCar from "./pages/deleteCar";
+import ManageBooking from "./pages/booking";
+import ManageMyBooking from "./pages/myBooking";
+import ManageStartCharging from "./pages/startCharging";
 
 // 1. Component
 // là 1 cái function
@@ -64,6 +67,18 @@ function App() {
         {
           path: "map",
           element: <ManageMap />,
+        },
+        {
+          path: "booking/:stationId",
+          element: <ManageBooking />,
+        },
+        {
+          path: "startCharging",
+          element: <ManageStartCharging />,
+        },
+        {
+          path: "myBooking",
+          element: <ManageMyBooking />,
         },
         {
           path: "myCar",
