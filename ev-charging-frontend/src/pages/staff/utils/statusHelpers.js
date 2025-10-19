@@ -1,6 +1,6 @@
 import { STATUS_COLORS, STATUS_BG_COLORS, STATUS_KEYWORDS } from "../constants/status"
 
-export const getStatusColor = (status: string): string => {
+export const getStatusColor = (status) => {
   const statusLower = (status || "").toLowerCase()
 
   if (STATUS_KEYWORDS.solved.some((keyword) => statusLower.includes(keyword))) return "success"
@@ -11,12 +11,12 @@ export const getStatusColor = (status: string): string => {
   return "default"
 }
 
-export const getStatusBorderColor = (status: string): string => {
+export const getStatusBorderColor = (status) => {
   const colorType = getStatusColor(status)
-  return STATUS_COLORS[colorType as keyof typeof STATUS_COLORS] || STATUS_COLORS.default
+  return STATUS_COLORS[colorType] || STATUS_COLORS.default
 }
 
-export const getStatusBgColor = (status: string): string => {
+export const getStatusBgColor = (status) => {
   const colorType = getStatusColor(status)
-  return STATUS_BG_COLORS[colorType as keyof typeof STATUS_BG_COLORS] || STATUS_BG_COLORS.default
+  return STATUS_BG_COLORS[colorType] || STATUS_BG_COLORS.default
 }

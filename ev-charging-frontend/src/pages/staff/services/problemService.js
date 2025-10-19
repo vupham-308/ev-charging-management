@@ -1,6 +1,6 @@
-import api from "./../../../config/axios"  // hoặc đường dẫn phù hợp với cấu trúc thư mục của bạn
+import api from "./../../../config/axios" // hoặc chỉnh lại đường dẫn phù hợp
 
-export const getProblems = async (stationId: string) => {
+export const getProblems = async (stationId) => {
   try {
     const response = await api.get("problem/get-all-by-staff", { params: { stationId } })
     console.log(response.data)

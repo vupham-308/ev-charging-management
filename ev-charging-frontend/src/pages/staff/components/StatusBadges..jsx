@@ -1,10 +1,6 @@
-import type { ProblemCounts } from "../utils/problemHelpers"
+import React from "react"
 
-interface StatusBadgesProps {
-  counts: ProblemCounts
-}
-
-export const StatusBadges = ({ counts }: StatusBadgesProps) => {
+export const StatusBadges = ({ counts }) => {
   return (
     <div className="flex items-center gap-3">
       {counts.pending > 0 && (

@@ -8,24 +8,16 @@ import {
 import { FaHeartbeat } from "react-icons/fa"
 import React from "react"
 
-interface MonitoringTabProps {
-  available: number
-  occupied: number
-  reserved: number
-  outOfService: number
-}
-
 export const MonitoringTab = ({
   available,
   occupied,
   reserved,
   outOfService,
-}: MonitoringTabProps) => {
+}) => {
   const stats = [
     {
       label: "Có sẵn",
       value: available,
-      // icon component only (we'll control size via wrapper)
       icon: <FaHeartbeat />,
       colorClass: "text-green-500",
       bg: "bg-green-50 hover:bg-green-100",
@@ -64,17 +56,18 @@ export const MonitoringTab = ({
               className={`rounded-2xl shadow-sm ${item.bg} transition-all duration-200 text-center p-8 hover:shadow-md`}
             >
               {/* Khung vuông cố định cho icon để tránh méo */}
-              <div className={`w-14 h-14 mx-auto flex items-center justify-center mb-4 ${item.colorClass}`}>
-                {/* - Với react-icons: size prop works; with ant icons we style via fontSize */}
+              <div
+                className={`w-14 h-14 mx-auto flex items-center justify-center mb-4 ${item.colorClass}`}
+              >
                 {React.isValidElement(item.icon) &&
-                  // if it's an Ant icon (has props), we set style; otherwise try size prop
-                  React.cloneElement(item.icon as React.ReactElement, {
+                  React.cloneElement(item.icon, {
                     style: { fontSize: 28, lineHeight: 0 },
-                    ...(item.icon.type && (item.icon.type as any).render ? {} : {}),
                   })}
               </div>
 
-              <h2 className="text-3xl font-semibold text-gray-900">{item.value}</h2>
+              <h2 className="text-3xl font-semibold text-gray-900">
+                {item.value}
+              </h2>
               <p className="text-gray-600 text-lg mt-1">{item.label}</p>
             </div>
           ))}

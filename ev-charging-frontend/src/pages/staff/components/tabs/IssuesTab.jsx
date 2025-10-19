@@ -3,29 +3,11 @@
 import { useState } from "react"
 import { Card, Input, Button } from "antd"
 import { SearchOutlined, WarningOutlined } from "@ant-design/icons"
-import { ProblemCard } from "../ProblemCard"
-import { StatusBadges } from "../StatusBadges"
+import { ProblemCard } from "../ProblemCard."
+import { StatusBadges } from "../StatusBadges."
 import { getStatusCounts } from "../../utils/problemHelpers"
 
-interface Problem {
-  id: string
-  title: string
-  description: string
-  status: string
-  chargerPoint: string
-  reportedBy: string
-  createdAt: string
-  solvedAt?: string
-  response?: string
-}
-
-interface IssuesTabProps {
-  problems: Problem[]
-  isLoading: boolean
-  onSearch: (stationId: string) => void
-}
-
-export const IssuesTab = ({ problems, isLoading, onSearch }: IssuesTabProps) => {
+export const IssuesTab = ({ problems, isLoading, onSearch }) => {
   const [stationId, setStationId] = useState("")
   const statusCounts = getStatusCounts(problems)
 
@@ -89,10 +71,14 @@ export const IssuesTab = ({ problems, isLoading, onSearch }: IssuesTabProps) => 
         {problems.length === 0 ? (
           <Card className="text-center py-12 shadow-sm border-dashed">
             <WarningOutlined className="text-6xl text-gray-300 mb-4" />
-            <p className="text-gray-500 text-lg">Chưa có sự cố nào được ghi nhận</p>
+            <p className="text-gray-500 text-lg">
+              Chưa có sự cố nào được ghi nhận
+            </p>
           </Card>
         ) : (
-          problems.map((problem) => <ProblemCard key={problem.id} problem={problem} />)
+          problems.map((problem) => (
+            <ProblemCard key={problem.id} problem={problem} />
+          ))
         )}
       </div>
     </div>

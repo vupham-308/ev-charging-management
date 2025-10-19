@@ -1,13 +1,7 @@
 import { STATUS_KEYWORDS } from "../constants/status"
 
-export interface ProblemCounts {
-  pending: number
-  inProgress: number
-  solved: number
-}
-
-export const getStatusCounts = (problems: any[]): ProblemCounts => {
-  const counts: ProblemCounts = {
+export const getStatusCounts = (problems) => {
+  const counts = {
     pending: 0,
     inProgress: 0,
     solved: 0,

@@ -1,25 +1,13 @@
 import { Badge, Tag, Card } from "antd"
 import { ThunderboltOutlined, CheckCircleOutlined } from "@ant-design/icons"
-import { getStatusColor, getStatusBorderColor, getStatusBgColor } from "../utils/statusHelpers"
+import {
+  getStatusColor,
+  getStatusBorderColor,
+  getStatusBgColor,
+} from "../utils/statusHelpers"
 import { formatDateTime } from "../utils/dateHelpers"
 
-interface Problem {
-  id: string
-  title: string
-  description: string
-  status: string
-  chargerPoint: string
-  reportedBy: string
-  createdAt: string
-  solvedAt?: string
-  response?: string
-}
-
-interface ProblemCardProps {
-  problem: Problem
-}
-
-export const ProblemCard = ({ problem }: ProblemCardProps) => {
+export const ProblemCard = ({ problem }) => {
   const statusColor = getStatusColor(problem.status)
 
   return (
@@ -41,12 +29,12 @@ export const ProblemCard = ({ problem }: ProblemCardProps) => {
             statusColor === "success"
               ? "success"
               : statusColor === "processing"
-                ? "processing"
-                : statusColor === "error"
-                  ? "error"
-                  : statusColor === "warning"
-                    ? "warning"
-                    : "default"
+              ? "processing"
+              : statusColor === "error"
+              ? "error"
+              : statusColor === "warning"
+              ? "warning"
+              : "default"
           }
           text={<Tag color={statusColor}>{problem.status || "Chưa cập nhật"}</Tag>}
         />
@@ -62,8 +50,12 @@ export const ProblemCard = ({ problem }: ProblemCardProps) => {
           <Tag color="blue">{problem.chargerPoint || "N/A"}</Tag>
         </p>
         <p className="flex items-center gap-2">
-          <span className="font-medium text-gray-700 min-w-[120px]">Thời gian báo cáo:</span>
-          <span className="text-sm bg-gray-100 px-3 py-1 rounded-md">{formatDateTime(problem.createdAt)}</span>
+          <span className="font-medium text-gray-700 min-w-[120px]">
+            Thời gian báo cáo:
+          </span>
+          <span className="text-sm bg-gray-100 px-3 py-1 rounded-md">
+            {formatDateTime(problem.createdAt)}
+          </span>
         </p>
         <p className="flex items-center gap-2">
           <span className="font-medium text-gray-700 min-w-[120px]">Báo cáo bởi:</span>

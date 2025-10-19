@@ -1,4 +1,4 @@
-export const formatDateTime = (dateString: string | null | undefined): string => {
+export const formatDateTime = (dateString) => {
   if (!dateString) return "Chưa cập nhật"
 
   try {
@@ -11,6 +11,6 @@ export const formatDateTime = (dateString: string | null | undefined): string =>
 
     return `${day}/${month}/${year} ${hours}:${minutes}`
   } catch (error) {
-    return "Không hợp lệ"
+    return error
   }
 }

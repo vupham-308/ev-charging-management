@@ -4,23 +4,11 @@ import { useState } from "react"
 import { toast } from "react-toastify"
 import { getProblems } from "../services/problemService"
 
-interface Problem {
-  id: string
-  title: string
-  description: string
-  status: string
-  chargerPoint: string
-  reportedBy: string
-  createdAt: string
-  solvedAt?: string
-  response?: string
-}
-
 export const useProblems = () => {
-  const [problems, setProblems] = useState<Problem[]>([])
+  const [problems, setProblems] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchProblems = async (stationId: string) => {
+  const fetchProblems = async (stationId) => {
     if (!stationId) {
       toast.warning("Vui lòng nhập Station ID trước!")
       return
