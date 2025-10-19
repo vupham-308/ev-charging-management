@@ -41,8 +41,10 @@ const RegisterPage = () => {
       toast.success("Successfully create new account!");
       navigate("/login");
       console.log(response);
+      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       message.error("Registration failed. Please try again.");
+      toast.warning("Registration failed. Please try again. ");
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiUser,
   FiMail,
@@ -10,21 +10,20 @@ import {
   FiEdit3,
   FiSettings,
   FiCreditCard,
-  FiSave, // Added for save button
-  FiXCircle, // Added for cancel button
+  FiSave,
+  FiXCircle,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import api from "../../config/axios";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState({
-    fullName: "Nguyễn Văn An",
-    email: "driver@demo.com",
-    phone: "+84123456789",
-    memberLevel: "Thành viên thân thiết",
-    rewardPoints: 1250,
-  });
+  const [user, setUser] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [password, setPassword] = useState({
     current: "",
@@ -32,32 +31,110 @@ const ProfilePage = () => {
     confirm: "",
   });
 
-  const handleChangePassword = (e) => {
+  // 🔹 Lấy dữ liệu người dùng khi mở trang
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // hoặc sessionStorage nếu bạn lưu ở đó
+        if (!token) {
+          console.error("❌ Chưa có token đăng nhập!");
+          return;
+        }
+
+        const response = await api.get("/profile/get", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("📦 API Response:", response.data);
+        setUser(response.data);
+      } catch (error) {
+        console.error("❌ Lỗi khi tải thông tin người dùng:", error);
+        alert("Không thể tải thông tin người dùng.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // 🔹 Xử lý khi chỉnh sửa input
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setPassword({ ...password, [name]: value });
+    setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSavePassword = () => {
+  // 🔹 Lưu thông tin người dùng (PUT /account/profile)
+  const handleSaveProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.put("/profile/update", user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success("Cập nhật thông tin thành công!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("❌ Lỗi cập nhật thông tin:", error);
+      toast.warning("Không thể cập nhật thông tin!");
+    }
+  };
+
+  // 🔹 Lưu mật khẩu (PUT /account/password)
+  const handleSavePassword = async () => {
     if (password.new !== password.confirm) {
-      alert("❌ Mật khẩu mới và xác nhận không khớp!");
+      toast.warning("❌ Mật khẩu mới và xác nhận không khớp!");
       return;
     }
-    // In a real application, you would send this to your backend
-    alert("✅ Cập nhật mật khẩu thành công!");
-    setPassword({ current: "", new: "", confirm: "" }); // Clear fields after successful update
+
+    try {
+      const token = localStorage.getItem("token");
+      await api.put(
+        "/profile/update-password",
+        {
+          currentPassword: password.current,
+          newPassword: password.new,
+          confirmPassword: password.confirm,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Cập nhật mật khẩu thành công!");
+      setPassword({ current: "", new: "", confirm: "" });
+    } catch (error) {
+      console.error("❌ Lỗi khi đổi mật khẩu:", error);
+      toast.warning("Đổi mật khẩu thất bại!");
+    }
   };
 
   const handleCancelPasswordChange = () => {
     setPassword({ current: "", new: "", confirm: "" });
   };
 
+  localStorage.setItem("user", JSON.stringify(user));
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-xl">
+        Đang tải thông tin người dùng...
+      </div>
+    );
+  }
+
   return (
-    // Apply consistent background and text colors from homepage
     <div className="min-h-screen bg-dark-bg text-text-color font-sans">
-      {/* Header nhỏ - Styled to match homepage header */}
+      {/* Header */}
       <div className="fixed top-0 left-0 w-full bg-black/90 backdrop-blur-lg border-b border-gray-700 z-50 flex items-center px-6 md:px-12 py-4">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            navigate("/driver");
+          }}
           className="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-lg"
         >
           <FiArrowLeft /> Quay lại
@@ -65,119 +142,154 @@ const ProfilePage = () => {
         <h1 className="flex-1 text-center text-2xl font-bold text-white tracking-wide">
           Hồ sơ cá nhân
         </h1>
-        <div className="w-[80px] md:w-[120px]"></div>{" "}
-        {/* Spacer to balance title */}
+        <div className="w-[80px] md:w-[120px]"></div>
       </div>
 
-      {/* Nội dung chính */}
+      {/* Nội dung */}
       <div className="pt-28 pb-20 px-6 md:px-12 max-w-5xl mx-auto space-y-10">
         {/* --- Thông tin cơ bản --- */}
         <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg hover:border-primary transition-all duration-300">
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">
             <FiUser className="text-primary" /> Thông tin cơ bản
           </h2>
-          <p className="text-text-muted mb-6 text-lg">
-            Cập nhật thông tin cá nhân của bạn
-          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
             <div>
               <p className="text-gray-500 text-sm mb-1">Họ và tên</p>
-              <p className="font-semibold text-black text-lg">
-                {user.fullName}
-              </p>
+              {isEditing ? (
+                <input
+                  name="fullName"
+                  value={user.fullName}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-400 rounded-lg text-black"
+                />
+              ) : (
+                <p className="font-semibold text-black text-lg">
+                  {user?.fullName}
+                </p>
+              )}
             </div>
+
             <div>
               <p className="text-gray-500 text-sm mb-1">Email</p>
-              <p className="font-semibold flex items-center gap-2 text-lg">
-                <FiMail className="text-primary" /> {user.email}
-              </p>
+              {isEditing ? (
+                <input
+                  name="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-400 rounded-lg text-black"
+                />
+              ) : (
+                <p className="font-semibold flex items-center gap-2 text-lg">
+                  <FiMail className="text-primary" /> {user?.email}
+                </p>
+              )}
             </div>
+
             <div>
               <p className="text-gray-500 text-sm mb-1">Số điện thoại</p>
-              <p className="font-semibold flex items-center gap-2 text-lg">
-                <FiPhone className="text-primary" /> {user.phone}
-              </p>
+              {isEditing ? (
+                <input
+                  name="phone"
+                  value={user.phone}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-400 rounded-lg text-black"
+                />
+              ) : (
+                <p className="font-semibold flex items-center gap-2 text-lg">
+                  <FiPhone className="text-primary" /> {user?.phone}
+                </p>
+              )}
             </div>
-            {/* You might add an edit button here for basic info */}
-            {/* <div className="md:col-span-2 text-right">
-              <button className="px-6 py-2 bg-primary text-dark-bg font-semibold rounded-full hover:bg-black hover:-translate-y-1 transform transition-all duration-300 shadow-md shadow-primary/30">
+          </div>
+
+          <div className="mt-6 flex gap-4">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSaveProfile}
+                  className="flex items-center gap-2 px-6 py-3 bg-primary text-dark-bg rounded-full font-semibold hover:bg-black hover:text-primary transition-all"
+                >
+                  <FiSave /> Lưu thay đổi
+                </button>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex items-center gap-2 px-6 py-3 border border-gray-500 text-gray-500 rounded-full font-semibold hover:bg-gray-700 transition-all"
+                >
+                  <FiXCircle /> Hủy
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-6 py-3 bg-primary text-dark-bg font-semibold rounded-full hover:bg-black hover:text-primary transition-all"
+              >
                 Chỉnh sửa
               </button>
-            </div> */}
+            )}
           </div>
         </section>
 
         {/* --- Chương trình thành viên --- */}
-        <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg hover:border-primary transition-all duration-300">
+        <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg">
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">
             <FiStar className="text-yellow-400" /> Chương trình thành viên
           </h2>
-          <p className="text-text-muted mb-6 text-lg">
-            Thông tin hạng thành viên và quyền lợi
-          </p>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-xl font-semibold text-black mb-2">
-                {user.memberLevel}
-              </h3>
-              <p className="text-yellow-400 font-medium text-lg">
-                {user.rewardPoints.toLocaleString()} điểm thưởng
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-5 py-2 border-2 border-primary text-primary rounded-full hover:bg-primary hover:text-dark-bg transition-all duration-300 font-semibold transform hover:-translate-y-0.5">
-                Xem quyền lợi
-              </button>
-              <button className="px-5 py-2 bg-primary text-dark-bg font-semibold rounded-full hover:bg-black hover:text-primary transition-all duration-300 transform hover:-translate-y-0.5 shadow-md shadow-primary/30">
-                Nâng hạng
-              </button>
-            </div>
+          <div>
+            <h3 className="text-xl font-semibold text-black mb-2">
+              {user?.memberLevel}
+            </h3>
+            <p className="text-yellow-400 font-medium text-lg">
+              {user?.rewardPoints?.toLocaleString()} điểm thưởng
+            </p>
           </div>
         </section>
 
         {/* --- Đổi mật khẩu --- */}
-        <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg hover:border-primary transition-all duration-300">
+        <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg">
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">
             <FiLock className="text-red-400" /> Đổi mật khẩu
           </h2>
-          <p className="text-text-muted mb-6 text-lg">
-            Cập nhật mật khẩu của bạn để bảo mật tài khoản
-          </p>
           <div className="space-y-4">
             <input
               type="password"
               name="current"
               placeholder="Mật khẩu hiện tại"
-              className="w-full p-4 rounded-lg bg-dark-bg border border-border-color text-black focus:border-primary outline-none transition-colors"
+              className="w-full p-4 rounded-lg border border-border-color text-black"
               value={password.current}
-              onChange={handleChangePassword}
+              onChange={(e) =>
+                setPassword({ ...password, current: e.target.value })
+              }
             />
             <input
               type="password"
               name="new"
               placeholder="Mật khẩu mới"
-              className="w-full p-4 rounded-lg bg-dark-bg border border-border-color text-black focus:border-primary outline-none transition-colors"
+              className="w-full p-4 rounded-lg border border-border-color text-black"
               value={password.new}
-              onChange={handleChangePassword}
+              onChange={(e) =>
+                setPassword({ ...password, new: e.target.value })
+              }
             />
             <input
               type="password"
               name="confirm"
               placeholder="Xác nhận mật khẩu mới"
-              className="w-full p-4 rounded-lg bg-dark-bg border border-border-color text-black focus:border-primary outline-none transition-colors"
+              className="w-full p-4 rounded-lg border border-border-color text-black"
               value={password.confirm}
-              onChange={handleChangePassword}
+              onChange={(e) =>
+                setPassword({ ...password, confirm: e.target.value })
+              }
             />
             <div className="flex flex-col sm:flex-row gap-4 mt-6">
               <button
                 onClick={handleSavePassword}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-primary text-dark-bg font-semibold rounded-full hover:bg-black hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-md shadow-primary/30"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-primary text-dark-bg font-semibold rounded-full hover:bg-black transition-all"
               >
                 <FiSave /> Lưu thay đổi
               </button>
               <button
                 onClick={handleCancelPasswordChange}
-                className="flex items-center justify-center gap-2 px-8 py-3 border-2 border-gray-600 rounded-full hover:bg-gray-700 text-gray-300 font-semibold transition-all duration-300 text-lg hover:-translate-y-1 transform"
+                className="flex items-center justify-center gap-2 px-8 py-3 border-2 border-gray-600 rounded-full text-gray-300 hover:bg-gray-700 transition-all"
               >
                 <FiXCircle /> Hủy bỏ
               </button>
@@ -185,78 +297,6 @@ const ProfilePage = () => {
           </div>
         </section>
       </div>
-
-      {/* Footer nhỏ - Reusing homepage footer styles */}
-      <footer
-        id="lienhe"
-        className="bg-[#0a0a0a] text-gray-300 py-10 px-6 md:px-20 mt-10"
-      >
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Cột 1: Giới thiệu */}
-          <div>
-            <h3 className="text-2xl font-bold text-white mb-3">EV CHARGE</h3>
-            <p className="text-gray-400 leading-relaxed">
-              Hệ thống trạm sạc xe điện hàng đầu Việt Nam, cung cấp dịch vụ sạc
-              nhanh, an toàn và tiện lợi trên toàn quốc.
-            </p>
-          </div>
-
-          {/* Cột 2: Hỗ trợ */}
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Hỗ trợ</h4>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href="#faq"
-                  className="hover:text-primary transition-colors flex items-center gap-2"
-                >
-                  <FiPhoneCall /> Câu hỏi thường gặp
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#report"
-                  className="hover:text-primary transition-colors flex items-center gap-2"
-                >
-                  <FiEdit3 /> Báo cáo sự cố
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#privacy"
-                  className="hover:text-primary transition-colors flex items-center gap-2"
-                >
-                  <FiSettings /> Chính sách bảo mật
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#terms"
-                  className="hover:text-primary transition-colors flex items-center gap-2"
-                >
-                  <FiCreditCard /> Điều khoản sử dụng
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Cột 3: Liên hệ */}
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Liên hệ</h4>
-            <p className="text-gray-400 mb-2">Email: support@evcharge.vn</p>
-            <p className="text-gray-400 mb-2">Hotline: 1900 1234</p>
-            <p className="text-gray-400">
-              © 2025 EV CHARGE. Mọi quyền được bảo lưu.
-            </p>
-          </div>
-        </div>
-
-        {/* Dòng bản quyền nhỏ ở dưới cùng */}
-        <div className="border-t border-gray-700 mt-10 pt-6 text-center text-sm text-gray-500">
-          Thiết kế bởi{" "}
-          <span className="text-primary font-medium">EV Charging Team</span>
-        </div>
-      </footer>
     </div>
   );
 };

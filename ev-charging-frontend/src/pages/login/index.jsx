@@ -45,15 +45,21 @@ const LoginPage = () => {
 
       // lưu state
       dispatch(login(response.data));
+
       if (role === "ADMIN") {
         navigate("/admin");
       } else if (role === "STAFF") {
         navigate("/staff");
+      } else if (role === "USER") {
+        navigate("/driver");
       } else {
         navigate("/");
       }
+
+      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       message.error("Login failed. Please try again.");
+      toast.warning("Login failed!!!");
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +68,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative">
       {/* Background */}
-      <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1571068316344-75bc76f77890?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center bg-no-repeat">
+      <div className="absolute inset-0 z-0 bg-[url('https://genk.mediacdn.vn/139269124445442048/2023/6/29/o-to-dienthanhnien-2zzfj-1688012119644-16880121207971298916652.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black/50"></div>
       </div>
 
@@ -141,6 +147,16 @@ const LoginPage = () => {
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </Form.Item>
+
+            <div className="text-center mt-3">
+              <span className="text-gray-600">Don’t have an account? </span>
+              <a
+                className="text-blue-600 hover:underline font-medium cursor-pointer"
+                onClick={() => navigate("/register")}
+              >
+                Register now
+              </a>
+            </div>
 
             <Divider>Or continue with</Divider>
 
