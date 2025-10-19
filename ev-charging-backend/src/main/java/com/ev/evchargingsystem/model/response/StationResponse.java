@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StationResponse {
+
+    private int id;
     @NotEmpty(message = "Name cannot be empty!")
     @Column(unique = true,columnDefinition = "Nvarchar(100)")
     private String name;
@@ -26,4 +28,8 @@ public class StationResponse {
     private int pointChargerTotal;
     @NotNull
     private List<String> portType;
+
+    private String phone;
+    private String email;
+    private String status;
 }

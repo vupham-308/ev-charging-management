@@ -73,12 +73,18 @@ public class StationService {
         List<Station> stations = stationRepository.findAll();
         for(Station station : stations) {
             StationResponse rp = new StationResponse();
+            rp.setId(station.getId());
             rp.setName(station.getName());
             rp.setAddress(station.getAddress());
             rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
             rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
             rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
             rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+
+            rp.setPhone(station.getPhone());
+            rp.setEmail(station.getEmail());
+            rp.setStatus(station.getStatus());
+
             stationResponseList.add(rp);
         }
         return stationResponseList;
@@ -88,12 +94,17 @@ public class StationService {
     public StationResponse getStation(int stationId) {
         Station station = stationRepository.findStationsById(stationId);
         StationResponse rp = new StationResponse();
+        rp.setId(station.getId());
         rp.setName(station.getName());
         rp.setAddress(station.getAddress());
         rp.setPointChargerTotal(getPointChargerTotalByStation(station.getId()));
         rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
         rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
         rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+
+        rp.setPhone(station.getPhone());
+        rp.setEmail(station.getEmail());
+        rp.setStatus(station.getStatus());
         return rp;
     }
 
