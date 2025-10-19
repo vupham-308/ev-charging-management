@@ -1,0 +1,66 @@
+.header {
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    /* chia 2 phần: bên trái và bên phải */
+    align-items: center;
+    padding: 14px 40px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Container bên trái: gộp Quản trị hệ thống + tên + vai trò */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* khoảng cách giữa phần quản trị hệ thống và tên + vai trò */
+}
+
+.header-left h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* Tên và vai trò nằm cạnh nhau */
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-center .name {
+    font-weight: 600;
+    color: #333;
+}
+
+.header-center .role {
+    font-size: 13px;
+    color: #8e44ad;
+    background: #f4e8ff;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+/* Bên phải */
+.header-right {
+    display: flex;
+    gap: 12px;
+}
+
+.header-right .btn {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.header-right .btn.logout {
+    background: #fff3f3;
+    border-color: #f1c0c0;
+    color: #d32f2f;
+}
