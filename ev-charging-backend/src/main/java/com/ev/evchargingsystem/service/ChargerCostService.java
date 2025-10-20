@@ -5,6 +5,8 @@ import com.ev.evchargingsystem.repository.ChargerCostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ChargerCostService {
 
@@ -20,5 +22,9 @@ public class ChargerCostService {
         c.setCost(newCost);
         chargerCostRepository.save(c);
         return true;
+    }
+
+    public List<ChargerCost> get() {
+        return chargerCostRepository.findAll();
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class ChargerCostController {
     @Operation(
             summary = "ADMIN: thay đổi giá trạm sạc phụ thuộc vào cổng sạc"
     )
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("edit-cost/{portType}")
     public ResponseEntity editChargerPointCost(float newCost, @PathVariable("portType") String chargerType){
         try{
@@ -27,5 +29,11 @@ public class ChargerCostController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("get")
+    public ResponseEntity getCost(){
+        return ResponseEntity.ok(chargerCostService.get());
     }
 }
