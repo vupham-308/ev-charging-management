@@ -64,4 +64,25 @@ public class ChargingSessionController {
         }
     }
 
+    @Operation(summary = "Staff: Trả về tất cả Session theo trạm sạc")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @GetMapping("/getAllByStaff")
+    public ResponseEntity getAllByStaff() {
+        try {
+            return ResponseEntity.ok(chargingSessionService.getAllByStaff());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Staff: Thanh toán tiền mặt")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @PostMapping("/cash/{sessionId}")
+    public ResponseEntity cash(@PathVariable("sessionId") int sessionId) {
+        try {
+            return ResponseEntity.ok(chargingSessionService.payByCash(sessionId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

@@ -93,7 +93,7 @@ public class ReservationService {
                     chargerPointRepository.save(r.getChargerPoint());
                 }
             }
-            //TH2: 20p trước giờ đặt, nếu có người đang sạc trước đó thì sao?
+            //TH2: 10p trước giờ đặt, nếu có người đang sạc trước đó thì sao?
             //Trụ sạc sẽ đang ở trạng thái Occupied
             //1)nếu phiên sạc đang sạc trước đó sạc xong TRƯỚC giờ kết
             //thúc của phiên đặt chỗ, trạng thái sẽ tự động về reserve

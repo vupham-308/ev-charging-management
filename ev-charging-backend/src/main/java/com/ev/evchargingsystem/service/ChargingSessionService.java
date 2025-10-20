@@ -3,10 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.*;
 import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
 import com.ev.evchargingsystem.model.response.ChargingResponse;
-import com.ev.evchargingsystem.repository.CarRepository;
-import com.ev.evchargingsystem.repository.ChargerPointRepository;
-import com.ev.evchargingsystem.repository.ChargingSessionRepository;
-import com.ev.evchargingsystem.repository.TransactionRepository;
+import com.ev.evchargingsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +26,8 @@ public class ChargingSessionService {
     TransactionService transactionService;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    StaffRepository staffRepository;
 
 
     public ChargingSession charge(int sessionId) {
@@ -227,4 +226,18 @@ public class ChargingSessionService {
         return true;
     }
 
+    public List<ChargingSession> getAllByStaff() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Staff staff = staffRepository.findStaffByUser(user);
+        Station s = staff.getStation();
+        List<ChargingSession> list = chargingSessionRepository.findChargingSessionByStationId(s.getId());
+        return list;
+    }
+
+    public ChargingSession payByCash(int sessionId) {
+        ChargingSession s = chargingSessionRepository.findChargingSessionById(sessionId);
+        s.setStatus("PAID");
+        if(s==null) throw new RuntimeException("Không tìm thấy SessionID!");
+        return chargingSessionRepository.save(s);
+    }
 }

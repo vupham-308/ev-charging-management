@@ -17,6 +17,13 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     ChargingSession findChargingSessionByCar(Car car);
 
     @Query("""
+        SELECT c
+        FROM ChargingSession c
+        WHERE c.chargerPoint.station.id = :stationId
+    """)
+    List<ChargingSession> findChargingSessionByStationId(@Param("stationId") int stationId);
+
+    @Query("""
         SELECT c 
         FROM ChargingSession c 
         WHERE c.car.user.id = :userId 

@@ -45,10 +45,12 @@ com\ev\evchargingsystem\model\response\UserResponse.class
 com\ev\evchargingsystem\repository\ChargerPointRepository.class
 com\ev\evchargingsystem\repository\ChargingSessionRepository.class
 com\ev\evchargingsystem\entity\User.class
+com\ev\evchargingsystem\model\response\TransactionResponse.class
 com\ev\evchargingsystem\model\response\UserInfoResponse.class
 com\ev\evchargingsystem\model\request\LoginRequest.class
 com\ev\evchargingsystem\model\response\StationResponse.class
 com\ev\evchargingsystem\controller\ProfileController.class
+com\ev\evchargingsystem\model\response\ReviewResponse.class
 com\ev\evchargingsystem\config\ModelMapperConfig.class
 com\ev\evchargingsystem\model\response\UserStatsResponseForAdmin.class
 com\ev\evchargingsystem\config\JwtFilter.class
