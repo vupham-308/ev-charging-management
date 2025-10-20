@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.request.ChargerPointRequest;
 import com.ev.evchargingsystem.model.response.ChargerPointStatsResponseForAdmin;
+import com.ev.evchargingsystem.model.response.StaffChargerPointResponse;
 import com.ev.evchargingsystem.service.ChargerPointService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -86,4 +87,21 @@ public class ChargerPointController {
         ChargerPointStatsResponseForAdmin stats = chargerPointService.getChargerPointStats();
         return ResponseEntity.ok(stats);
     }
+
+    @Operation(summary = "Staff xem các thông tin về trụ sạc")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @GetMapping("/staff/points")
+    public ResponseEntity chargerPointStaff() {
+        List<StaffChargerPointResponse> list = chargerPointService.chargerPointStaff();
+        return ResponseEntity.ok(list);
+    }
+
+    @Operation(summary = "Staff thay đổi trạng thái trụ sạc: AVAILABLE, ONGOING, OUT_OF_SERVICE")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @PostMapping("/staff/point-status/{pointId}/{status}")
+    public ResponseEntity chargerPointStatus(@PathVariable("pointId") int pointId, @PathVariable("status") String status) {
+        return ResponseEntity.ok(chargerPointService.chargerPointStatus(pointId, status));
+    }
+
+
 }

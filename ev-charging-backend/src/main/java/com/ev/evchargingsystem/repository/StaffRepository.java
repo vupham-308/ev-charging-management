@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.repository;
 
 import com.ev.evchargingsystem.entity.Staff;
+import com.ev.evchargingsystem.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,5 +12,7 @@ public interface StaffRepository extends JpaRepository<Staff,Integer> {
     List<Staff> findStaffsByStationId(int stationID);
 
     Optional<Staff> findByUserEmail(String email);
+
+    Staff findStaffByUser(User user);
 
 }

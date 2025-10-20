@@ -21,5 +21,5 @@ public class ChargerCost {
     @Column(name="port_type")
     private String portType;
     @NotNull
-    private float cost;
+    private double cost;
 }
