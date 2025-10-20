@@ -1,61 +1,80 @@
-import React, { useState } from "react";
-import { Button } from "antd";
-import { useNavigate } from "react-router-dom";
+"use client";
 
-const tabs = ["Giám sát", "Thanh toán", "Sự cố KH", "Báo cáo", "Bảo trì"];
+import { Header } from "./components/Header.";
+import { TabNavigation } from "./components/TabNavigation.";
+import { IssuesTab } from "./components/tabs/IssuesTab";
+import { MonitoringTab } from "./components/tabs/MonitoringTab.";
+import { PaymentTab } from "./components/tabs/PaymentTab.";
+import { ReportsTab } from "./components/tabs/ReportsTab.";
+import { MaintenanceTab } from "./components/tabs/MaintenanceTab.";
+import { useAuth } from "./hooks/useAuth";
+import { useProblems } from "./hooks/useProblems";
+import { useTabs } from "./hooks/useTabs";
+import { TAB_KEYS } from "./constants/tabs";
+import { useStations } from "./hooks/useStations";
+import { useEffect } from "react";
 
 const StaffDashboard = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("Giám sát");
+  const { logout } = useAuth();
+  const { stations, isLoading: stationsLoading, fetchStations } = useStations();
+  const { problems, isLoading: problemsLoading, fetchProblems } = useProblems();
+  const { activeTab, setActiveTab } = useTabs();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
-  const renderContent = () => {
+  useEffect(() => {
+    fetchStations()
+  }, [])
+  const renderTabContent = () => {
     switch (activeTab) {
-      case "Giám sát":
-        return "Theo dõi tình trạng điểm sạc (online/offline, công suất, ...)";
-      case "Thanh toán":
-        return "Quản lý việc khởi động/dừng phiên sạc, ghi nhận thanh toán tại chỗ phí sạc xe.";
-      case "Sự cố KH":
-        return "Báo cáo và xử lý sự cố của khách hàng tại trạm.";
-      case "Báo cáo":
-        return "Xem thống kê và báo cáo tổng hợp.";
-      case "Bảo trì":
-        return "Lên lịch và ghi nhận bảo trì trạm sạc.";
+      case TAB_KEYS.MONITORING:
+        return (
+          <MonitoringTab
+            available={stations.available}
+            occupied={stations.occupied}
+            reserved={stations.reserved}
+            outOfService={stations.outOfService}
+            isLoading={stationsLoading}
+          />
+        );
+      case TAB_KEYS.PAYMENT:
+        return <PaymentTab />;
+      case TAB_KEYS.ISSUES:
+        return (
+          <IssuesTab
+            problems={problems}
+            isLoading={problemsLoading}
+            onSearch={fetchProblems}
+          />
+        );
+      case TAB_KEYS.REPORTS:
+        return <ReportsTab />;
+      case TAB_KEYS.MAINTENANCE:
+        return <MaintenanceTab />;
       default:
-        return "";
+        return (
+          <MonitoringTab
+            available={stations.available}
+            occupied={stations.occupied}
+            reserved={stations.reserved}
+            outOfService={stations.outOfService}
+            isLoading={stationsLoading}
+          />
+        );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="flex justify-between items-center bg-white shadow p-4">
-        <h1 className="text-xl font-bold">⚡ Staff Dashboard</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-700">Trần Thị Bình - Nhân viên trạm sạc</span>
-          <Button onClick={handleLogout}>Đăng xuất</Button>
+    <div className="min-h-screen bg-white">
+      <Header
+        userName="Trần Thị Bình"
+        userRole="Nhân viên trạm sạc"
+        onLogout={logout}
+      />
+      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+      <main className="max-w-full">
+        <div className="bg-white text-gray-700 min-h-[500px]">
+          {renderTabContent()}
         </div>
-      </header>
-
-      <nav className="flex bg-white mt-2 shadow">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 font-medium border-b-2 ${
-              activeTab === tab ? "border-blue-500 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </nav>
-
-      <main className="p-6">
-        <div className="bg-white p-6 rounded shadow text-gray-700">{renderContent()}</div>
       </main>
     </div>
   );
