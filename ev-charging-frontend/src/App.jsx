@@ -67,7 +67,7 @@ function App() {
           element: <ManageBooking />,
         },
         {
-          path: "startCharging",
+          path: "startCharging/:stationId",
           element: <ManageStartCharging />,
         },
         {
