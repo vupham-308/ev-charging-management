@@ -3,10 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.*;
 import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
 import com.ev.evchargingsystem.model.response.ChargingResponse;
-import com.ev.evchargingsystem.repository.CarRepository;
-import com.ev.evchargingsystem.repository.ChargerPointRepository;
-import com.ev.evchargingsystem.repository.ChargingSessionRepository;
-import com.ev.evchargingsystem.repository.TransactionRepository;
+import com.ev.evchargingsystem.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +26,8 @@ public class ChargingSessionService {
     TransactionService transactionService;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    StaffRepository staffRepository;
 
 
     public ChargingSession charge(int sessionId) {
@@ -137,6 +136,7 @@ public class ChargingSessionService {
     }
 
     public ChargingSession createSession(ChargingSessionRequest rq) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Car car = carRepository.findById(rq.getCarId()).orElse(null);
         ChargerPoint point = chargerPointRepository.findById(rq.getPointId()).orElse(null);
         if(car==null||point==null){
@@ -144,6 +144,11 @@ public class ChargingSessionService {
         }
         Date current = new Date(System.currentTimeMillis());
         ChargingSession charge = new ChargingSession();
+        //kiểm tra xem xe này có đang được sạc không, nếu xe đang có 1 phiên sạc khác thì báo lỗi
+        ChargingSession s = chargingSessionRepository.findChargingSessionByCar(car);
+        if(s!=null&&s.getStatus().equals("ONGOING")){
+            throw new RuntimeException("Đang có 1 phiên sạc khác với xe này. Vui lòng kiểm tra lai!");
+        }
         charge.setCar(car);
         charge.setStartTime(current);
         //time cần phải sạc (phút)
@@ -154,23 +159,16 @@ public class ChargingSessionService {
         charge.setPaymentMethod(rq.getPaymentMethod());
         //set trạng thái về WAITING TO PAY
         charge.setStatus("WAITING_TO_PAY");
+        if(!point.getStatus().equals("AVAILABLE")){
+            throw new RuntimeException("Trụ sạc không khả dụng");
+        }
         charge.setChargerPoint(point);
+
         if(rq.getGoalBattery()<=car.getInitBattery()){
             throw new RuntimeException("Không thể sạc với mục tiêu sạc thấp hơn pin của bạn!");
         }
         charge.setGoalBattery(rq.getGoalBattery());
         return chargingSessionRepository.save(charge);
-        //======================================
-//        //trả về ChargingResponse
-//        ChargingResponse rs = new ChargingResponse();
-//        rs.setFee(timeCharge*charge.getChargerPoint().getChargerCost().getCost());
-//        rs.setMinute(timeCharge);
-//        rs.setGoalBattery(charge.getGoalBattery());
-//        rs.setInitBattery(charge.getCar().getInitBattery());
-//        rs.setPoint(charge.getChargerPoint());
-//        rs.setPaymentMethod(charge.getPaymentMethod());
-//        rs.setCarName(charge.getCar().getBrand());
-//        return rs;
     }
 
     public int caculateTimeToReachGoalBattery(String portType, int initBattery, int goalBattery){
@@ -226,5 +224,20 @@ public class ChargingSessionService {
         tranNew.setTotalAmount(total);
         transactionRepository.save(tranNew);
         return true;
+    }
+
+    public List<ChargingSession> getAllByStaff() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Staff staff = staffRepository.findStaffByUser(user);
+        Station s = staff.getStation();
+        List<ChargingSession> list = chargingSessionRepository.findChargingSessionByStationId(s.getId());
+        return list;
+    }
+
+    public ChargingSession payByCash(int sessionId) {
+        ChargingSession s = chargingSessionRepository.findChargingSessionById(sessionId);
+        s.setStatus("PAID");
+        if(s==null) throw new RuntimeException("Không tìm thấy SessionID!");
+        return chargingSessionRepository.save(s);
     }
 }

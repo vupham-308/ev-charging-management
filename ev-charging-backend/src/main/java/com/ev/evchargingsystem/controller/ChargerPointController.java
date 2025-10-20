@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.request.ChargerPointRequest;
 import com.ev.evchargingsystem.model.response.ChargerPointStatsResponseForAdmin;
+import com.ev.evchargingsystem.model.response.StaffChargerPointResponse;
 import com.ev.evchargingsystem.service.ChargerPointService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -64,6 +65,16 @@ public class ChargerPointController {
         return ResponseEntity.ok(list);
     }
 
+    @Operation(summary = "Lấy danh sách trụ sạc theo trạm, chỉ lấy trụ nào Available")
+    @GetMapping("/getAllAvailable/{stationID}")
+    public ResponseEntity getAllChargerPointAvailable(@PathVariable int stationID) {//id station
+        List<ChargerPoint> list = chargerPointService.getAllByStationAvailable(stationID);
+        if(list.size()==0){
+            return ResponseEntity.badRequest().body("Hiện tại, trạm này không có trụ sạc nào!");
+        }
+        return ResponseEntity.ok(list);
+    }
+
     @GetMapping("/get/{pointID}")
     public ResponseEntity getChargerPoint(@PathVariable int pointID) {
         return ResponseEntity.ok(chargerPointService.get(pointID));
@@ -76,4 +87,21 @@ public class ChargerPointController {
         ChargerPointStatsResponseForAdmin stats = chargerPointService.getChargerPointStats();
         return ResponseEntity.ok(stats);
     }
+
+    @Operation(summary = "Staff xem các thông tin về trụ sạc")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @GetMapping("/staff/points")
+    public ResponseEntity chargerPointStaff() {
+        List<StaffChargerPointResponse> list = chargerPointService.chargerPointStaff();
+        return ResponseEntity.ok(list);
+    }
+
+    @Operation(summary = "Staff thay đổi trạng thái trụ sạc: AVAILABLE, ONGOING, OUT_OF_SERVICE")
+    @PreAuthorize("hasAuthority('STAFF')")
+    @PostMapping("/staff/point-status/{pointId}/{status}")
+    public ResponseEntity chargerPointStatus(@PathVariable("pointId") int pointId, @PathVariable("status") String status) {
+        return ResponseEntity.ok(chargerPointService.chargerPointStatus(pointId, status));
+    }
+
+
 }
