@@ -7,6 +7,7 @@ com\ev\evchargingsystem\service\CarService.class
 com\ev\evchargingsystem\model\response\CarResponse.class
 com\ev\evchargingsystem\model\response\ReservationResponse.class
 com\ev\evchargingsystem\controller\ChargingSessionController.class
+com\ev\evchargingsystem\model\response\StaffChargerPointResponse.class
 com\ev\evchargingsystem\repository\ReviewStationRepository.class
 com\ev\evchargingsystem\entity\ReviewStation.class
 com\ev\evchargingsystem\controller\AuthenticationController.class
