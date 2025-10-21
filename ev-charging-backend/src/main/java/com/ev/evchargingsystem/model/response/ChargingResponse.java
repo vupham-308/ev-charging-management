@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChargingResponse {
+    private int id;
     private ChargerPoint point;
     private String carName;
     private String paymentMethod;

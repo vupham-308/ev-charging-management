@@ -135,7 +135,7 @@ public class ChargingSessionService {
         }
     }
 
-    public ChargingSession createSession(ChargingSessionRequest rq) {
+    public ChargingResponse createSession(ChargingSessionRequest rq) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Car car = carRepository.findById(rq.getCarId()).orElse(null);
         ChargerPoint point = chargerPointRepository.findById(rq.getPointId()).orElse(null);
@@ -147,7 +147,7 @@ public class ChargingSessionService {
         //kiểm tra xem xe này có đang được sạc không, nếu xe đang có 1 phiên sạc khác thì báo lỗi
         ChargingSession s = chargingSessionRepository.findChargingSessionByCar(car);
         if(s!=null&&s.getStatus().equals("ONGOING")){
-            throw new RuntimeException("Đang có 1 phiên sạc khác với xe này. Vui lòng kiểm tra lai!");
+            throw new RuntimeException("Đang có 1 phiên sạc khác với xe này. Vui lòng kiểm tra lại!");
         }
         charge.setCar(car);
         charge.setStartTime(current);
@@ -156,6 +156,7 @@ public class ChargingSessionService {
                 car.getInitBattery(),rq.getGoalBattery());
         //đổi sang mili giây
         charge.setEndTime(new Date(current.getTime() + timeCharge*60*1000));
+        double fee = timeCharge*point.getChargerCost().getCost();
         charge.setPaymentMethod(rq.getPaymentMethod());
         //set trạng thái về WAITING TO PAY
         charge.setStatus("WAITING_TO_PAY");
@@ -168,7 +169,13 @@ public class ChargingSessionService {
             throw new RuntimeException("Không thể sạc với mục tiêu sạc thấp hơn pin của bạn!");
         }
         charge.setGoalBattery(rq.getGoalBattery());
-        return chargingSessionRepository.save(charge);
+        chargingSessionRepository.save(charge);
+
+        //=====================
+        //Map từ ChargingSession về ChargingResponse
+        return new ChargingResponse(charge.getId(),charge.getChargerPoint(),charge.getCar().getBrand(),
+                charge.getPaymentMethod(),timeCharge,fee,charge.getCar().getInitBattery(),
+                charge.getGoalBattery());
     }
 
     public int caculateTimeToReachGoalBattery(String portType, int initBattery, int goalBattery){
@@ -197,7 +204,7 @@ public class ChargingSessionService {
             int time = caculateTimeToReachGoalBattery(c.getChargerPoint().getChargerCost().getPortType(),
                     c.getCar().getInitBattery(), c.getGoalBattery());
             double total = 0;
-            ChargingResponse rs = new ChargingResponse(c.getChargerPoint(),
+            ChargingResponse rs = new ChargingResponse(c.getId(),c.getChargerPoint(),
                     c.getCar().getBrand(), c.getPaymentMethod(), time, total,
                     c.getCar().getInitBattery(), c.getGoalBattery());
             rsList.add(rs);
