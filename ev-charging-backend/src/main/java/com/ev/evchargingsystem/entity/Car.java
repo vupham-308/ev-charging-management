@@ -18,8 +18,10 @@ public class Car {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
     @NotEmpty(message = "Brand cannot be empty!")
+    @Column(columnDefinition = "nvarchar(30)")
     private String brand;
     @NotEmpty(message = "Color cannot be empty!")
+    @Column(columnDefinition = "nvarchar(30)")
     private String color;
     @NotNull
     private int initBattery;
