@@ -35,10 +35,8 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String phone;
     @Column(length = 10)
+    @NotNull
     private String role;
-
-    @OneToOne(mappedBy = "user")
-    private Staff staff;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

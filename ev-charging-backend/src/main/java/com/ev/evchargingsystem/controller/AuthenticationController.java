@@ -2,6 +2,7 @@ package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.LoginRequest;
+import com.ev.evchargingsystem.model.request.RegisterRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.service.AuthenticationService;
 import jakarta.validation.*;
@@ -15,8 +16,8 @@ public class AuthenticationController {
     @Autowired
     AuthenticationService authenticationService;
     @PostMapping("/register")
-    public ResponseEntity register(@Valid @RequestBody User user) {
-        return ResponseEntity.ok(authenticationService.register(user));
+    public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest) {
+        return ResponseEntity.ok(authenticationService.register(registerRequest));
     }
 
     @PostMapping("/login")

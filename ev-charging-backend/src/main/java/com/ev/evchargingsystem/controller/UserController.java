@@ -8,6 +8,7 @@ import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.UserRepository;
 import com.ev.evchargingsystem.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -60,5 +61,11 @@ public class UserController {
     public ResponseEntity<UserStatsResponseForAdmin> getUserStats() {
         UserStatsResponseForAdmin stats = userService.getUserStats();
         return ResponseEntity.ok(stats);
+    }
+
+    @Operation(summary = "Chỉ cần nhập: password,fullName,Phone,Email, Role")
+    @PostMapping("/create-user")
+    public ResponseEntity createUser(@RequestBody @Valid User user){
+        return ResponseEntity.ok(userService.createUser(user));
     }
 }
