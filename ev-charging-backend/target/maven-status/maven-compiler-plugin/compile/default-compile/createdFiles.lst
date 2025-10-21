@@ -49,6 +49,7 @@ com\ev\evchargingsystem\entity\User.class
 com\ev\evchargingsystem\model\response\TransactionResponse.class
 com\ev\evchargingsystem\model\response\UserInfoResponse.class
 com\ev\evchargingsystem\model\request\LoginRequest.class
+com\ev\evchargingsystem\model\request\RegisterRequest.class
 com\ev\evchargingsystem\model\response\StationResponse.class
 com\ev\evchargingsystem\controller\ProfileController.class
 com\ev\evchargingsystem\model\response\ReviewResponse.class

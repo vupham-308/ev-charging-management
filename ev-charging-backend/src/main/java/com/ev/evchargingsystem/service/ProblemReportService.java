@@ -110,11 +110,12 @@ public class ProblemReportService {
     }
 
     public List<ProblemReport> getAllByStaff() {
-        User current = (User)  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!current.getRole().equals("STAFF")) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.getRole().equals("STAFF")) {
             throw new RuntimeException("Trang này chỉ dành cho nhân viên trạm sạc!");
         }
-        Station s = current.getStaff().getStation();
+        Staff staff = staffRepository.findStaffByUser(user);
+        Station s = staff.getStation();
         return problemReportRepository.findAllByStation(s);
     }
 

@@ -3,6 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.LoginRequest;
+import com.ev.evchargingsystem.model.request.RegisterRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.repository.AuthenticationRepository;
 import com.ev.evchargingsystem.repository.StaffRepository;
@@ -38,21 +39,23 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     private StaffRepository staffRepository;
 
-    public User register(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(user.getRole()==null){
-            user.setRole("USER");//mặc định role USER
-        }
-        User savedUser = authenticationRepository.save(user);
+    public User register(RegisterRequest registerRequest) {
+        User user = new User();
+        user.setFullName(registerRequest.getFullName());
+        user.setPhone(registerRequest.getPhone());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setRole("USER");//mặc định role USER
+        return authenticationRepository.save(user);
 
-        // nếu là STAFF thì tạo Staff tương ứng
-        if ("STAFF".equalsIgnoreCase(savedUser.getRole())) {
-            Staff staff = new Staff();
-            staff.setUser(savedUser);
-            staffRepository.save(staff);
-        }
-
-        return savedUser;
+//        // nếu là STAFF thì tạo Staff tương ứng
+//        if ("STAFF".equalsIgnoreCase(savedUser.getRole())) {
+//            Staff staff = new Staff();
+//            staff.setUser(savedUser);
+//            staffRepository.save(staff);
+//        }
+//
+//        return savedUser;
     }
 
     public UserResponse login(LoginRequest loginRequest) {
