@@ -1,4 +1,4 @@
-# Created at 2025-10-21T12:17:52.278
+# Created at 2025-10-21T13:39:42.955
 Boot Manifest-JAR contains absolute paths in classpath 'D:\Code\ev-charging-management\ev-charging-backend\target\test-classes'
 Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
 'other' has different root
