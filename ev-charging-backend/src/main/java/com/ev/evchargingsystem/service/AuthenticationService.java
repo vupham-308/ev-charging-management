@@ -10,6 +10,7 @@ import com.ev.evchargingsystem.repository.StaffRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,19 +60,24 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public UserResponse login(LoginRequest loginRequest) {
-        //xử lý logic đăng nhập
-        //xác thực người dùng
-        Authentication authentication;
-        authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginRequest.getEmail(),
-                loginRequest.getPassword()
-        ));
-        User user= (User) authentication.getPrincipal();
-        // User -> UserResponse
-        UserResponse userResponse= modelMapper.map(user, UserResponse.class);
-        String token= tokenService.generateToken(user);
-        userResponse.setToken(token);
-        return userResponse;
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+
+            User user = (User) authentication.getPrincipal();
+            UserResponse userResponse = modelMapper.map(user, UserResponse.class);
+            String token = tokenService.generateToken(user);
+            userResponse.setToken(token);
+            return userResponse;
+
+        } catch (BadCredentialsException e) {
+            // Ném lại để GlobalExceptionHandler bắt được
+            throw e;
+        }
     }
 
     @Override
