@@ -15,4 +15,5 @@ public interface StaffRepository extends JpaRepository<Staff,Integer> {
 
     Staff findStaffByUser(User user);
 
+    void deleteByUser(User user);
 }
