@@ -23,7 +23,9 @@ const ManageMyBooking = () => {
   }, []);
 
   const handleStart = (booking) => {
-    navigate("/driver/startCharging", { state: { booking } });
+    navigate(`/driver/startCharging/${booking.id}`, {
+      state: { booking },
+    });
   };
 
   const handleCancel = async (id) => {

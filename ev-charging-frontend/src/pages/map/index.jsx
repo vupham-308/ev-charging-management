@@ -51,7 +51,7 @@ const ManageMap = () => {
     navigate(`/driver/booking/${station.id}`);
   };
   const handleStartCharging = (station) => {
-    navigate("/driver/startCharging", { state: { station } });
+    navigate(`/driver/startCharging/${station.id}`);
   };
 
   return (

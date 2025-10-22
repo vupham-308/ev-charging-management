@@ -25,6 +25,8 @@ import ManageDeleteCar from "./pages/deleteCar";
 import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
+import ManageChargingSession from "./pages/chargingSession";
+import ManageConfirmBill from "./pages/confirmBill";
 
 // 1. Component
 // là 1 cái function
@@ -67,12 +69,20 @@ function App() {
           element: <ManageBooking />,
         },
         {
-          path: "startCharging",
+          path: "startCharging/:stationId",
           element: <ManageStartCharging />,
         },
         {
           path: "myBooking",
           element: <ManageMyBooking />,
+        },
+        {
+          path: "confirmBill",
+          element: <ManageConfirmBill />,
+        },
+        {
+          path: "chargingSession",
+          element: <ManageChargingSession />,
         },
         {
           path: "myCar",

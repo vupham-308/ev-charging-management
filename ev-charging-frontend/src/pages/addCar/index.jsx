@@ -96,24 +96,6 @@ const ManageAddCar = () => {
             <Input placeholder="VD: 59A-12345" />
           </Form.Item>
 
-          {/* Mức pin */}
-          <Form.Item
-            label="🔋 Mức pin khởi tạo (%)"
-            name="initBattery"
-            initialValue={100}
-            rules={[
-              { required: true, message: "Vui lòng nhập mức pin!" },
-              { type: "number", min: 0, max: 100, message: "0–100%" },
-            ]}
-          >
-            <InputNumber
-              min={0}
-              max={100}
-              style={{ width: "100%" }}
-              placeholder="Nhập phần trăm pin ban đầu"
-            />
-          </Form.Item>
-
           {/* Nút hành động */}
           <Form.Item style={{ textAlign: "right", marginTop: "20px" }}>
             <Button
