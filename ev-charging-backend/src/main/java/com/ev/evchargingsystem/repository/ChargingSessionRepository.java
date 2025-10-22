@@ -30,4 +30,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
           AND c.status = 'ONGOING'
     """)
     List<ChargingSession> findOngoingSessionsByUser(@Param("userId") int userId);
+
+    void deleteByCar(Car car);
 }

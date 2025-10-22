@@ -1,18 +1,20 @@
 package com.ev.evchargingsystem.service;
 
 
+import com.ev.evchargingsystem.entity.Car;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
-import com.ev.evchargingsystem.repository.UserRepository;
+import com.ev.evchargingsystem.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +29,9 @@ public class UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    private TransactionRepository transactionRepository;
+
 
     public List<UserInfoResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -40,8 +45,21 @@ public class UserService {
         return modelMapper.map(user, UserInfoResponse.class);
     }
 
+//    public void deleteUser(Integer id) {
+//        userRepository.deleteById(id);
+//    }
+
+    @Transactional
     public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isActive()) {
+            throw new RuntimeException("User already deactivated");
+        }
+
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     public UserInfoResponse getUserInfoByEmail(String email) {
@@ -101,5 +119,17 @@ public class UserService {
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public void restoreUser(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isActive()) {
+            throw new RuntimeException("User is already active");
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
     }
 }

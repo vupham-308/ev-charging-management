@@ -68,4 +68,10 @@ public class UserController {
     public ResponseEntity createUser(@RequestBody @Valid User user){
         return ResponseEntity.ok(userService.createUser(user));
     }
+
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<String> restoreUser(@PathVariable Integer id) {
+        userService.restoreUser(id);
+        return ResponseEntity.ok("User has been reactivated successfully");
+    }
 }

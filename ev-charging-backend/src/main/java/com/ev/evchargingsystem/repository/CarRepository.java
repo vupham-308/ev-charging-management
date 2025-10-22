@@ -10,4 +10,5 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
     List<Car> findByUserId(int userId);
     Optional<Car> findByIdAndUserId(int id, int userId);
     List<Car> findByUser(User user);
+    void deleteByUser(User user);
 }

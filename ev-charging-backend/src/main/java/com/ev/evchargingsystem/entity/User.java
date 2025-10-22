@@ -37,7 +37,8 @@ public class User implements UserDetails {
     @Column(length = 10)
     @NotNull
     private String role;
-
+    @Column(nullable = false)
+    private boolean active = true;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role));
@@ -46,5 +47,10 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.getEmail();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.active;
     }
 }
