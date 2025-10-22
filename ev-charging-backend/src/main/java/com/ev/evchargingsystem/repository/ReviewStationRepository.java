@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.repository;
 
 import com.ev.evchargingsystem.entity.ReviewStation;
+import com.ev.evchargingsystem.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,4 +13,6 @@ public interface ReviewStationRepository extends JpaRepository<ReviewStation,Int
     Double findAverageRatingByStationId(@Param("stationId") int stationId);
 
     List<ReviewStation> findByStationId(int stationId);
+
+    void deleteByUser(User user);
 }

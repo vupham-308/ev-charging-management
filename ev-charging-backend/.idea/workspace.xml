@@ -6,10 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="18155b67-2f6b-4eb2-a641-f70307be8089" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/JwtFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/JwtFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/request/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/request/LoginRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/AuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/AuthenticationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/request/RegisterRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/request/RegisterRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ChargingSessionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ChargingSessionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ProblemReportRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ProblemReportRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReviewStationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReviewStationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/StaffRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/StaffRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/TransactionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/TransactionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/model/request/RegisterRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/model/request/RegisterRequest.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,6 +27,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -42,28 +50,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.EvChargingSystemApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;19__10&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.EvChargingSystemApplication.executor": "Run",
+    "git-widget-placeholder": "19__10",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/NHAT/Desktop/SWP/fix_search/ev-charging-management/ev-charging-backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="EvChargingSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ev-charging-system" />
@@ -91,6 +101,12 @@
       <workItem from="1761028346666" duration="740000" />
       <workItem from="1761029735762" duration="1001000" />
       <workItem from="1761033855238" duration="3023000" />
+      <workItem from="1761037900013" duration="25000" />
+      <workItem from="1761038795068" duration="234000" />
+      <workItem from="1761062758655" duration="797000" />
+      <workItem from="1761063763893" duration="106000" />
+      <workItem from="1761100115702" duration="591000" />
+      <workItem from="1761128312662" duration="5581000" />
     </task>
     <servers />
   </component>

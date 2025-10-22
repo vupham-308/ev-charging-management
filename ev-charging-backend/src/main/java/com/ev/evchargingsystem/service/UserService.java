@@ -1,18 +1,20 @@
 package com.ev.evchargingsystem.service;
 
 
+import com.ev.evchargingsystem.entity.Car;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
-import com.ev.evchargingsystem.repository.UserRepository;
+import com.ev.evchargingsystem.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +29,22 @@ public class UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private ReviewStationRepository reviewRepository;
+    @Autowired
+    private ProblemReportRepository problemReportRepository;
+    @Autowired
+    private CarRepository carRepository;
+    @Autowired
+    private MembershipRepository membershipRepository;
+    @Autowired
+    private StaffRepository staffRepository;
+    @Autowired
+    private ChargingSessionRepository chargingSessionRepository;
 
     public List<UserInfoResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -40,8 +58,35 @@ public class UserService {
         return modelMapper.map(user, UserInfoResponse.class);
     }
 
+//    public void deleteUser(Integer id) {
+//        userRepository.deleteById(id);
+//    }
+
+    @Transactional
     public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lấy tất cả xe của user
+        List<Car> cars = carRepository.findByUserId(id);
+
+        // Xóa các phiên sạc của từng xe
+        for (Car car : cars) {
+            chargingSessionRepository.deleteByCar(car);
+        }
+
+        transactionRepository.deleteByUser(user);
+        reservationRepository.deleteByUser(user);
+        reviewRepository.deleteByUser(user);
+        problemReportRepository.deleteByUser(user);
+        membershipRepository.deleteByUser(user);
+        staffRepository.deleteByUser(user);
+
+        // Sau khi xóa session mới xóa car
+        carRepository.deleteByUser(user);
+
+        // Cuối cùng xóa user
+        userRepository.delete(user);
     }
 
     public UserInfoResponse getUserInfoByEmail(String email) {
