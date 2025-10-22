@@ -1,175 +1,149 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../admin/userADMIN.css";
+import "./userADMIN.css";
+import api from "../../config/axios";
+import { message, Spin, Modal } from "antd";
 
 const Users = () => {
+    const [users, setUsers] = useState([]);
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
     const [showModal, setShowModal] = useState(false);
 
-    const users = [
-        {
-            id: 1,
-            name: "Nguyễn Văn Nam",
-            email: "nam.nguyen@email.com",
-            role: "Tài xế",
-            sessions: 45,
-            spent: "13.067.500 VND",
-        },
-        {
-            id: 2,
-            name: "Trần Thị Hoa",
-            email: "hoa.tran@tram.com",
-            role: "Quản lý",
-            sessions: 30,
-            spent: "8.540.000 VND",
-        },
-        {
-            id: 3,
-            name: "Lê Minh Tuấn",
-            email: "tuan.le@tram.com",
-            role: "Quản lý",
-            sessions: 18,
-            spent: "4.230.000 VND",
-        },
-        {
-            id: 4,
-            name: "Phạm Thị Mai",
-            email: "mai.pham@email.com",
-            role: "Tài xế",
-            sessions: 23,
-            spent: "5.394.000 VND",
-        },
-    ];
+    // 🟢 Lấy danh sách người dùng
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get("admin/users");
+            setUsers(res.data);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải danh sách người dùng!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 🧮 Lấy thống kê
+    const fetchStats = async () => {
+        try {
+            const res = await api.get("admin/users/user-stats");
+            setStats(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+        fetchStats();
+    }, []);
+
+    // 🔍 Tìm kiếm người dùng
+    const handleSearch = async (keyword) => {
+        setSearch(keyword);
+        if (!keyword.trim()) {
+            fetchUsers();
+            return;
+        }
+
+        try {
+            const res = await api.get(`admin/users/search?name=${encodeURIComponent(keyword)}`);
+            setUsers(res.data);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tìm kiếm người dùng!");
+        }
+    };
+
+    // 🗑 Xóa người dùng
+    const handleDelete = async (id) => {
+        Modal.confirm({
+            title: "Xác nhận xóa",
+            content: "Bạn có chắc muốn xóa người dùng này không?",
+            okText: "Xóa",
+            cancelText: "Hủy",
+            okButtonProps: { danger: true },
+            onOk: async () => {
+                try {
+                    await api.delete(`admin/users/${id}`);
+                    message.success("Đã xóa người dùng thành công!");
+                    fetchUsers();
+                    fetchStats();
+                } catch (error) {
+                    console.error(error);
+                    message.error("Xóa người dùng thất bại!");
+                }
+            },
+        });
+    };
+
+    if (loading) {
+        return (
+            <div className="users-admin-page loading">
+                <Spin size="large" tip="Đang tải dữ liệu..." />
+            </div>
+        );
+    }
 
     return (
-
-
-        <div >
-
+        <div className="users-admin-page">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h1>Quản Lý Người Dùng</h1>
                 <button className="btn-primary" onClick={() => setShowModal(true)}>
-                    <i className="fa-solid fa-user-plus"></i> Thêm người dùng
+<i className="fa-solid fa-user-plus"></i> Thêm người dùng
                 </button>
             </div>
 
-            <div className="users-admin-page">
+            <br></br>
+            {/* Ô tìm kiếm */}
+            <input
+                type="text"
+                className="search-inputt"
+                placeholder="🔍 Tìm kiếm người dùng theo tên..."
+                value={search}
+                onChange={(e) => handleSearch(e.target.value)}
+            />
 
-
-                <div className="users-header">
-                    <div>
-                        <h3 className="section-title">Quản lý người dùng</h3>
-                        <p className="section-desc">
-                            Tất cả người dùng — Quản lý người dùng hệ thống và phân quyền
-                        </p>
-                    </div>
-
-                </div>
-
-                {/* Danh sách người dùng */}
-                <div className="users-list">
-                    {users.map((u) => (
-                        <div key={u.id} className="user-card">
-                            <div className="user-info">
-                                {/* <div className="user-avatar">
-                                    {u.name
-                                        .split(" ")
-                                        .slice(-2)
-                                        .map((w) => w[0])
-                                        .join("")
-                                        .toUpperCase()}
-                                </div> */}
-                                <div>
-                                    <div className="user-name">
-                                        {u.name}{" "}
-                                        <span
-                                            className={`badge ${u.role === "Tài xế"
-                                                ? "driver"
-                                                : u.role === "Quản lý"
-                                                    ? "manager"
+            {/* Danh sách người dùng */}
+            <div className="users-list">
+                {users.map((u) => (
+                    <div key={u.id} className="user-card">
+                        <div className="user-info">
+                            <div>
+                                <div className="user-name">
+                                    {u.fullName}{" "}
+                                    <span
+                                        className={`badge ${u.role === "USER"
+                                            ? "driver"
+                                            : u.role === "STAFF"
+                                                ? "manager"
+                                                : u.role === "ADMIN"
+                                                    ? "admin"
                                                     : ""
-                                                }`}
-                                        >
-                                            {u.role}
-                                        </span>
-                                    </div>
-                                    <div className="user-email">{u.email}</div>
-                                    <div className="user-meta">
-                                        {u.sessions} phiên sạc · {u.spent} đã chi
-                                    </div>
+                                            }`}
+                                    >
+                                        {u.role}
+                                    </span>
                                 </div>
-                            </div>
-                            <div className="user-actions">
-                                <button className="btn-icon edit">
-                                    <i className="fa-solid fa-pen"></i> Sửa
-                                </button>
-                                <button className="btn-icon delete">
-                                    <i className="fa-solid fa-trash"></i> Xóa
-                                </button>
+                                <div className="user-email">{u.email}</div>
+                                <div className="user-meta">📞 {u.phone}</div>
                             </div>
                         </div>
-                    ))}
-                </div>
-
-                {/* Phần gói đăng ký */}
-                <div className="subscription-section">
-                    <h3 className="section-title">Gói đăng ký</h3>
-                    <p className="section-desc">Quản lý gói giá và đăng ký</p>
-
-                    <div className="plan-grid">
-                        <div className="plan-card free">
-                            <div className="plan-header">
-                                <div>
-                                    <h4>Gói cơ bản</h4>
-                                    <p className="price">Miễn phí</p>
-                                </div>
-                                <span className="plan-count">1.847 người dùng</span>
-                            </div>
-                            <ul>
-                                <li>Trả theo sử dụng</li>
-                                <li>Giá tiêu chuẩn</li>
-                                <li>Hỗ trợ cơ bản</li>
-                            </ul>
-                            <button className="btn-secondary">Chỉnh sửa gói</button>
-                        </div>
-
-                        <div className="plan-card premium">
-                            <div className="plan-header">
-                                <div>
-                                    <h4>Gói cao cấp</h4>
-                                    <p className="price">689.000 VND/tháng</p>
-                                </div>
-                                <span className="plan-count">654 người dùng</span>
-                            </div>
-                            <ul>
-                                <li>Giảm giá 15%</li>
-                                <li>Ưu tiên đặt chỗ</li>
-                                <li>Báo cáo hàng tháng</li>
-                            </ul>
-                            <button className="btn-secondary">Chỉnh sửa gói</button>
-                        </div>
-
-                        <div className="plan-card business">
-                            <div className="plan-header">
-                                <div>
-                                    <h4>Gói doanh nghiệp</h4>
-                                    <p className="price">2.299.000 VND/tháng</p>
-                                </div>
-                                <span className="plan-count">346 người dùng</span>
-                            </div>
-                            <ul>
-                                <li>Giảm giá 25%</li>
-                                <li>Hỗ trợ riêng</li>
-                                <li>Bảng điều khiển phân tích</li>
-                            </ul>
-                            <button className="btn-secondary">Chỉnh sửa gói</button>
+                        <div className="user-actions">
+                            <button className="btn-icon edit">
+                                <i className="fa-solid fa-pen"></i> Sửa
+                            </button>
+                            <button className="btn-icon delete" onClick={() => handleDelete(u.id)}>
+                                <i className="fa-solid fa-trash"></i> Xóa
+                            </button>
                         </div>
                     </div>
-                </div>
+                ))}
             </div>
 
-
-            {/* Popup thêm người dùng */}
+            {/* Popup thêm người dùng (chưa kết nối API) */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal">
@@ -179,7 +153,7 @@ const Users = () => {
                                 <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <p className="modal-desc">Tạo tài khoản cho nhân viên hoặc tài xế mới</p>
+<p className="modal-desc">Tạo tài khoản cho nhân viên hoặc tài xế mới</p>
 
                         <form className="modal-form">
                             <label>Họ và tên <span>*</span></label>
@@ -194,9 +168,9 @@ const Users = () => {
                             <label>Vai trò <span>*</span></label>
                             <select defaultValue="">
                                 <option value="" disabled>Chọn vai trò</option>
-                                <option value="driver">Tài xế</option>
-                                <option value="manager">Quản lý trạm</option>
-                                <option value="admin">Quản trị viên</option>
+                                <option value="USER">Tài xế</option>
+                                <option value="STAFF">Nhân viên</option>
+                                <option value="ADMIN">Quản trị viên</option>
                             </select>
 
                             <label>Mật khẩu <span>*</span></label>

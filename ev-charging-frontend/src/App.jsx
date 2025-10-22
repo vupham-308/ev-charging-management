@@ -2,16 +2,10 @@
 // phối hợp JS & HTML 1 cách dễ dàng
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Dashboard from "./components/dashboard";
-import ManageBike from "./pages/bike";
-import ManageCategory from "./pages/category";
 import { ToastContainer } from "react-toastify";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
-import EbikeHomePage from "./pages/home";
-import UserHomePage from "./pages/home";
 import EVChargeHomePage from "./pages/home";
-import AdminPage from "./pages/admin";
 import StaffDashboard from "./pages/staff";
 import AdminDashboard from "./pages/admin";
 import DriverDashboard from "./pages/driver";
@@ -31,6 +25,8 @@ import ManageDeleteCar from "./pages/deleteCar";
 import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
+import ManageChargingSession from "./pages/chargingSession";
+import ManageConfirmBill from "./pages/confirmBill";
 
 // 1. Component
 // là 1 cái function
@@ -73,12 +69,20 @@ function App() {
           element: <ManageBooking />,
         },
         {
-          path: "startCharging",
+          path: "startCharging/:stationId",
           element: <ManageStartCharging />,
         },
         {
           path: "myBooking",
           element: <ManageMyBooking />,
+        },
+        {
+          path: "confirmBill",
+          element: <ManageConfirmBill />,
+        },
+        {
+          path: "chargingSession",
+          element: <ManageChargingSession />,
         },
         {
           path: "myCar",
