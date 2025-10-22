@@ -31,20 +31,7 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     @Autowired
     private TransactionRepository transactionRepository;
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private ReviewStationRepository reviewRepository;
-    @Autowired
-    private ProblemReportRepository problemReportRepository;
-    @Autowired
-    private CarRepository carRepository;
-    @Autowired
-    private MembershipRepository membershipRepository;
-    @Autowired
-    private StaffRepository staffRepository;
-    @Autowired
-    private ChargingSessionRepository chargingSessionRepository;
+
 
     public List<UserInfoResponse> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -67,26 +54,12 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Lấy tất cả xe của user
-        List<Car> cars = carRepository.findByUserId(id);
-
-        // Xóa các phiên sạc của từng xe
-        for (Car car : cars) {
-            chargingSessionRepository.deleteByCar(car);
+        if (!user.isActive()) {
+            throw new RuntimeException("User already deactivated");
         }
 
-        transactionRepository.deleteByUser(user);
-        reservationRepository.deleteByUser(user);
-        reviewRepository.deleteByUser(user);
-        problemReportRepository.deleteByUser(user);
-        membershipRepository.deleteByUser(user);
-        staffRepository.deleteByUser(user);
-
-        // Sau khi xóa session mới xóa car
-        carRepository.deleteByUser(user);
-
-        // Cuối cùng xóa user
-        userRepository.delete(user);
+        user.setActive(false);
+        userRepository.save(user);
     }
 
     public UserInfoResponse getUserInfoByEmail(String email) {
@@ -146,5 +119,17 @@ public class UserService {
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    public void restoreUser(Integer id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.isActive()) {
+            throw new RuntimeException("User is already active");
+        }
+
+        user.setActive(true);
+        userRepository.save(user);
     }
 }

@@ -22,7 +22,7 @@ public class DataInitializer {
                 admin.setPhone("0900000000");
                 admin.setRole("ADMIN");
                 userRepository.save(admin);
-                System.out.println("✅ Default admin account created: admin@gmail.com / 12345678");
+                System.out.println("Default admin account created: admin@gmail.com / 12345678");
             }
         };
     }

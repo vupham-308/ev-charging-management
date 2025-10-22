@@ -41,12 +41,25 @@ public class AuthenticationService implements UserDetailsService {
     private StaffRepository staffRepository;
 
     public User register(RegisterRequest registerRequest) {
+        // Kiểm tra email đã tồn tại chưa
+        User existing = authenticationRepository.findUserByEmail(registerRequest.getEmail());
+
+        if (existing != null) {
+            if (!existing.isEnabled()) {
+                throw new RuntimeException("This account has been deactivated. Please contact admin to restore access.");
+            } else {
+                throw new RuntimeException("Email already registered.");
+            }
+        }
+
+        // Nếu chưa tồn tại => tạo mới
         User user = new User();
         user.setFullName(registerRequest.getFullName());
         user.setPhone(registerRequest.getPhone());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole("USER");//mặc định role USER
+        user.setRole("USER"); // mặc định USER
+        user.setActive(true);
         return authenticationRepository.save(user);
 
 //        // nếu là STAFF thì tạo Staff tương ứng
