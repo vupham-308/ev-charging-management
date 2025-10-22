@@ -7,6 +7,7 @@ import com.ev.evchargingsystem.model.response.TransactionResponse;
 import com.ev.evchargingsystem.repository.TransactionRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -42,10 +43,26 @@ public class TransactionService {
                 throw new RuntimeException("Tài khoản của bạn không đủ! Vui lòng nạp tiền để tiếp tục sử dụng.");
             }
         }
-        transaction.setStatus("COMPLETED");
+        transaction.setStatus("PENDING");
         transaction.setChargingSession(c);
         transaction.setUser(user);
         return transactionRepository.save(transaction);
+    }
+
+    public Transaction setComplete(Transaction transaction){
+        transaction.setStatus("COMPLETE");
+        return transactionRepository.save(transaction);
+    }
+
+    @Scheduled(cron="0 0 0 * * *")//reload mỗi ngày
+    public void updateCashStatus(){
+        //nếu kh chọn cash, cần liên hệ nhân viên thanh toán
+        //nếu không cứ 0h transaction sẽ trở thành fail
+        List<Transaction> list = transactionRepository.findTransactionByStatus("PENDING");
+        for(Transaction t : list){
+            t.setStatus("FAILED");
+            transactionRepository.save(t);
+        }
     }
 
     public double getBalance(){

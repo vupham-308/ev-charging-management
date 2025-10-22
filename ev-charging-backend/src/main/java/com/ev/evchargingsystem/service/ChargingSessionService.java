@@ -36,26 +36,20 @@ public class ChargingSessionService {
         if(c.getStatus().equals("COMPLETED")) {
             throw new RuntimeException("Phiên sạc đã hoàn thành");
         }
-        int time = caculateTimeToReachGoalBattery(c.getChargerPoint().getChargerCost().getPortType(),
-                c.getCar().getInitBattery(),c.getGoalBattery());
-        double total = time*c.getChargerPoint().getChargerCost().getCost();
         //nếu CASH thì check xem KH đã thanh toán chưa
         if(c.getPaymentMethod().equals("CASH")&&c.getStatus().equals("WAITING_TO_PAY")){
             throw new RuntimeException("Vui lòng liên hệ nhân viên thanh toán để tiếp tục!");
         }
         //BALANCE thì lưu vào transaction
-        if(c.getPaymentMethod().equals("BALANCE")){
-            Transaction t = transactionService.createTransaction(c,total);
-        }
-        //CASH + PAID thì lưu vào transaction
-        if(c.getPaymentMethod().equals("CASH")&&c.getStatus().equals("PAID")){
-            Transaction t = transactionService.createTransaction(c,total);
-        }
+        //CASH + PAID thì lưu vào transaction thành complete
+            Transaction t = transactionRepository.findTransactionByChargingSession(c);
+            transactionService.setComplete(t);
         c.setStatus("ONGOING");
         c.getChargerPoint().setStatus("OCCUPIED");
         chargerPointRepository.save(c.getChargerPoint());
         return chargingSessionRepository.save(c);
     }
+
 
     @Scheduled(fixedRate = 18000)//reload mỗi 18s
     public void updateChargingSessionCCS(){
@@ -170,6 +164,8 @@ public class ChargingSessionService {
         }
         charge.setGoalBattery(rq.getGoalBattery());
         chargingSessionRepository.save(charge);
+        //tạo 1 transaction mới
+        transactionService.createTransaction(charge,fee);
 
         //=====================
         //Map từ ChargingSession về ChargingResponse
@@ -200,10 +196,12 @@ public class ChargingSessionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<ChargingSession> list = chargingSessionRepository.findOngoingSessionsByUser(user.getId());
         List<ChargingResponse> rsList = new ArrayList<>();
+        Transaction t;
         for(ChargingSession c : list) {
             int time = caculateTimeToReachGoalBattery(c.getChargerPoint().getChargerCost().getPortType(),
                     c.getCar().getInitBattery(), c.getGoalBattery());
-            double total = 0;
+            t = transactionRepository.findTransactionByChargingSession(c);
+            double total = t.getTotalAmount();
             ChargingResponse rs = new ChargingResponse(c.getId(),c.getChargerPoint(),
                     c.getCar().getBrand(), c.getPaymentMethod(), time, total,
                     c.getCar().getInitBattery(), c.getGoalBattery());
@@ -233,12 +231,23 @@ public class ChargingSessionService {
         return true;
     }
 
-    public List<ChargingSession> getAllByStaff() {
+    public List<ChargingResponse> getAllByStaff() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Staff staff = staffRepository.findStaffByUser(user);
         Station s = staff.getStation();
         List<ChargingSession> list = chargingSessionRepository.findChargingSessionByStationId(s.getId());
-        return list;
+        List<ChargingResponse> rsList = new ArrayList<>();
+        Transaction tranNew=null;
+        for(ChargingSession x: list){
+            tranNew = transactionRepository.findTransactionByChargingSession(x);
+            //thời gian còn lại để sạc đến goal
+            int minute = caculateTimeToReachGoalBattery(x.getChargerPoint().getChargerCost().getPortType(),
+                    x.getCar().getInitBattery(), x.getGoalBattery());
+            rsList.add(new ChargingResponse(x.getId(),x.getChargerPoint(),
+                    x.getCar().getBrand(),x.getPaymentMethod(),minute,
+                    tranNew.getTotalAmount(),x.getCar().getInitBattery(),x.getGoalBattery()));
+        }
+        return rsList;
     }
 
     public ChargingSession payByCash(int sessionId) {
