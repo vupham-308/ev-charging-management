@@ -3,9 +3,11 @@ package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.Car;
 import com.ev.evchargingsystem.entity.User;
+import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
+import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.*;
 import org.modelmapper.ModelMapper;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,5 +135,22 @@ public class UserService {
 
         user.setActive(true);
         userRepository.save(user);
+    }
+
+    public Optional<UserResponse> adminUpdateUser(int userId, AdminUpdateUserRequest request) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return Optional.empty();
+
+        User user = optionalUser.get();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setRole(request.getRole());
+        if (request.getActive() != null)
+            user.setActive(request.getActive());
+
+        userRepository.save(user);
+
+        return Optional.of(modelMapper.map(user, UserResponse.class));
     }
 }

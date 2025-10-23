@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -29,7 +30,7 @@ public class CarService {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
         if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
+            username = ((UserDetails) principal).getUsername();
         } else {
             username = principal.toString();
         }
@@ -66,7 +67,7 @@ public class CarService {
     // Lấy danh sách xe của người dùng hiện tại
     public List<CarResponse> getUserCars() {
         User currentUser = getCurrentUser();
-        return carRepository.findByUser(currentUser)
+        return carRepository.findByUserAndActiveTrue(currentUser)
                 .stream()
                 .map(this::toCarResponse)
                 .collect(Collectors.toList());
@@ -76,6 +77,7 @@ public class CarService {
     public Optional<CarResponse> getCarById(int carId) {
         User currentUser = getCurrentUser();
         return carRepository.findByIdAndUserId(carId, currentUser.getId())
+                .filter(Car::isActive)
                 .map(this::toCarResponse);
     }
 
@@ -102,10 +104,15 @@ public class CarService {
     // Xóa xe
     public void deleteCar(int id) {
         User currentUser = getCurrentUser();
-
         Car car = carRepository.findByIdAndUserId(id, currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Car not found or not owned by current user"));
-        carRepository.delete(car);
-    }
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy xe với ID: " + id));
 
+        if (!car.isActive()) {
+            throw new RuntimeException("Xe này đã bị xóa");
+        }
+
+        car.setActive(false);
+        carRepository.save(car);
+
+    }
 }
