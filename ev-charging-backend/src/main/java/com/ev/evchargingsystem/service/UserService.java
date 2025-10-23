@@ -4,9 +4,11 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.Car;
 import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
+import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
+import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.*;
 import org.modelmapper.ModelMapper;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,11 +40,12 @@ public class UserService {
 
 
     public List<UserInfoResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findByActiveTrue();
         return users.stream()
                 .map(this::convertToUserInfoResponse)
                 .collect(Collectors.toList());
     }
+
 
     private UserInfoResponse convertToUserInfoResponse(User user) {
         // Sử dụng modelMapper để chuyển đổi tự động
@@ -55,10 +59,10 @@ public class UserService {
     @Transactional
     public void deleteUser(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy User với id: " + id));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User already deactivated");
+            throw new RuntimeException("User này đã xóa");
         }
 
         user.setActive(false);
@@ -67,13 +71,13 @@ public class UserService {
 
     public UserInfoResponse getUserInfoByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với email: " + email));
         return convertToUserInfoResponse(user);
     }
 
     public UserInfoResponse updateUser(String email, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với email: " + email));
 
         user.setFullName(userUpdateRequest.getFullName());
         user.setPhone(userUpdateRequest.getPhone());
@@ -89,7 +93,7 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
         User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Không thấy user"));
 
         // Kiểm tra mật khẩu hiện tại
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
@@ -132,13 +136,30 @@ public class UserService {
 
     public void restoreUser(Integer id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy User với id: " + id));
 
         if (user.isActive()) {
-            throw new RuntimeException("User is already active");
+            throw new RuntimeException("User này đã kích hoạt");
         }
 
         user.setActive(true);
         userRepository.save(user);
+    }
+
+    public Optional<UserResponse> adminUpdateUser(int userId, AdminUpdateUserRequest request) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return Optional.empty();
+
+        User user = optionalUser.get();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setRole(request.getRole());
+        if (request.getActive() != null)
+            user.setActive(request.getActive());
+
+        userRepository.save(user);
+
+        return Optional.of(modelMapper.map(user, UserResponse.class));
     }
 }
