@@ -1,5 +1,3 @@
-"use client";
-
 import { Header } from "./components/Header.";
 import { TabNavigation } from "./components/TabNavigation.";
 import { IssuesTab } from "./components/tabs/IssuesTab";
@@ -8,19 +6,21 @@ import { PaymentTab } from "./components/tabs/PaymentTab.";
 import { ReportsTab } from "./components/tabs/ReportsTab.";
 import { MaintenanceTab } from "./components/tabs/MaintenanceTab.";
 import { useAuth } from "./hooks/useAuth";
-import { useProblems } from "./hooks/useProblems";
+import { useProblems } from "./hooks/useProblems";  
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";
 import { useStations } from "./hooks/useStations";
+import { useChargingSessions } from "./hooks/useChargingSessions";
 import { useChargerPoints } from "./hooks/useChargerPoints";
 
 const StaffDashboard = () => {
   const { logout } = useAuth();
   const { activeTab, setActiveTab } = useTabs();
   const { stations, isLoading: stationsLoading } = useStations();
-  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints();
+  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints(); 
   const { problems, isLoading: problemsLoading } = useProblems();
-
+  const { sessions, isLoading: sessionsLoading } = useChargingSessions()
+  
   const isMonitoringLoading = stationsLoading || pointsLoading;
 
   const renderTabContent = () => {
@@ -38,13 +38,16 @@ const StaffDashboard = () => {
           />
         );
       case TAB_KEYS.PAYMENT:
-        return <PaymentTab />;
+        return <PaymentTab
+            sessions={sessions}      
+            isLoading={sessionsLoading}  
+          />;
       case TAB_KEYS.ISSUES:
         return <IssuesTab problems={problems} isLoading={problemsLoading} />;
       case TAB_KEYS.REPORTS:
         return <ReportsTab />;
       case TAB_KEYS.MAINTENANCE:
-        return <MaintenanceTab />;
+        return <MaintenanceTab chargerPoints={chargerPoints} isLoading={pointsLoading} />;
       default:
         return (
           <MonitoringTab
