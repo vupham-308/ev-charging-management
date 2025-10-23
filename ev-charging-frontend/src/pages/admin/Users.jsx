@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+<<<<<<< HEAD
 import "./userADMIN.css";
+=======
+import "../admin/userADMIN.css";
+>>>>>>> e5ea23daca85bb868f7845ff164d33be427eecc0
 import api from "../../config/axios";
 import { message, Spin, Modal } from "antd";
 
