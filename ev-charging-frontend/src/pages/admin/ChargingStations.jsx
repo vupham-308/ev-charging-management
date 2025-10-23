@@ -13,9 +13,9 @@ const ChargingStations = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingStation, setEditingStation] = useState(null);
     const [form] = Form.useForm();
-    const [modal, contextHolder] = Modal.useModal(); //  Ant Design v5 modal hook
+    const [modal, contextHolder] = Modal.useModal();
 
-    //  Lấy danh sách trạm
+    // Lấy danh sách trạm
     const fetchStations = async () => {
         setLoading(true);
         try {
@@ -33,7 +33,7 @@ const ChargingStations = () => {
         fetchStations();
     }, []);
 
-    // 🔍 Tìm kiếm trạm
+    // Tìm kiếm trạm
     const handleSearch = async (value) => {
         setSearch(value);
         if (!value.trim()) {
@@ -52,7 +52,7 @@ const ChargingStations = () => {
         }
     };
 
-    // 🧾 Xem chi tiết trạm
+    // Xem chi tiết trạm
     const handleView = async (id) => {
         try {
             const res = await api.get(`station/get/${id}`);
@@ -64,6 +64,7 @@ const ChargingStations = () => {
                         <p><b>Tên:</b> {data.name}</p>
                         <p><b>Địa chỉ:</b> {data.address}</p>
                         <p><b>Trụ sạc sẵn sàng:</b> {data.pointChargerAvailable}</p>
+                        <p><b>Trụ đang bảo trì:</b> {data.pointChargerMaintenance}</p>
                         <p><b>Tổng trụ sạc:</b> {data.pointChargerTotal}</p>
                         <p><b>Cổng hỗ trợ:</b> {data.portType?.join(", ")}</p>
                     </div>
@@ -74,7 +75,7 @@ const ChargingStations = () => {
         }
     };
 
-    // ➕ Mở form thêm hoặc sửa
+    // Mở form thêm hoặc sửa
     const openModal = (station = null) => {
         setIsEditMode(!!station);
         setEditingStation(station);
@@ -88,10 +89,11 @@ const ChargingStations = () => {
             form.resetFields();
             form.setFieldsValue({ status: "ACTIVE" });
         }
-setIsModalOpen(true);
+
+        setIsModalOpen(true);
     };
 
-    // 🗑 Xóa trạm (dùng modal mới)
+    // Xóa trạm
     const handleDelete = async (id) => {
         modal.confirm({
             title: "Xác nhận xóa",
@@ -112,7 +114,7 @@ setIsModalOpen(true);
         });
     };
 
-    // ✅ Submit form (Thêm hoặc Cập nhật)
+    // Submit form (Thêm hoặc Cập nhật)
     const handleSubmit = async (values) => {
         try {
             if (isEditMode) {
@@ -173,9 +175,11 @@ setIsModalOpen(true);
                 {stations.map((s, i) => {
                     const ready = s.pointChargerAvailable || 0;
                     const total = s.pointChargerTotal || 0;
-                    const using = total - ready;
-const status = ready > 0 ? "Hoạt động" : "Bảo trì";
-                    const color = ready > 0 ? "green" : "red";
+                    const maintenance = s.pointChargerMaintenance || 0;
+                    const using = total - ready - maintenance;
+                    //  Hiển thị trạng thái theo DB (ACTIVE / INACTIVE)
+                    const status = s.status === "ACTIVE" ? "Hoạt động" : "Bảo trì";
+                    const color = s.status === "ACTIVE" ? "green" : "red";
 
                     return (
                         <div key={i} className="station-card">
@@ -204,6 +208,10 @@ const status = ready > 0 ? "Hoạt động" : "Bảo trì";
                                         {using}
                                         <span>Đang sử dụng</span>
                                     </div>
+                                    <div className="stat red">
+                                        {maintenance}
+                                        <span>Bảo trì</span>
+                                    </div>
                                     <div className="stat total">
                                         {total}
                                         <span>Tổng cộng</span>
@@ -219,7 +227,7 @@ const status = ready > 0 ? "Hoạt động" : "Bảo trì";
                 })}
             </div>
 
-            {/* 🔧 Modal thêm/sửa */}
+            {/* Modal thêm/sửa */}
             <Modal
                 title={isEditMode ? "Cập nhật trạm sạc" : "Thêm trạm sạc mới"}
                 open={isModalOpen}
@@ -237,7 +245,7 @@ const status = ready > 0 ? "Hoạt động" : "Bảo trì";
                         label="Tên trạm"
                         rules={[{ required: true, message: "Vui lòng nhập tên trạm" }]}
                     >
-<Input placeholder="Nhập tên trạm..." />
+                        <Input placeholder="Nhập tên trạm..." />
                     </Form.Item>
 
                     <Form.Item
@@ -275,7 +283,7 @@ const status = ready > 0 ? "Hoạt động" : "Bảo trì";
                 </Form>
             </Modal>
 
-            {/* ✅ Context holder cho Modal.confirm */}
+            {/* Context holder cho Modal.confirm */}
             {contextHolder}
         </div>
     );
