@@ -1,31 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { toast } from "react-toastify"
-import { getProblems } from "../services/problemService"
+import { useEffect, useState } from "react";
+import { getProblems } from "../services/problemService";
 
 export const useProblems = () => {
-  const [problems, setProblems] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [problems, setProblems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchProblems = async (stationId) => {
-    if (!stationId) {
-      toast.warning("Vui lòng nhập Station ID trước!")
-      return
-    }
-
-    setIsLoading(true)
+  const fetchProblems = async () => {
+    setIsLoading(true);
     try {
-      const data = await getProblems(stationId)
-      setProblems(data)
-      toast.success("Lấy danh sách sự cố thành công!")
+      const data = await getProblems();
+      setProblems(data);
     } catch (error) {
-      console.error("Error fetching problems:", error)
-      toast.error("Không thể tải danh sách sự cố!")
+      console.error("Error fetching problems:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  return { problems, isLoading, fetchProblems }
-}
+  useEffect(() => {
+    fetchProblems();
+  }, []);
+
+  return { problems, isLoading, fetchProblems };
+};

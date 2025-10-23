@@ -28,5 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByUserId(int userId);
 
     void deleteByUser(User user);
+
+    List<Transaction> findTransactionByStatus(String status);
 }
 

@@ -12,17 +12,17 @@ import { useProblems } from "./hooks/useProblems";
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";
 import { useStations } from "./hooks/useStations";
-import { useEffect } from "react";
+import { useChargerPoints } from "./hooks/useChargerPoints";
 
 const StaffDashboard = () => {
   const { logout } = useAuth();
-  const { stations, isLoading: stationsLoading, fetchStations } = useStations();
-  const { problems, isLoading: problemsLoading, fetchProblems } = useProblems();
   const { activeTab, setActiveTab } = useTabs();
+  const { stations, isLoading: stationsLoading } = useStations();
+  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints();
+  const { problems, isLoading: problemsLoading } = useProblems();
 
-  useEffect(() => {
-    fetchStations()
-  }, [])
+  const isMonitoringLoading = stationsLoading || pointsLoading;
+
   const renderTabContent = () => {
     switch (activeTab) {
       case TAB_KEYS.MONITORING:
@@ -32,19 +32,15 @@ const StaffDashboard = () => {
             occupied={stations.occupied}
             reserved={stations.reserved}
             outOfService={stations.outOfService}
-            isLoading={stationsLoading}
+            chargerPoints = {chargerPoints} 
+            isLoading={isMonitoringLoading}
+             
           />
         );
       case TAB_KEYS.PAYMENT:
         return <PaymentTab />;
       case TAB_KEYS.ISSUES:
-        return (
-          <IssuesTab
-            problems={problems}
-            isLoading={problemsLoading}
-            onSearch={fetchProblems}
-          />
-        );
+        return <IssuesTab problems={problems} isLoading={problemsLoading} />;
       case TAB_KEYS.REPORTS:
         return <ReportsTab />;
       case TAB_KEYS.MAINTENANCE:
@@ -56,7 +52,9 @@ const StaffDashboard = () => {
             occupied={stations.occupied}
             reserved={stations.reserved}
             outOfService={stations.outOfService}
-            isLoading={stationsLoading}
+            chargerPoints = {chargerPoints} 
+            isLoading={isMonitoringLoading}
+             
           />
         );
     }

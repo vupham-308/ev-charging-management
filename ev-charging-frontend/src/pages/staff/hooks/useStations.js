@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getStations } from "../services/stationService";
 
@@ -30,8 +30,6 @@ export const useStations = () => {
         console.warn("Unexpected station data format:", data);
         toast.warning("Dữ liệu trạm không hợp lệ.");
       }
-
-      toast.success("Lấy danh sách trạm thành công!");
     } catch (error) {
       console.error("Error fetching stations:", error);
       toast.error("Không thể tải danh sách trạm!");
@@ -39,6 +37,10 @@ export const useStations = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+      fetchStations();
+    }, []);
 
   return { stations, isLoading, fetchStations };
 };
