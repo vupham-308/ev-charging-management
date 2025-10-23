@@ -50,7 +50,7 @@ public class TransactionService {
     }
 
     public Transaction setComplete(Transaction transaction){
-        transaction.setStatus("COMPLETE");
+        transaction.setStatus("COMPLETED");
         return transactionRepository.save(transaction);
     }
 

@@ -33,6 +33,7 @@ com\ev\evchargingsystem\service\ChargerCostService.class
 com\ev\evchargingsystem\service\TokenService.class
 com\ev\evchargingsystem\config\SecurityConfig.class
 com\ev\evchargingsystem\model\request\ProblemResponseRequest.class
+com\ev\evchargingsystem\model\request\AdminUpdateUserRequest.class
 com\ev\evchargingsystem\model\request\ReviewStationRequest.class
 com\ev\evchargingsystem\controller\CarController.class
 com\ev\evchargingsystem\controller\StationController.class

@@ -32,6 +32,7 @@ D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\entity\Trans
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\entity\User.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\EvChargingSystemApplication.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\exception\GlobalExceptionHandler.java
+D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\AdminUpdateUserRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\CarCreateRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\ChargerPointRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\ChargingSessionRequest.java

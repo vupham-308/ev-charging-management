@@ -159,8 +159,9 @@ public class ChargingSessionService {
         }
         //nếu create 1 trụ sạc đang ở trạng thái RESERVED, cần kiểm tra xem
         //có đúng user đang tạo session này đã đặt chỗ không
-        boolean check = false;
+        boolean check = true;//nếu nó không phải là RESERVED thì bỏ qua code dưới
         if(point.getStatus().equals("RESERVED")){
+            check=false;
             List<Reservation> r = reservationRepository.findByUserIdAndStatus(user.getId(),"PENDING");
             for(Reservation x: r){
                 if(x.getChargerPoint().getId()==charge.getChargerPoint().getId()){

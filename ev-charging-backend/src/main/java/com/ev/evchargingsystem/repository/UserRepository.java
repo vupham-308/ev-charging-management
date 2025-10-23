@@ -14,16 +14,16 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     List<User> findByFullNameContainingIgnoreCase(String fullName);
 
-    @Query("SELECT COUNT(u) FROM User u")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
     long countTotalUsers();
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'USER'")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'USER' AND u.active = true")
     long countNormalUsers();
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'STAFF'")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'STAFF' AND u.active = true")
     long countStaffs();
 
-    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'ADMIN'")
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'ADMIN' AND u.active = true")
     long countAdmins();
 
     List<User> findByActiveTrue();
