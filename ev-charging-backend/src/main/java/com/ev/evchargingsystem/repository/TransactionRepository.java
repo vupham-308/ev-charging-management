@@ -23,7 +23,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             """)
     Double getUserBalance(@Param("userId") int userId);
 
-    Transaction findTransactionByChargingSession(ChargingSession chargingSession);
+    Transaction findTransactionByChargingSessionId(int chargingSessionId);
 
     List<Transaction> findByUserId(int userId);
 

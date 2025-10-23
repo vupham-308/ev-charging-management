@@ -6,12 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="4d561b4c-acf6-48fe-bd07-69fb137ea639" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/DataInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/entity/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/entity/Car.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/TransactionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/TransactionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ChargingSessionRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ChargingSessionRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/UserRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargingSessionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ChargingSessionService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/TransactionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/TransactionService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,32 +46,35 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="34SFGsg8ikQKI0Gea0CE5iQTRx8" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.EvChargingSystemApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;19__10&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.EvChargingSystemApplication.executor": "Run",
+    "git-widget-placeholder": "vu",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="EvChargingSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="ev-charging-system" />

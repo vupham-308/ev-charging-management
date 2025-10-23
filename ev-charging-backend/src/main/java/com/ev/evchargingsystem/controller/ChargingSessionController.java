@@ -1,8 +1,9 @@
 package com.ev.evchargingsystem.controller;
 
-import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
+import com.ev.evchargingsystem.model.request.*;
 import com.ev.evchargingsystem.service.ChargingSessionService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,19 @@ public class ChargingSessionController {
     public ResponseEntity charge(
                                  @RequestBody ChargingSessionRequest chargingSessionRequest) {
         try {
+            return ResponseEntity.ok(chargingSessionService.createSession(chargingSessionRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Driver: Bắt đầu 1 phiên sạc đã đặt trước")
+    @PreAuthorize("hasAuthority('USER')")
+    @PostMapping("/reservation-charge/{chargerPointId}")
+    public ResponseEntity reservationCharging(@PathVariable("chargerPointId") int chargerPointId,
+                                              @RequestBody ChargingSessionRequest chargingSessionRequest) {
+        try {
+            chargingSessionRequest.setPointId(chargerPointId);
             return ResponseEntity.ok(chargingSessionService.createSession(chargingSessionRequest));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
