@@ -100,7 +100,8 @@ public class ReservationService {
             //2)nếu phiên sạc đang sạc trước đó sạc xong SAU giờ kết
             //thúc của phiên đặt chỗ, đặt chỗ coi như bị hủy
             if(r.getEndDate().before(current)) {
-                r.getChargerPoint().setStatus("AVAILABLE");
+                if(!r.getChargerPoint().equals("ONGOING")){
+                r.getChargerPoint().setStatus("AVAILABLE");}
                 r.setStatus("CANCELLED");
                 reservationRepository.save(r);
                 chargerPointRepository.save(r.getChargerPoint());

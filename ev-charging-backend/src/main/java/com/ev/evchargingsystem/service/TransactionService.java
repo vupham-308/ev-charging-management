@@ -27,8 +27,8 @@ public class TransactionService {
     private UserRepository userRepo;
 
     public Transaction createTransaction(ChargingSession c, double total){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Transaction transaction = transactionRepository.findTransactionByChargingSession(c);
+        User user = c.getCar().getUser();
+        Transaction transaction = transactionRepository.findTransactionByChargingSessionId(c.getId());
         if(transaction == null) {
             transaction = new Transaction();
         }
@@ -36,6 +36,9 @@ public class TransactionService {
         transaction.setTotalAmount(total);
         transaction.setPaymentMethod(c.getPaymentMethod());
         transaction.setPaymentType("WITHDRAW");
+        transaction.setStatus("PENDING");
+        transaction.setChargingSession(c);
+        transaction.setUser(user);
         if(c.getPaymentMethod().equals("BALANCE")) {
         Double balance = transactionRepository.getUserBalance(user.getId());
         //check xem đủ tiền để trừ không
@@ -43,9 +46,6 @@ public class TransactionService {
                 throw new RuntimeException("Tài khoản của bạn không đủ! Vui lòng nạp tiền để tiếp tục sử dụng.");
             }
         }
-        transaction.setStatus("PENDING");
-        transaction.setChargingSession(c);
-        transaction.setUser(user);
         return transactionRepository.save(transaction);
     }
 

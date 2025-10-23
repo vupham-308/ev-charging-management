@@ -14,7 +14,7 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
 
     ChargingSession findChargingSessionById(int sessionId);
 
-    ChargingSession findChargingSessionByCar(Car car);
+    List<ChargingSession> findChargingSessionByCar(Car car);
 
     @Query("""
         SELECT c

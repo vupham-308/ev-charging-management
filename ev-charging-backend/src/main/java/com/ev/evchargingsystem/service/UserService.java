@@ -2,6 +2,7 @@ package com.ev.evchargingsystem.service;
 
 
 import com.ev.evchargingsystem.entity.Car;
+import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
@@ -31,6 +32,8 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    StaffRepository staffRepository;
 
 
     public List<UserInfoResponse> getAllUsers() {
@@ -118,6 +121,12 @@ public class UserService {
 
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //        // nếu là STAFF thì tạo Staff tương ứng
+        if ("STAFF".equalsIgnoreCase(user.getRole())) {
+            Staff staff = new Staff();
+            staff.setUser(user);
+            staffRepository.save(staff);
+        }
         return userRepository.save(user);
     }
 
