@@ -25,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role = 'ADMIN'")
     long countAdmins();
+
+    List<User> findByActiveTrue();
 }

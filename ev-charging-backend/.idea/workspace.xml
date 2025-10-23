@@ -4,11 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="28ef5ac2-ef70-466f-8998-bfd203c32cde" name="Changes" comment="">
+    <list default="true" id="4d561b4c-acf6-48fe-bd07-69fb137ea639" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/ChargingResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/ChargingResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ChargingSessionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/config/DataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/entity/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/entity/Car.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/CarRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,18 +28,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;vupham-308&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/vupham-308/ev-charging-management&quot;,
-    &quot;accountId&quot;: &quot;807f5b70-022f-4406-93c8-7026c869a1eb&quot;
-  }
-}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -45,12 +36,10 @@
     </option>
   </component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
 }</component>
-  <component name="ProjectId" id="34EvaRcatA7AVok718Ic5ctDuua" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectId" id="34SFGsg8ikQKI0Gea0CE5iQTRx8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -63,15 +52,11 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;Spring Boot.EvChargingSystemApplication.executor&quot;: &quot;Run&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;vu&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;19__10&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/NHAT/Desktop/SWP/fix_search/ev-charging-management/ev-charging-backend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -100,33 +85,17 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="28ef5ac2-ef70-466f-8998-bfd203c32cde" name="Changes" comment="" />
-      <created>1760791609050</created>
+      <changelist id="4d561b4c-acf6-48fe-bd07-69fb137ea639" name="Changes" comment="" />
+      <created>1761198975027</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1760791609050</updated>
-      <workItem from="1760791610309" duration="310000" />
-      <workItem from="1760792888566" duration="24000" />
-      <workItem from="1760806513200" duration="3228000" />
-      <workItem from="1760859717396" duration="1625000" />
-      <workItem from="1760862761618" duration="3000" />
-      <workItem from="1760863078105" duration="777000" />
-      <workItem from="1760865289898" duration="947000" />
-      <workItem from="1760869999169" duration="2232000" />
-      <workItem from="1760872660616" duration="398000" />
-      <workItem from="1760876029927" duration="216000" />
-      <workItem from="1760876669838" duration="675000" />
-      <workItem from="1760878808861" duration="1323000" />
-      <workItem from="1760880228697" duration="47000" />
-      <workItem from="1760882008972" duration="840000" />
-      <workItem from="1760882950110" duration="18000" />
-      <workItem from="1760883358446" duration="1790000" />
-      <workItem from="1760938324854" duration="1727000" />
-      <workItem from="1760943249058" duration="8575000" />
-      <workItem from="1760952496924" duration="504000" />
-      <workItem from="1760964838024" duration="1464000" />
-      <workItem from="1760977618774" duration="15000" />
-      <workItem from="1761017869942" duration="6452000" />
+      <updated>1761198975027</updated>
+      <workItem from="1761198977925" duration="204000" />
+      <workItem from="1761203467026" duration="41000" />
+      <workItem from="1761226949443" duration="2933000" />
+      <workItem from="1761231406999" duration="1109000" />
+      <workItem from="1761232583531" duration="7000" />
+      <workItem from="1761233803992" duration="2979000" />
     </task>
     <servers />
   </component>

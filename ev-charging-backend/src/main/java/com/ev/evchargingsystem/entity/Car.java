@@ -33,4 +33,7 @@ public class Car {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.User;
+import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
@@ -72,6 +73,15 @@ public class UserController {
     @PutMapping("/restore/{id}")
     public ResponseEntity<String> restoreUser(@PathVariable Integer id) {
         userService.restoreUser(id);
-        return ResponseEntity.ok("User has been reactivated successfully");
+        return ResponseEntity.ok("Người dùng đã được khôi phục thành công.");
+    }
+
+    @Operation(summary = "Admin cập nhật thông tin user")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/admin-update-user/{id}")
+    public ResponseEntity<UserResponse> adminUpdateUser(@PathVariable int id, @Valid @RequestBody AdminUpdateUserRequest request) {
+        return userService.adminUpdateUser(id, request)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
