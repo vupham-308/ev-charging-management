@@ -183,7 +183,6 @@ public class ChargingSessionService {
         charge.setPaymentMethod(rq.getPaymentMethod());
         charge.setStatus("WAITING_TO_PAY");
         chargingSessionRepository.save(charge);
-        //tạo 1 transaction mới
         transactionService.createTransaction(charge,fee);
 
         //=====================
@@ -240,6 +239,9 @@ public class ChargingSessionService {
         s.setEndTime(new Date(System.currentTimeMillis()));
         s.setStatus("COMPLETED");
         chargingSessionRepository.save(s);
+        //sửa lại trạng thái cua trụ sạc về Available
+        s.getChargerPoint().setStatus("AVAILABLE");
+        chargerPointRepository.save(s.getChargerPoint());
         //sửa transaction mới tương ứng
         Transaction tranNew = transactionRepository.findTransactionByChargingSessionId(s.getId());
         Date current = new Date(System.currentTimeMillis());

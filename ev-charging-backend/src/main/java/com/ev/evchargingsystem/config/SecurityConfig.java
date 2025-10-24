@@ -76,6 +76,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/chargerPoint/getAll/**").permitAll()
                                 .requestMatchers("/api/chargerPoint/get/**").permitAll()
                                 .requestMatchers("/error").permitAll()
+                                .requestMatchers("/api/payment/success/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()

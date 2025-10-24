@@ -3,6 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.entity.Transaction;
 import com.ev.evchargingsystem.entity.User;
+import com.ev.evchargingsystem.model.request.TopUpRequest;
 import com.ev.evchargingsystem.model.response.TransactionResponse;
 import com.ev.evchargingsystem.repository.TransactionRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
@@ -43,6 +44,8 @@ public class TransactionService {
         Double balance = transactionRepository.getUserBalance(user.getId());
         //check xem đủ tiền để trừ không
             if (balance < total) {
+                transaction.setStatus("FAILED");
+                transactionRepository.save(transaction);
                 throw new RuntimeException("Tài khoản của bạn không đủ! Vui lòng nạp tiền để tiếp tục sử dụng.");
             }
         }
@@ -94,5 +97,12 @@ public class TransactionService {
         }
 
         return responses;
+    }
+
+    public Transaction topUp(TopUpRequest topUpRequest){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.save(new Transaction(new Date(System.currentTimeMillis()),
+                topUpRequest.getTotalAmount(),topUpRequest.getPaymentMethod(),
+                "TOPUP","PENDING",user));
     }
 }

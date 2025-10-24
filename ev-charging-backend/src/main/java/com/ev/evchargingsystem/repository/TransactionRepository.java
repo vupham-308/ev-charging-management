@@ -30,5 +30,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     void deleteByUser(User user);
 
     List<Transaction> findTransactionByStatus(String status);
+
+    Transaction findTransactionById(int id);
 }
 
