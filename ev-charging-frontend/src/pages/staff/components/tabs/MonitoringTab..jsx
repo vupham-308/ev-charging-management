@@ -127,7 +127,7 @@ export const MonitoringTab = ({
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-800">
-                          CH{String(point.id).padStart(3, "0")}
+                          {point.id}
                         </h3>
                         <p className="text-gray-600 text-sm">
                           {point.capacity} kW • {point.portType}

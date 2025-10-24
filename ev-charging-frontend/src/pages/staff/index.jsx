@@ -1,4 +1,4 @@
-import { Header } from "./components/Header.";
+import { Header } from "./components/Header";
 import { TabNavigation } from "./components/TabNavigation.";
 import { IssuesTab } from "./components/tabs/IssuesTab";
 import { MonitoringTab } from "./components/tabs/MonitoringTab.";
