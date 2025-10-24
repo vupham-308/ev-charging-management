@@ -31,6 +31,7 @@ com\ev\evchargingsystem\model\request\ChargerPointRequest.class
 com\ev\evchargingsystem\repository\StationRepository.class
 com\ev\evchargingsystem\service\ChargerCostService.class
 com\ev\evchargingsystem\service\TokenService.class
+com\ev\evchargingsystem\controller\PaymentController.class
 com\ev\evchargingsystem\config\SecurityConfig.class
 com\ev\evchargingsystem\model\request\ProblemResponseRequest.class
 com\ev\evchargingsystem\model\request\AdminUpdateUserRequest.class
@@ -52,6 +53,7 @@ com\ev\evchargingsystem\repository\ChargerPointRepository.class
 com\ev\evchargingsystem\repository\ChargingSessionRepository.class
 com\ev\evchargingsystem\entity\User.class
 com\ev\evchargingsystem\model\response\TransactionResponse.class
+com\ev\evchargingsystem\service\PaymentService.class
 com\ev\evchargingsystem\model\response\UserInfoResponse.class
 com\ev\evchargingsystem\model\request\LoginRequest.class
 com\ev\evchargingsystem\model\request\RegisterRequest.class

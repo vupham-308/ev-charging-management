@@ -10,6 +10,7 @@ D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\C
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ChargerCostController.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ChargerPointController.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ChargingSessionController.java
+D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\PaymentController.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ProblemReportController.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ProfileController.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\controller\ReservationController.java
@@ -76,6 +77,7 @@ D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\CarS
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ChargerCostService.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ChargerPointService.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ChargingSessionService.java
+D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\PaymentService.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ProblemReportService.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ReservationService.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\service\ReviewStationService.java

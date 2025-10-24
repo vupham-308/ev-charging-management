@@ -11,7 +11,7 @@ import org.hibernate.annotations.Check;
 import java.util.Date;
 
 @Entity
-@Check(constraints = "payment_method IN ('CASH','BALANCE', 'ONLINE') AND payment_type IN ('TOPUP', 'WITHDRAW') AND status IN ('PENDING', 'COMPLETED', 'FAILED')")
+@Check(constraints = "payment_method IN ('CASH','BALANCE', 'VNPAY') AND payment_type IN ('TOPUP', 'WITHDRAW') AND status IN ('PENDING', 'COMPLETED', 'FAILED')")
 @Table(name = "transactions")
 @Data
 @AllArgsConstructor
@@ -38,4 +38,13 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private User user;
+
+    public Transaction(Date date, double totalAmount, String paymentMethod, String paymentType, String status, User user) {
+        this.date = date;
+        this.totalAmount = totalAmount;
+        this.paymentMethod = paymentMethod;
+        this.paymentType = paymentType;
+        this.status = status;
+        this.user = user;
+    }
 }
