@@ -2,6 +2,7 @@ package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.response.StaffDashboardResponse;
 import com.ev.evchargingsystem.service.ChargerPointService;
 import com.ev.evchargingsystem.service.StaffService;
 import com.ev.evchargingsystem.service.StationService;
@@ -58,5 +59,13 @@ public class StaffController {
         staffService.save(staff);
 
         return ResponseEntity.ok("Đã gán trạm " + station.getName() + " cho staff " + staff.getUser().getFullName());
+    }
+
+    @Operation(summary = "STAFF xem thống kê trong ngày của trạm mình quản lý")
+    @GetMapping("/dashboard-status")
+    @PreAuthorize("hasAuthority('STAFF')")
+    public ResponseEntity<StaffDashboardResponse> getDashboard() {
+        StaffDashboardResponse response = staffService.getTodayStats();
+        return ResponseEntity.ok(response);
     }
 }

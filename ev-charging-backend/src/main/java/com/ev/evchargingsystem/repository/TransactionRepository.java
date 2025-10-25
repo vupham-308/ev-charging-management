@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -32,5 +33,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findTransactionByStatus(String status);
 
     Transaction findTransactionById(int id);
+
+    @Query("""
+       SELECT COALESCE(SUM(t.totalAmount), 0)
+       FROM Transaction t
+       WHERE t.date BETWEEN :start AND :end
+         AND t.status = 'COMPLETED'
+         AND t.chargingSession.chargerPoint.station.id = :stationId
+       """)
+    double sumByStationAndDateRange(@Param("stationId") int stationId,
+                                    @Param("start") Date start,
+                                    @Param("end") Date end);
+
 }
 
