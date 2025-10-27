@@ -59,7 +59,7 @@ const ManageTransaction = () => {
   };
 
   const renderTransactionMainText = (t) => {
-    if (t.paymentType === "DEPOSIT") return "Nạp tiền";
+    if (t.paymentType === "DEPOSIT") return "Nạp tiền tài khoản";
     if (t.paymentType === "WITHDRAW") return "Sạc xe điện";
     return "Giao dịch khác";
   };
