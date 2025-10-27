@@ -3,6 +3,7 @@ com\ev\evchargingsystem\config\CORSConfig.class
 com\ev\evchargingsystem\entity\ChargerCost.class
 com\ev\evchargingsystem\entity\Station.class
 com\ev\evchargingsystem\model\request\ReservationRequest.class
+com\ev\evchargingsystem\model\request\TopUpRequest.class
 com\ev\evchargingsystem\service\CarService.class
 com\ev\evchargingsystem\model\response\CarResponse.class
 com\ev\evchargingsystem\model\response\ReservationResponse.class

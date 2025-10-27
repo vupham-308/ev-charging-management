@@ -43,6 +43,7 @@ D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\reques
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\RegisterRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\ReservationRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\ReviewStationRequest.java
+D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\TopUpRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\UpdatePasswordRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\request\UserUpdateRequest.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\CarResponse.java
