@@ -28,4 +28,22 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
 
     // Lấy trụ sạc theo trạm + trạng thái (nếu cần lọc)
     List<ChargerPoint> findByStationIdAndStatus(int stationId, String status);
+
+    //tất cả trụ sạc của trạm
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId")
+    int countTotalByStationId(@Param("stationId") int stationId);
+
+    //trụ sạc AVAILABLE của trạm
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'AVAILABLE'")
+    int countAvailableByStationId(@Param("stationId") int stationId);
+
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OCCUPIED'")
+    int countOccupiedByStationId(@Param("stationId") int stationId);
+
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'RESERVED'")
+    int countReservedByStationId(@Param("stationId") int stationId);
+
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OUT_OF_SERVICE'")
+    int countOutOfServiceByStationId(@Param("stationId") int stationId);
+
 }
