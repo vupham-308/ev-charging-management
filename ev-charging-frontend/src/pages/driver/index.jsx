@@ -18,6 +18,7 @@ import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setAccount } from "../../redux/accountSlice";
+import api from "../../config/axios";
 
 // --- Custom Hook for Scroll-triggered Animations ---
 const useAnimateOnScroll = () => {
@@ -53,6 +54,7 @@ const DriverDashboard = () => {
     avatar:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=2080",
   };
+
   const dispatch = useDispatch();
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -61,6 +63,7 @@ const DriverDashboard = () => {
       dispatch(setAccount(parsedUser));
     }
   }, []);
+
   useEffect(() => {
     // Simulate checking if user is logged in based on Redux or other logic
     if (account && account.id) {
@@ -77,6 +80,25 @@ const DriverDashboard = () => {
     dispatch(logout());
     navigate("/");
   };
+
+  const [balance, setBalance] = useState(null);
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const res = await api.get("/balance");
+        console.log("💰 Số dư tài khoản:", res.data);
+        setBalance(res.data);
+      } catch (err) {
+        console.error("⚠️ Lỗi khi lấy số dư:", err);
+        setBalance(0);
+      }
+    };
+
+    fetchBalance();
+  }, []);
+
+  const formatVND = (num) =>
+    num?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   // --- END: Authentication State ---
 
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
@@ -216,9 +238,16 @@ const DriverDashboard = () => {
               onMouseLeave={() => setIsDropdownOpen(false)}
             >
               <div className="flex items-center gap-3 cursor-pointer">
-                <span className="hidden sm:inline font-semibold">
+                {balance !== null && (
+                  <span className="text-green-400 font-semibold text-sm bg-gray-800 px-3 py-1 rounded-full">
+                    💰 {formatVND(balance)}
+                  </span>
+                )}
+
+                <span className="font-semibold text-white text-center flex-1 truncate">
                   {account.fullName}
                 </span>
+
                 <img
                   src={user.avatar}
                   alt="User Avatar"
@@ -235,10 +264,10 @@ const DriverDashboard = () => {
                     <FiUser /> Hồ sơ của tôi
                   </a>
                   <a
-                    href="#"
+                    href="/transaction"
                     className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
                   >
-                    <FiShoppingCart /> Lịch sử đơn hàng
+                    <FiShoppingCart /> Quản lý giao dịch
                   </a>
                   <div className="border-t border-gray-700 my-2"></div>
                   <button

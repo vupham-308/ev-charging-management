@@ -25,6 +25,12 @@ import ManageDeleteCar from "./pages/deleteCar";
 import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
+import ManageChargingSession from "./pages/chargingSession";
+import ManageConfirmBill from "./pages/confirmBill";
+import ManageIncidentReport from "./pages/incidentReport";
+import ManageStationReport from "./pages/stationReport";
+import ManageStartChargingBooking from "./pages/startChargingBooking";
+import ManageTransaction from "./pages/transaction";
 
 // 1. Component
 // là 1 cái function
@@ -71,8 +77,29 @@ function App() {
           element: <ManageStartCharging />,
         },
         {
+          path: "startCharging/:stationId/stationReport",
+          element: <ManageStationReport />,
+        },
+        {
+          path: "startChargingBooking/:stationId",
+          element: <ManageStartChargingBooking />,
+        },
+
+        {
           path: "myBooking",
           element: <ManageMyBooking />,
+        },
+        {
+          path: "confirmBill",
+          element: <ManageConfirmBill />,
+        },
+        {
+          path: "chargingSession",
+          element: <ManageChargingSession />,
+        },
+        {
+          path: "incidentReport",
+          element: <ManageIncidentReport />,
         },
         {
           path: "myCar",
@@ -97,6 +124,10 @@ function App() {
     {
       path: "/profile",
       element: <ProfilePage />,
+    },
+    {
+      path: "/transaction",
+      element: <ManageTransaction />,
     },
     //  Route dành cho Admin có layout dùng Outlet
     {

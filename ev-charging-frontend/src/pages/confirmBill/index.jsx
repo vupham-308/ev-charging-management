@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, Button, Tag, Divider, Spin, message } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CheckCircleOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import api from "../../config/axios";
-
+import { toast } from "react-toastify";
 const ManageConfirmBill = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const [chargeData, setChargeData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [chargeData] = useState(state?.chargeData || null);
+  const [loading, setLoading] = useState(false);
 
-  // Nếu người dùng vào trực tiếp mà không có state từ trang trước
-  if (!state) {
+  if (!state || !chargeData) {
     return (
       <div style={{ textAlign: "center", marginTop: 50 }}>
         <p>❌ Không có dữ liệu phiên sạc.</p>
@@ -22,75 +21,47 @@ const ManageConfirmBill = () => {
     );
   }
 
-  const { selectedCar, selectedCharger, targetBattery, paymentMethod } = state;
-
-  // 🔐 Lấy token từ localStorage
-  const token = localStorage.getItem("token");
-
-  // Gửi API khi vào trang
-  useEffect(() => {
-    const fetchCharge = async () => {
-      try {
-        const payload = {
-          carId: selectedCar.id,
-          pointId: selectedCharger.id,
-          goalBattery: targetBattery,
-          paymentMethod,
-        };
-        console.log("📦 Payload gửi lên:", payload);
-        const response = await api.post("/charge", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setChargeData(response.data);
-      } catch (err) {
-        console.error("❌ Lỗi khi tạo phiên sạc:", err);
-        message.error("Không thể tạo phiên sạc. Vui lòng thử lại!");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharge();
-  }, [selectedCar, selectedCharger, targetBattery, paymentMethod, token]);
+  const { station, selectedCharger } = state;
+  const {
+    point,
+    carName,
+    paymentMethod: method,
+    minute,
+    fee,
+    initBattery,
+    goalBattery,
+  } = chargeData;
 
   const handleConfirm = async () => {
     try {
-      if (!selectedCar?.id || !selectedCharger?.id) {
-        return message.warning(
-          "⚠️ Vui lòng chọn xe và trụ sạc trước khi xác nhận!"
-        );
+      setLoading(true);
+
+      const sessionId = chargeData?.id; // ✅ lấy ID phiên sạc từ chargeData
+      if (!sessionId) {
+        message.warning("⚠️ Không tìm thấy ID phiên sạc!");
+        return;
       }
 
-      const payload = {
-        carId: Number(selectedCar.id),
-        pointId: Number(selectedCharger.id),
-        goalBattery: Number(targetBattery),
-        paymentMethod: paymentMethod || "CASH",
-      };
+      console.log("🔌 Bắt đầu sạc với sessionId:", sessionId);
 
-      console.log("🚗 Payload gửi đi:", payload);
+      // ✅ Gọi API /charging/{sessionId}
+      const res = await api.post(`/charging/${sessionId}`);
 
-      const res = await api.post("/charge", payload);
-      console.log("📦 Response từ server:", res.data);
-      navigate("/driver/chargingSession", {
-        state: {
-          id: res.data.id,
-          carName: selectedCar.brand,
-          currentBattery: selectedCar.initBattery,
-          targetBattery,
-          stationName: station.name,
-          chargerName: selectedCharger.name,
-          chargerCost: selectedCharger.chargerCost?.cost,
-          paymentMethod,
-          status: "Đang sạc",
-        },
-      });
+      console.log("📦 Response từ /charging:", res.data);
+
+      // Nếu thành công → chuyển sang trang sạc
+      navigate("/driver/chargingSession");
     } catch (error) {
-      message.error("❌ Lỗi khi bắt đầu sạc!");
-      console.error("Chi tiết lỗi:", error.response?.data || error);
+      console.error("❌ Lỗi khi xác nhận bắt đầu sạc:", error);
+
+      // ✅ BE trả về dạng text/plain nên chỉ cần lấy error.response.data
+      const errMsg =
+        error.response?.data || "Không thể bắt đầu sạc! Vui lòng thử lại sau.";
+
+      // ✅ Hiện toast lỗi
+      toast.error(errMsg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,20 +82,6 @@ const ManageConfirmBill = () => {
       </div>
     );
   }
-
-  // 🧩 Giải nén dữ liệu từ API
-  const {
-    point,
-    carName,
-    paymentMethod: method,
-    minute,
-    fee,
-    initBattery,
-    goalBattery,
-  } = chargeData;
-
-  const station = point.station;
-  const chargerCost = point.chargerCost;
 
   return (
     <div style={{ maxWidth: 1000, margin: "40px auto" }}>
@@ -216,11 +173,15 @@ const ManageConfirmBill = () => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <p>
               <strong>💡 Giá điện:</strong>{" "}
-              {chargerCost.cost.toLocaleString("vi-VN")}đ/kWh
+              {selectedCharger.chargerCost?.cost?.toLocaleString("vi-VN") ||
+                "—"}
+              đ/kWh
             </p>
             <p>
               <strong>🔌 Loại trụ:</strong>{" "}
-              <Tag color="blue">{chargerCost.portType}</Tag>
+              <Tag color="blue">
+                {selectedCharger.chargerCost?.portType || "—"}
+              </Tag>
             </p>
           </div>
           <p>
