@@ -30,7 +30,7 @@ public class PaymentService {
 
         String tmnCode = "1RN3MS23";
         String vnpayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String returnUrl = "http://localhost:8080/api/payment/success/" + transaction.getId();
+        String returnUrl = "http://222.255.214.35/:8080/api/payment/success/" + transaction.getId();
         Map<String, String> vnpParams = new TreeMap<>();
 
         //format date
@@ -105,7 +105,7 @@ public class PaymentService {
         return hexString.toString();
     }
 
-    public void paymentCallback(int id,Map<String,String> params) throws NoSuchAlgorithmException, InvalidKeyException {
+    public Transaction paymentCallback(int id,Map<String,String> params) throws NoSuchAlgorithmException, InvalidKeyException {
         // Lấy giá trị vnp_SecureHash từ params
         String vnp_SecureHash = params.get("vnp_SecureHash");
         params.remove("vnp_SecureHash");
@@ -137,6 +137,7 @@ public class PaymentService {
                 Transaction t = transactionRepository.findTransactionById(id);
                 t.setStatus("COMPLETED");
                 transactionRepository.save(t);
+                return t;
             } else {
                 // Giao dịch thất bại
                 Transaction t = transactionRepository.findTransactionById(id);

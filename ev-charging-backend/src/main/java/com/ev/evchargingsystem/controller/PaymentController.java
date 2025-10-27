@@ -30,8 +30,7 @@ public class PaymentController {
     public ResponseEntity paymentCallback(@PathVariable("id") int id,
         @RequestParam Map<String, String> params) throws NoSuchAlgorithmException, InvalidKeyException {
         try {
-            paymentService.paymentCallback(id, params);
-            return ResponseEntity.ok("Thanh toán thành công!");
+            return ResponseEntity.ok(paymentService.paymentCallback(id, params));
         }catch (RuntimeException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
