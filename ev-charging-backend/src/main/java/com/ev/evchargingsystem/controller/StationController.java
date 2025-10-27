@@ -78,4 +78,12 @@ public class StationController {
         StationStatsResponseForAdmin stats = stationService.getStationStats();
         return ResponseEntity.ok(stats);
     }
+
+    @Operation(summary = "Admin xem tổng doanh thu tất cả trạm trong tháng hiện tại")
+    @GetMapping("/admin/total-revenue-month")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Double> getTotalRevenueForAllStationsThisMonth() {
+        double total = stationService.getTotalRevenueForAllStationsThisMonth();
+        return ResponseEntity.ok(total);
+    }
 }

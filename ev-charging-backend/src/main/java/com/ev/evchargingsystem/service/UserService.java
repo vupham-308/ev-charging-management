@@ -39,6 +39,20 @@ public class UserService {
     StaffRepository staffRepository;
 
 
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
+    }
+
     public List<UserInfoResponse> getAllUsers() {
         List<User> users = userRepository.findByActiveTrue();
         return users.stream()

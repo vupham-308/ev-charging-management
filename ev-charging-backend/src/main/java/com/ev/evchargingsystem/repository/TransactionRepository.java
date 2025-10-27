@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -82,6 +83,30 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     Transaction findTransactionById(int id);
 
+    //tổng tiền giao dịch của trạm trong khoảng thời gian
+    @Query("""
+       SELECT COALESCE(SUM(t.totalAmount), 0)
+       FROM Transaction t
+       WHERE t.date BETWEEN :start AND :end
+         AND t.status = 'COMPLETED'
+         AND t.chargingSession.chargerPoint.station.id = :stationId
+       """)
+    double sumByStationAndDateRange(@Param("stationId") int stationId,
+                                    @Param("start") Date start,
+                                    @Param("end") Date end);
+
+    //Admin xem doanh thu tất cả trạm trong tháng hiện tại
+    @Query("""
+       SELECT COALESCE(SUM(t.totalAmount), 0)
+       FROM Transaction t
+       JOIN t.chargingSession cs
+       JOIN cs.chargerPoint cp
+       JOIN cp.station s
+       WHERE t.status = 'COMPLETED'
+         AND MONTH(t.date) = MONTH(CURRENT_DATE)
+         AND YEAR(t.date) = YEAR(CURRENT_DATE)
+       """)
+    double getTotalRevenueForAllStationsThisMonth();
 
 }
 
