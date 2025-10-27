@@ -131,6 +131,7 @@ public class ReservationService {
                 dto.setChargerPointName(r.getChargerPoint().getName());
                 if (r.getChargerPoint().getStation() != null) {
                     dto.setStationName(r.getChargerPoint().getStation().getName());
+                    dto.setStationId(r.getChargerPoint().getStation().getId());
                 }
             }
             result.add(dto);

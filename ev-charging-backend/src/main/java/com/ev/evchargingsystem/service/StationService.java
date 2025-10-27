@@ -8,6 +8,7 @@ import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ReviewStationRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
+import com.ev.evchargingsystem.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,8 @@ public class StationService {
     private ReviewStationRepository reviewStationRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
 
     public Station addStation(Station station) {
@@ -182,11 +185,14 @@ public class StationService {
                 .filter(cp -> "OUT_OF_SERVICE".equalsIgnoreCase(cp.getStatus()))
                 .count();
 
-        // Trả về kết quả dạng JSON
         CPointStatusResponseForStaff response = new CPointStatusResponseForStaff(
                 available, occupied, reserved, outOfService
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    public double getTotalRevenueForAllStationsThisMonth() {
+        return transactionRepository.getTotalRevenueForAllStationsThisMonth();
     }
 }
