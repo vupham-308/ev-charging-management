@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUpdatePassword } from "../hooks/useUpdatePass";
 import {
   EyeIcon,
@@ -17,6 +17,7 @@ export default function ChangePasswordModal({ open, onClose, onSuccess }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const hasCalledSuccess = useRef(false);
 
   const {
     handleChangePassword,
@@ -27,10 +28,11 @@ export default function ChangePasswordModal({ open, onClose, onSuccess }) {
   } = useUpdatePassword();
 
   useEffect(() => {
-    if (success) {
+    if (success && !hasCalledSuccess.current) {
+      hasCalledSuccess.current = true;
       setTimeout(() => {
         onSuccess?.(); // Gọi callback từ Header (trong đó gọi logout())
-        onClose?.();   // Đóng modal
+        onClose?.(); // Đóng modal
       }, 1500);
     }
   }, [success, onSuccess, onClose]);

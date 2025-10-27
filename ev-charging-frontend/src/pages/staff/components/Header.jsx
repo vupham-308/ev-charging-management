@@ -4,6 +4,7 @@ import ChangePasswordModal from "./ChangePasswordModal";
 import { useAuth } from "../hooks/useAuth";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
 
 export const Header = ({ userName, userRole, onLogout }) => {
   const { logout } = useAuth();
@@ -57,9 +58,11 @@ export const Header = ({ userName, userRole, onLogout }) => {
         open={openModal}
         onClose={() => setOpenModal(false)}
         onSuccess={() => {
-          toast.warning("Vui lòng đăng nhập lại để xác nhận bảo mật 🔐", {
+          toast.success("Đổi mật khẩu thành công! 🎉\nVui lòng đăng nhập lại!", {
+            icon: <CheckCircleIcon className="h-5 w-5 text-white" />,
             position: "top-center",
             autoClose: 2000,
+            theme: "colored",
           });
           setTimeout(() => logout(), 2200); // logout sau khi toast biến mất
         }}

@@ -3,11 +3,13 @@ import { Card, Button, Spin, message, Tag, Select } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
-import { Outlet } from "react-router-dom";
-
-const ManageStartCharging = () => {
+import { Outlet, useLocation } from "react-router-dom";
+const ManageStartChargingBooking = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const booking = location.state?.booking;
 
   const [station, setStation] = useState(null);
   const [cars, setCars] = useState([]);
@@ -36,6 +38,15 @@ const ManageStartCharging = () => {
         setStation(stationRes.data);
         setCars(carRes.data);
         setChargers(chargerRes.data);
+
+        if (booking?.chargerPointId) {
+          const bookedCharger = {
+            id: booking.chargerPointId,
+            name: booking.chargerPointName,
+          };
+          setSelectedCharger(bookedCharger);
+        }
+
         setReviews(reviewRes.data);
 
         if (reviewRes.data.length > 0) {
@@ -44,6 +55,7 @@ const ManageStartCharging = () => {
             reviewRes.data.length;
           setAverageRating(avg.toFixed(1));
         }
+
         // eslint-disable-next-line no-unused-vars
       } catch (error) {
         message.error("❌ Lỗi khi tải dữ liệu!");
@@ -56,9 +68,12 @@ const ManageStartCharging = () => {
 
   useEffect(() => {
     setCanContinue(
-      selectedCar && selectedCharger && targetBattery && paymentMethod
+      selectedCar &&
+        targetBattery &&
+        paymentMethod &&
+        (booking || selectedCharger)
     );
-  }, [selectedCar, selectedCharger, targetBattery, paymentMethod]);
+  }, [selectedCar, selectedCharger, targetBattery, paymentMethod, booking]);
 
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
@@ -78,25 +93,41 @@ const ManageStartCharging = () => {
 
     try {
       const token = localStorage.getItem("token");
+
+      // ✅ Lấy ID trụ sạc
+      const chargerPointId = booking?.chargerPointId || selectedCharger?.id;
+      if (!chargerPointId) {
+        message.error("Không tìm thấy trụ sạc!");
+        return;
+      }
+
+      // ✅ Tạo payload gửi lên
       const payload = {
         carId: selectedCar.id,
-        pointId: selectedCharger.id,
         goalBattery: targetBattery,
         paymentMethod,
       };
 
-      console.log("📦 Gửi tạo phiên sạc:", payload);
-      const res = await api.post("/charge", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      console.log("📦 Gửi tạo phiên sạc:", payload, "với trụ:", chargerPointId);
 
-      console.log("✅ Phản hồi từ /charge:", res.data);
+      // ✅ Gọi API mới
+      const res = await api.post(
+        `/reservation-charge/${chargerPointId}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      console.log("✅ Phản hồi từ /reservation-charge:", res.data);
+      message.success("Tạo phiên sạc thành công!");
+
+      // ✅ Chuyển tới trang xác nhận hóa đơn
       navigate("/driver/confirmBill", {
         state: {
-          chargeData: res.data, // Dữ liệu từ backend
+          chargeData: res.data, // dữ liệu backend trả về
           station,
           selectedCar,
           selectedCharger,
@@ -106,13 +137,10 @@ const ManageStartCharging = () => {
       });
     } catch (err) {
       console.error("❌ Lỗi khi tạo phiên sạc:", err);
-
-      // Lấy thông báo lỗi thật từ backend (nếu có)
       const errorMsg =
-        err.response?.data?.message || // Nếu backend trả về { message: "..."}
-        err.response?.data || // Nếu chỉ trả về chuỗi đơn giản
-        "Không thể tạo phiên sạc!"; // fallback nếu không có gì
-
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Không thể tạo phiên sạc!";
       message.error(errorMsg);
       toast.warning(errorMsg);
     }
@@ -227,8 +255,36 @@ const ManageStartCharging = () => {
           </div>
 
           {/* Chọn trụ sạc */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ fontWeight: 500, marginBottom: 6 }}>Trụ sạc</p>
+          <p style={{ fontWeight: 500, marginBottom: 6 }}>Trụ sạc</p>
+          {booking ? (
+            <div
+              style={{
+                backgroundColor: "#f6ffed",
+                border: "1px solid #b7eb8f",
+                borderRadius: 8,
+                padding: "10px 12px",
+                marginBottom: 8,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <p style={{ margin: 0, fontWeight: 500, color: "#000" }}>
+                {booking.chargerPointName}
+              </p>
+              <Tag
+                color="green"
+                style={{
+                  margin: 0,
+                  borderRadius: 6,
+                  fontWeight: 500,
+                  fontSize: 13,
+                }}
+              >
+                Trụ đã đặt trước
+              </Tag>
+            </div>
+          ) : (
             <Select
               placeholder="Chọn trụ sạc"
               style={{ width: "100%" }}
@@ -243,7 +299,7 @@ const ManageStartCharging = () => {
                 </Select.Option>
               ))}
             </Select>
-          </div>
+          )}
 
           {/* Mục tiêu pin */}
           <div style={{ marginBottom: 16 }}>
@@ -349,4 +405,4 @@ const ManageStartCharging = () => {
   );
 };
 
-export default ManageStartCharging;
+export default ManageStartChargingBooking;
