@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.Transaction;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.TopUpRequest;
 import com.ev.evchargingsystem.model.response.TransactionResponse;
+import com.ev.evchargingsystem.model.response.UserReportResponse;
 import com.ev.evchargingsystem.repository.TransactionRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class TransactionService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    PaymentService paymentService;
 
     public Transaction createTransaction(ChargingSession c, double total){
         User user = c.getCar().getUser();
@@ -99,10 +103,50 @@ public class TransactionService {
         return responses;
     }
 
-    public Transaction topUp(TopUpRequest topUpRequest){
+    public String topUp(TopUpRequest topUpRequest){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return transactionRepository.save(new Transaction(new Date(System.currentTimeMillis()),
+        Transaction t = new Transaction(new Date(System.currentTimeMillis()),
                 topUpRequest.getTotalAmount(),topUpRequest.getPaymentMethod(),
-                "TOPUP","PENDING",user));
+                "TOPUP","PENDING",user);
+        transactionRepository.save(t);
+        //Trả về URL thanh toán VNPAY
+        return paymentService.createPayment(t.getId());
+    }
+
+    public UserReportResponse getUserReport() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Double avgExpense = transactionRepository.getAvgExpensePerSession(user.getId());
+        int totalSessions = transactionRepository.getTotalSession(user.getId());
+        Double expenseCurrentMonth = transactionRepository.getExpenseInCurrentMonth(user.getId());
+        Double topUpCurrentMonth = transactionRepository.getTopUpInCurrentMonth(user.getId());
+
+        UserReportResponse report = new UserReportResponse();
+        report.setAvgExpensePerSession(avgExpense);
+        report.setTotalSessions(totalSessions);
+        report.setExpenseInCurrentMonth(expenseCurrentMonth);
+        report.setTopUpInCurrentMonth(topUpCurrentMonth);
+
+        return report;
+    }
+
+    public Double getAvgExpensePerSession() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.getAvgExpensePerSession(user.getId());
+    }
+
+    public int getTotalSessions() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.getTotalSession(user.getId());
+    }
+
+    public Double getExpenseInCurrentMonth() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.getExpenseInCurrentMonth(user.getId());
+
+    }
+
+    public Double getTopUpInCurrentMonth() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return transactionRepository.getTopUpInCurrentMonth(user.getId());
     }
 }

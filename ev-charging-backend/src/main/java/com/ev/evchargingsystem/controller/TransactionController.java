@@ -37,4 +37,9 @@ public class TransactionController {
 
     }
 
+    @GetMapping("/user-report")
+    public ResponseEntity expenseMonth(){
+        return ResponseEntity.ok(transactionService.getUserReport());
+    }
+
 }
