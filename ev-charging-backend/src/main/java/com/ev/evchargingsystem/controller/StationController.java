@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.response.StationDetailResponse;
 import com.ev.evchargingsystem.model.response.StationResponse;
 import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.StationRepository;
@@ -86,4 +87,13 @@ public class StationController {
         double total = stationService.getTotalRevenueForAllStationsThisMonth();
         return ResponseEntity.ok(total);
     }
+
+    @Operation(summary = "Admin xem chi tiết trạm sạc")
+    @GetMapping("/admin/detail/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<StationDetailResponse> getStationDetailForAdmin(@PathVariable int id) {
+        StationDetailResponse detail = stationService.getStationDetailForAdmin(id);
+        return ResponseEntity.ok(detail);
+    }
+
 }
