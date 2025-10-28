@@ -69,14 +69,12 @@ export const ReportsTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           {/* Left */}
           <div className="space-y-3">
-            <p>Giờ cao điểm</p>
             <p>Thời gian sạc trung bình</p>
             <p>Trụ sạc phổ biến nhất</p>
           </div>
 
           {/* Right */}
           <div className="text-right space-y-3 text-gray-700">
-            <p>--:-- (chưa có dữ liệu)</p>
             <p>{report.averageChargingTime} phút</p>
             <p>{report.mostUsedChargerPoint}</p>
           </div>

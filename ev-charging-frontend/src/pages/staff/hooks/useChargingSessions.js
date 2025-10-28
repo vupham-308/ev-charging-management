@@ -4,6 +4,7 @@ import { getChargingSession } from "../services/chargingSessionService";
 export const useChargingSessions = () => {
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
   const fetchSessions = async () => {
     setIsLoading(true);
     try {
@@ -16,9 +17,17 @@ export const useChargingSessions = () => {
     }
   };
 
+  const updateSessionStatus = (sessionId, newStatus) => {
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === sessionId ? { ...s, status: newStatus } : s
+      )
+    );
+  };
+
   useEffect(() => {
     fetchSessions();
   }, []);
 
-  return { sessions, isLoading, fetchSessions };
+  return { sessions, isLoading, fetchSessions, updateSessionStatus };
 };

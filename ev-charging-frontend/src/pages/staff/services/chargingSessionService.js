@@ -10,3 +10,13 @@ export const getChargingSession = async () => {
     throw error;
   }
 };
+
+export const cashChargingSession = async (sessionId) => {
+  try {
+    const response = await api.post(`cash/${sessionId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error cashing Charging Session:", error);
+    throw error;
+  }
+};
