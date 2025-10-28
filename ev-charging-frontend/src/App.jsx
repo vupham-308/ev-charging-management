@@ -32,6 +32,7 @@ import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
 import ManageTopup from "./pages/topup";
+import ManagePaymentSuccess from "./pages/paymentSuccess";
 
 // 1. Component
 // là 1 cái function
@@ -134,6 +135,10 @@ function App() {
       path: "topup",
       element: <ManageTopup />,
     },
+    {
+      path: "payment/:id",
+      element: <ManagePaymentSuccess />,
+    },
     //  Route dành cho Admin có layout dùng Outlet
     {
       path: "/admin",
@@ -169,7 +174,6 @@ function App() {
 
   return (
     <>
-      
       <RouterProvider router={router} />
       <ToastContainer />
     </>

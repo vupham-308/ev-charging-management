@@ -18,6 +18,7 @@ import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setAccount } from "../../redux/accountSlice";
+
 import api from "../../config/axios";
 
 // --- Custom Hook for Scroll-triggered Animations ---
@@ -56,6 +57,7 @@ const DriverDashboard = () => {
   };
 
   const dispatch = useDispatch();
+  const location = useLocation();
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
@@ -65,9 +67,7 @@ const DriverDashboard = () => {
   }, []);
 
   useEffect(() => {
-    // Simulate checking if user is logged in based on Redux or other logic
-    if (account && account.id) {
-      // Assuming 'account' has an 'id' when logged in
+    if (account && account.fullName) {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
@@ -85,7 +85,11 @@ const DriverDashboard = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const res = await api.get("/balance");
+        const token = localStorage.getItem("token");
+        const res = await api.get("/balance", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         console.log("💰 Số dư tài khoản:", res.data);
         setBalance(res.data);
       } catch (err) {
@@ -176,7 +180,6 @@ const DriverDashboard = () => {
 
   const sectionClasses = "py-20 md:py-28 px-6 md:px-12 max-w-7xl mx-auto";
 
-  const location = useLocation();
   const isMainPage =
     location.pathname === "/driver" || location.pathname === "/driver/";
   useEffect(() => {
@@ -228,7 +231,7 @@ const DriverDashboard = () => {
             Báo cáo sự cố
           </Link>
         </nav>
-
+        <Outlet />
         {/* --- AUTH SECTION --- */}
         <div className="flex items-center gap-4">
           {account ? (
