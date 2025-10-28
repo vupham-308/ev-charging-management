@@ -149,4 +149,8 @@ public class TransactionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return transactionRepository.getTopUpInCurrentMonth(user.getId());
     }
+
+    public Transaction getTransactionById(int id){
+        return transactionRepository.findTransactionById(id);
+    }
 }

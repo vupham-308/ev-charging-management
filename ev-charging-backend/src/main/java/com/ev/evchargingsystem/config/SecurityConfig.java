@@ -69,6 +69,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/api/account/**").permitAll()
                                 .requestMatchers("/api/account/login").permitAll()
+                                .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/api/review/station/**").permitAll()
                                 .requestMatchers("api/station/search").permitAll()
                                 .requestMatchers("api/station/getAllStations").permitAll()
@@ -77,6 +78,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/chargerPoint/get/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/payment/success/**").permitAll()
+                                .requestMatchers("/api/payment/vnpay-return").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .anyRequest()
