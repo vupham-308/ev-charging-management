@@ -3,6 +3,7 @@ package com.ev.evchargingsystem.service;
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.response.CPointStatusResponseForStaff;
+import com.ev.evchargingsystem.model.response.StationDetailResponse;
 import com.ev.evchargingsystem.model.response.StationResponse;
 import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
@@ -195,4 +196,30 @@ public class StationService {
     public double getTotalRevenueForAllStationsThisMonth() {
         return transactionRepository.getTotalRevenueForAllStationsThisMonth();
     }
+
+    public StationDetailResponse getStationDetailForAdmin(int stationId) {
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạm có ID: " + stationId));
+
+        int total = chargerPointRepository.countTotalByStationId(stationId);
+        int available = chargerPointRepository.countAvailableByStationId(stationId);
+        int occupied = chargerPointRepository.countOccupiedByStationId(stationId);
+        int reserved = chargerPointRepository.countReservedByStationId(stationId);
+        int outOfService = chargerPointRepository.countOutOfServiceByStationId(stationId);
+
+        return new StationDetailResponse(
+                station.getId(),
+                station.getName(),
+                station.getAddress(),
+                station.getPhone(),
+                station.getEmail(),
+                station.getStatus(),
+                total,
+                available,
+                occupied,
+                reserved,
+                outOfService
+        );
+    }
+
 }
