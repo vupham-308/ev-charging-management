@@ -137,6 +137,7 @@ const ManageTransaction = () => {
             height: 40,
             padding: "0 20px",
           }}
+          onClick={() => navigate("/topup")}
         >
           Nạp tiền
         </Button>
@@ -282,7 +283,7 @@ const ManageTransaction = () => {
                         type="secondary"
                         style={{ fontSize: 13, marginTop: 4 }}
                       >
-                        Mã giao dịch: TXN{t.id}
+                        Mã giao dịch: {t.id}
                       </Text>
                     </div>
                   </div>

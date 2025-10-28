@@ -31,6 +31,7 @@ import ManageIncidentReport from "./pages/incidentReport";
 import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
+import ManageTopup from "./pages/topup";
 
 // 1. Component
 // là 1 cái function
@@ -128,6 +129,10 @@ function App() {
     {
       path: "/transaction",
       element: <ManageTransaction />,
+    },
+    {
+      path: "topup",
+      element: <ManageTopup />,
     },
     //  Route dành cho Admin có layout dùng Outlet
     {
