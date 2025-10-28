@@ -30,7 +30,7 @@ public class PaymentService {
 
         String tmnCode = "1RN3MS23";
         String vnpayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String returnUrl = "http://222.255.214.35/:8080/api/payment/success/" + transaction.getId();
+        String returnUrl = "http://222.255.214.35:8080/api/payment/success/" + transaction.getId();
         Map<String, String> vnpParams = new TreeMap<>();
 
         //format date

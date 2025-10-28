@@ -42,4 +42,9 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getUserReport());
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity getTransactionById(@PathVariable int id){
+        return ResponseEntity.ok(transactionService.getTransactionById(id));
+    }
+
 }
