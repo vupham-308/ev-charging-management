@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -62,6 +63,14 @@ public class ReservationService {
             return "Thời gian đặt chỗ phải ở tương lai";
         }
 
+        //extra: kiểm tra trùng lặp với các reservation khác
+        List<Reservation> existingReservations = reservationRepository.findByChargerPointIdAndStatus(cp.getId(), "PENDING");
+        for (Reservation r : existingReservations) {
+            if (start.before(r.getEndDate()) && end.after(r.getStartDate())) {
+                throw new RuntimeException("Khung giờ này đã được đặt trước!");
+            }
+        }
+
         // 5) Tạo reservation (status = PENDING để đúng CHECK constraint)
         Reservation reservation = new Reservation();
         reservation.setUser(user);
@@ -70,10 +79,7 @@ public class ReservationService {
         reservation.setEndDate(end);
         reservation.setStatus("PENDING");
         reservationRepository.save(reservation);
-//
-//        // 6) Đánh dấu trụ đã được giữ chỗ
-//        cp.setStatus("RESERVED");
-//        chargerPointRepository.save(cp);
+
 
         return "Reservation successful";
     }
@@ -135,6 +141,33 @@ public class ReservationService {
                 }
             }
             result.add(dto);
+        }
+        return result;
+    }
+
+    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
+        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
+        List<ReservationResponse> result = new ArrayList<>();
+        for (Reservation r : reservations) {
+            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
+            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
+            if (reservationDate.equals(date)) {
+                ReservationResponse dto = new ReservationResponse();
+                dto.setId(r.getId());
+                dto.setStatus(r.getStatus());
+                dto.setStartDate(r.getStartDate());
+                dto.setEndDate(r.getEndDate());
+
+                // Lấy tên trụ và trạm
+                if (r.getChargerPoint() != null) {
+                    dto.setChargerPointName(r.getChargerPoint().getName());
+                    if (r.getChargerPoint().getStation() != null) {
+                        dto.setStationName(r.getChargerPoint().getStation().getName());
+                        dto.setStationId(r.getChargerPoint().getStation().getId());
+                    }
+                }
+                result.add(dto);
+            }
         }
         return result;
     }

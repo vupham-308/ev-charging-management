@@ -34,10 +34,8 @@ public class PaymentController {
         @RequestParam Map<String, String> params, HttpServletResponse response) throws NoSuchAlgorithmException, InvalidKeyException {
         try {
             Transaction t = paymentService.paymentCallback(id, params);
-            String url = "http://222.255.214.35:8080/api/payment/"+t.getId();
-            if(t!=null){
+            String url = "http://localhost:5173/payment-return?vnp_Amount="+t.getTotalAmount()+"&vnp_ResponseCode=00";
                 response.sendRedirect(url);
-            }
             return ResponseEntity.ok(t);
         }catch (RuntimeException e){
             return ResponseEntity.badRequest().body(e.getMessage());

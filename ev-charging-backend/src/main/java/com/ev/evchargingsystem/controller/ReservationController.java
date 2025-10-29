@@ -6,11 +6,14 @@ import com.ev.evchargingsystem.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -34,6 +37,14 @@ public class ReservationController {
     public ResponseEntity<?> getUserReservations(Authentication authentication) {
         String email = authentication.getName();
         List<ReservationResponse> reservations = reservationService.getUserReservations(email);
+        return ResponseEntity.ok(reservations);
+    }
+
+    @Operation(summary = "json mẫu: {\"pointId\":1,\"date\":\"2025-10-31\"}")
+    @GetMapping("/locked/{pointId}/{date}")
+    public ResponseEntity getLockedReservations(@PathVariable("pointId") int id,
+                                                @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        List<ReservationResponse> reservations = reservationService.getLockedReservations(id, date);
         return ResponseEntity.ok(reservations);
     }
 

@@ -55,6 +55,7 @@ D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\respon
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\ReviewResponse.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\StaffChargerPointResponse.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\StaffDashboardResponse.java
+D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\StationDetailResponse.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\StationResponse.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\StationStatsResponseForAdmin.java
 D:\Code\2\ev-charging-backend\src\main\java\com\ev\evchargingsystem\model\response\TransactionResponse.java
