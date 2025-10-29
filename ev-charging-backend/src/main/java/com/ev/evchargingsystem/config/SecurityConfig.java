@@ -68,7 +68,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/account/**").permitAll()
-                                .requestMatchers("/api/account/login").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/api/review/station/**").permitAll()
                                 .requestMatchers("api/station/search").permitAll()

@@ -4,11 +4,14 @@ import com.ev.evchargingsystem.entity.*;
 import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
 import com.ev.evchargingsystem.model.response.ChargingResponse;
 import com.ev.evchargingsystem.repository.*;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,20 +20,23 @@ import java.util.List;
 public class ChargingSessionService {
 
     @Autowired
-    ChargingSessionRepository chargingSessionRepository;
+    private ChargingSessionRepository chargingSessionRepository;
     @Autowired
-    CarRepository carRepository;
+    private CarRepository carRepository;
     @Autowired
-    ChargerPointRepository chargerPointRepository;
+    private ChargerPointRepository chargerPointRepository;
     @Autowired
-    TransactionService transactionService;
+    private TransactionService transactionService;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
-    StaffRepository staffRepository;
+    private StaffRepository staffRepository;
     @Autowired
-    ReservationRepository reservationRepository;
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private EmailService emailService;
 
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     public ChargingSession charge(int sessionId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,7 +60,7 @@ public class ChargingSessionService {
 
 
     @Scheduled(fixedRate = 18000)//reload mỗi 18s
-    public void updateChargingSessionCCS(){
+    public void updateChargingSessionCCS() throws MessagingException {
         //lấy ra tất cả danh sách đang sạc
         List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
         List<ChargingSession> ccs = new ArrayList<>();
@@ -72,6 +78,19 @@ public class ChargingSessionService {
                 list.setStatus("COMPLETED");
                 list.getChargerPoint().setStatus("AVAILABLE");
                 list.setEndTime(new Date(System.currentTimeMillis()));
+                //gửi mail báo đã sạc xong
+                String title = "EV Charging Stion: Thông báo phiên sạc hoàn thành";
+                Transaction t = transactionRepository.findTransactionByChargingSessionId(list.getId());
+                String html = emailService.loadTemplate("mail/CompletedChargeMail.html")
+                        .replace("{{goalBattery}}", String.valueOf(list.getGoalBattery()))
+                        .replace("{{userName}}", list.getCar().getUser().getFullName())
+                        .replace("{{stationName}}", list.getChargerPoint().getStation().getName())
+                        .replace("{{chargerPoint}}", list.getChargerPoint().getName())
+                        .replace("{{startTime}}", sdf.format(list.getStartTime()))
+                        .replace("{{endTime}}", sdf.format(list.getEndTime()))
+                        .replace("{{totalCost}}", String.valueOf(t.getTotalAmount()));
+                emailService.sendMail(list.getCar().getUser().getEmail(), title, html);
+
             }
             chargerPointRepository.save(list.getChargerPoint());
             chargingSessionRepository.save(list);
@@ -80,7 +99,7 @@ public class ChargingSessionService {
     }
 
     @Scheduled(fixedRate = 48000)//reload mỗi 48s
-    public void updateChargingSessionCHAdeMO(){
+    public void updateChargingSessionCHAdeMO() throws MessagingException {
         //lấy ra tất cả danh sách đang sạc
         List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
         List<ChargingSession> cha = new ArrayList<>();
@@ -98,6 +117,18 @@ public class ChargingSessionService {
                 list.setStatus("COMPLETED");
                 list.getChargerPoint().setStatus("AVAILABLE");
                 list.setEndTime(new Date(System.currentTimeMillis()));
+                //gửi mail báo đã sạc xong
+                String title = "EV Charging Stion: Thông báo phiên sạc hoàn thành";
+                Transaction t = transactionRepository.findTransactionByChargingSessionId(list.getId());
+                String html = emailService.loadTemplate("mail/CompletedChargeMail.html")
+                        .replace("{{goalBattery}}", String.valueOf(list.getGoalBattery()))
+                        .replace("{{userName}}", list.getCar().getUser().getFullName())
+                        .replace("{{stationName}}", list.getChargerPoint().getStation().getName())
+                        .replace("{{chargerPoint}}", list.getChargerPoint().getName())
+                        .replace("{{startTime}}", sdf.format(list.getStartTime()))
+                        .replace("{{endTime}}", sdf.format(list.getEndTime()))
+                        .replace("{{totalCost}}", String.valueOf(t.getTotalAmount()));
+                emailService.sendMail(list.getCar().getUser().getEmail(), title, html);
             }
             chargerPointRepository.save(list.getChargerPoint());
             chargingSessionRepository.save(list);
@@ -106,7 +137,7 @@ public class ChargingSessionService {
     }
 
     @Scheduled(fixedRate = 108000)//reload mỗi 1,8p=108s
-    public void updateChargingSessionAC(){
+    public void updateChargingSessionAC() throws MessagingException {
         //lấy ra tất cả danh sách đang sạc
         List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
         List<ChargingSession> ac = new ArrayList<>();
@@ -124,6 +155,18 @@ public class ChargingSessionService {
                 list.setStatus("COMPLETED");
                 list.getChargerPoint().setStatus("AVAILABLE");
                 list.setEndTime(new Date(System.currentTimeMillis()));
+                //gửi mail báo đã sạc xong
+                String title = "EV Charging Stion: Thông báo phiên sạc hoàn thành";
+                Transaction t = transactionRepository.findTransactionByChargingSessionId(list.getId());
+                String html = emailService.loadTemplate("mail/CompletedChargeMail.html")
+                        .replace("{{goalBattery}}", String.valueOf(list.getGoalBattery()))
+                        .replace("{{userName}}", list.getCar().getUser().getFullName())
+                        .replace("{{stationName}}", list.getChargerPoint().getStation().getName())
+                        .replace("{{chargerPoint}}", list.getChargerPoint().getName())
+                        .replace("{{startTime}}", sdf.format(list.getStartTime()))
+                        .replace("{{endTime}}", sdf.format(list.getEndTime()))
+                        .replace("{{totalCost}}", String.valueOf(t.getTotalAmount()));
+                emailService.sendMail(list.getCar().getUser().getEmail(), title, html);
             }
             chargerPointRepository.save(list.getChargerPoint());
             chargingSessionRepository.save(list);

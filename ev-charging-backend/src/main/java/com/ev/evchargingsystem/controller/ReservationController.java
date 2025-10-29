@@ -6,11 +6,14 @@ import com.ev.evchargingsystem.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,7 +27,7 @@ public class ReservationController {
     @Operation(summary = "json mẫu: {\"chargerPointId\":1,\"startDate\":\"2024-07-01 10:00:00\",\"endDate\":\"2024-07-01 12:00:00\"}")
     public ResponseEntity<?> createReservation(Authentication authentication,
                                                @RequestBody ReservationRequest request) {
-        String email = authentication.getName();
+        String email = authentication.getName();  // lấy email đăng nhập của user
         String result = reservationService.createReservation(email, request);
         return ResponseEntity.ok(result);
     }
@@ -34,6 +37,14 @@ public class ReservationController {
     public ResponseEntity<?> getUserReservations(Authentication authentication) {
         String email = authentication.getName();
         List<ReservationResponse> reservations = reservationService.getUserReservations(email);
+        return ResponseEntity.ok(reservations);
+    }
+
+    @Operation(summary = "json mẫu: {\"pointId\":1,\"date\":\"2025-10-31\"}")
+    @GetMapping("/locked/{pointId}/{date}")
+    public ResponseEntity getLockedReservations(@PathVariable("pointId") int id,
+                                                @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        List<ReservationResponse> reservations = reservationService.getLockedReservations(id, date);
         return ResponseEntity.ok(reservations);
     }
 
