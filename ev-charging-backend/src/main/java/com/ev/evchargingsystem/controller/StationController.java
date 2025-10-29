@@ -1,9 +1,7 @@
 package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Station;
-import com.ev.evchargingsystem.model.response.StationDetailResponse;
-import com.ev.evchargingsystem.model.response.StationResponse;
-import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
+import com.ev.evchargingsystem.model.response.*;
 import com.ev.evchargingsystem.repository.StationRepository;
 import com.ev.evchargingsystem.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/station")
@@ -96,4 +95,18 @@ public class StationController {
         return ResponseEntity.ok(detail);
     }
 
+    @Operation(summary = "ADMIN xem doanhthu, số người dùng, phiên sạc trong ngày của trạm sạc")
+    @GetMapping("/admin/dashboard-status/{stationId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<StaffDashboardResponse> getDashboardForAdmin(@PathVariable int stationId) {
+        StaffDashboardResponse response = stationService.getTodayStatsByStationId(stationId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/top-revenue")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<Top5StationRevenue>> getTop5StationsByRevenue() {
+        List<Top5StationRevenue> list = stationService.getTop5StationsByRevenue();
+        return ResponseEntity.ok(list);
+    }
 }

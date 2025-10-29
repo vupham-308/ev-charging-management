@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 public class ReservationResponse {
     private int id;
-    private int stationId;
+    private int charcherpointId;
     private String stationName;
     private String chargerPointName;
 
