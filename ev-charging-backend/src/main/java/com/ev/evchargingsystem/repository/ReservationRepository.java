@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
     List<Reservation> findByUserId(int userId);
@@ -14,4 +15,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findByStatus(String status);
 
     void deleteByUser(User user);
+
+    Optional<Reservation> findByIdAndUserId(Integer reservationId, Integer userId);
 }

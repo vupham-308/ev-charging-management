@@ -24,7 +24,7 @@ public class ReservationController {
     @Operation(summary = "json mẫu: {\"chargerPointId\":1,\"startDate\":\"2024-07-01 10:00:00\",\"endDate\":\"2024-07-01 12:00:00\"}")
     public ResponseEntity<?> createReservation(Authentication authentication,
                                                @RequestBody ReservationRequest request) {
-        String email = authentication.getName();  // lấy email đăng nhập của user
+        String email = authentication.getName();
         String result = reservationService.createReservation(email, request);
         return ResponseEntity.ok(result);
     }
@@ -35,6 +35,16 @@ public class ReservationController {
         String email = authentication.getName();
         List<ReservationResponse> reservations = reservationService.getUserReservations(email);
         return ResponseEntity.ok(reservations);
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<?> cancelReservation(@PathVariable("id") int id) {
+        try {
+            reservationService.cancelReservation(id);
+            return ResponseEntity.ok("Đã hủy đặt chỗ thành công");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 }

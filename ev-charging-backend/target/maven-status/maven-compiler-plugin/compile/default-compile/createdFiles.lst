@@ -85,6 +85,7 @@ com\ev\evchargingsystem\config\CustomAuthenticationEntryPoint.class
 com\ev\evchargingsystem\model\response\StaffDashboardResponse.class
 com\ev\evchargingsystem\model\request\CarCreateRequest.class
 com\ev\evchargingsystem\controller\ProblemReportController.class
+com\ev\evchargingsystem\model\response\StationDetailResponse.class
 com\ev\evchargingsystem\model\response\StationStatsResponseForAdmin.class
 com\ev\evchargingsystem\service\TransactionService.class
 com\ev\evchargingsystem\service\ReservationService.class

@@ -2,19 +2,15 @@ package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
-import com.ev.evchargingsystem.model.response.CPointStatusResponseForStaff;
-import com.ev.evchargingsystem.model.response.StationDetailResponse;
-import com.ev.evchargingsystem.model.response.StationResponse;
-import com.ev.evchargingsystem.model.response.StationStatsResponseForAdmin;
-import com.ev.evchargingsystem.repository.ChargerPointRepository;
-import com.ev.evchargingsystem.repository.ReviewStationRepository;
-import com.ev.evchargingsystem.repository.StationRepository;
-import com.ev.evchargingsystem.repository.TransactionRepository;
+import com.ev.evchargingsystem.model.response.*;
+import com.ev.evchargingsystem.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +27,8 @@ public class StationService {
     private ModelMapper modelMapper;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private ChargingSessionRepository chargingSessionRepository;
 
 
     public Station addStation(Station station) {
@@ -222,4 +220,45 @@ public class StationService {
         );
     }
 
+    public StaffDashboardResponse getTodayStatsByStationId(int stationId) {
+        // Lấy trạm theo id
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trạm với ID: " + stationId));
+
+        LocalDate today = LocalDate.now();
+        Date start = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        double revenue = transactionRepository.sumByStationAndDateRange(stationId, start, end);
+        long customers = chargingSessionRepository.countDistinctUserByStationAndDate(stationId, start, end);
+        long sessions = chargingSessionRepository.countByStationAndDate(stationId, start, end);
+        Double avgTime = chargingSessionRepository.findAverageChargingTimeByStationAndDate(stationId, start, end);
+        String mostUsed = chargingSessionRepository.findMostUsedChargerPointByStationAndDate(stationId, start, end);
+
+        return new StaffDashboardResponse(
+                station.getId(),
+                station.getName(),
+                revenue,
+                customers,
+                sessions,
+                avgTime != null ? avgTime : 0,
+                mostUsed != null ? mostUsed : "Không có dữ liệu"
+        );
+    }
+
+    public List<Top5StationRevenue> getTop5StationsByRevenue() {
+        List<Object[]> rows = transactionRepository.findTop5StationsByRevenue();
+        List<Top5StationRevenue> responses = new ArrayList<>();
+
+        for (Object[] row : rows) {
+            Top5StationRevenue dto = new Top5StationRevenue();
+            dto.setStationId(((Number) row[0]).intValue());
+            dto.setStationName((String) row[1]);
+            dto.setAddress((String) row[2]);
+            dto.setTotalRevenue(((Number) row[3]).doubleValue());
+            responses.add(dto);
+        }
+
+        return responses;
+    }
 }
