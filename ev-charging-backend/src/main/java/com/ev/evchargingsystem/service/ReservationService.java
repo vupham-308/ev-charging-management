@@ -10,6 +10,8 @@ import com.ev.evchargingsystem.repository.ReservationRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +26,13 @@ public class ReservationService {
     private ChargerPointRepository chargerPointRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName(); // Spring Security lưu username/email tại đây
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
+    }
 
     public String createReservation(String email, ReservationRequest request) {
         // 1) Lấy user theo email từ token
@@ -158,6 +167,15 @@ public class ReservationService {
                 dto.setStartDate(r.getStartDate());
                 dto.setEndDate(r.getEndDate());
 
+            // Lấy tên trụ và trạm
+            if (r.getChargerPoint() != null) {
+                dto.setCharcherpointId(r.getChargerPoint().getId());
+                dto.setChargerPointName(r.getChargerPoint().getName());
+                if (r.getChargerPoint().getStation() != null) {
+                    dto.setStationName(r.getChargerPoint().getStation().getName());
+                }
+            }
+            result.add(dto);
                 // Lấy tên trụ và trạm
                 if (r.getChargerPoint() != null) {
                     dto.setChargerPointName(r.getChargerPoint().getName());
@@ -170,5 +188,20 @@ public class ReservationService {
             }
         }
         return result;
+    }
+
+    public void cancelReservation(int reservationId) {
+        User currentUser = getCurrentUser();
+
+        Reservation reservation = reservationRepository.findByIdAndUserId(reservationId, currentUser.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt chỗ của bạn với ID: " + reservationId));
+
+        if (reservation.getStatus().equalsIgnoreCase("CANCELLED") ||
+                reservation.getStatus().equalsIgnoreCase("COMPLETED")) {
+            throw new RuntimeException("Không thể hủy đặt chỗ");
+        }
+
+        reservation.setStatus("CANCELLED");
+        reservationRepository.save(reservation);
     }
 }

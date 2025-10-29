@@ -108,5 +108,22 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
        """)
     double getTotalRevenueForAllStationsThisMonth();
 
+    //top 5 doanh thu
+    @Query(value = """
+    SELECT TOP 5 
+        s.id AS stationId,
+        s.name AS stationName,
+        s.address,
+        COALESCE(SUM(t.total_amount), 0) AS totalRevenue
+    FROM transactions t
+    JOIN charging_sessions cs ON t.charging_session_id = cs.id
+    JOIN charger_points cp ON cs.charger_point_id = cp.id
+    JOIN stations s ON cp.station_id = s.id
+    WHERE t.status = 'COMPLETED'
+    GROUP BY s.id, s.name, s.address
+    ORDER BY totalRevenue DESC
+    """, nativeQuery = true)
+    List<Object[]> findTop5StationsByRevenue();
+
 }
 

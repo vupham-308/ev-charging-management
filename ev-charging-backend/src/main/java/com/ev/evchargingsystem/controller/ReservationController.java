@@ -48,4 +48,14 @@ public class ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<?> cancelReservation(@PathVariable("id") int id) {
+        try {
+            reservationService.cancelReservation(id);
+            return ResponseEntity.ok("Đã hủy đặt chỗ thành công");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

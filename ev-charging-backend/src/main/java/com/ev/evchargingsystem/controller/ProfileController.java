@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,11 +30,15 @@ public class ProfileController {
 
     @PutMapping("/update")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserInfoResponse> updateCurrentUser(@RequestBody UserUpdateRequest userUpdateRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = authentication.getName();
-        UserInfoResponse updatedUserInfo = userService.updateUser(currentUserName, userUpdateRequest);
-        return ResponseEntity.ok(updatedUserInfo);
+    public ResponseEntity<?> updateCurrentUser(@Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+       try{
+           Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+           String currentUserName = authentication.getName();
+           UserInfoResponse updatedUserInfo = userService.updateUser(currentUserName, userUpdateRequest);
+           return ResponseEntity.ok(updatedUserInfo);
+       } catch (RuntimeException e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+       }
     }
 
     @PutMapping("/update-password")
