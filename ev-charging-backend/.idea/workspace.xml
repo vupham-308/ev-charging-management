@@ -6,24 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="69a6f60f-1625-431b-ae26-824523985ceb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ReservationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/ReservationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/ReservationResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/model/response/ReservationResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/ReservationRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/TransactionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/repository/TransactionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StaffController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/controller/StaffController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/AuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/AuthenticationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/CarService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ReservationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/ReservationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/StationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/StationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/be.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/be.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/be.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/be.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ev/evchargingsystem/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ReservationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/ReservationController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/StationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/controller/StationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/model/response/ReservationResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/model/response/ReservationResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ReservationRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/ReservationRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/TransactionRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/repository/TransactionRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ReservationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/ReservationService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/StationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ev/evchargingsystem/service/StationService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/2025-10-28T17-30-33_847.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.ev.evchargingsystem.EvChargingSystemApplicationTests.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-com.ev.evchargingsystem.EvChargingSystemApplicationTests.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.ev.evchargingsystem.EvChargingSystemApplicationTests.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/com.ev.evchargingsystem.EvChargingSystemApplicationTests.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,6 +115,8 @@
       <workItem from="1761660375936" duration="2882000" />
       <workItem from="1761707801485" duration="36000" />
       <workItem from="1761745101758" duration="5288000" />
+      <workItem from="1761750766333" duration="811000" />
+      <workItem from="1761752291481" duration="255000" />
     </task>
     <servers />
   </component>

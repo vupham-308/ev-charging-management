@@ -92,7 +92,7 @@ public class CarService {
         }
 
         Car car = carOpt.get();
-        // cập nhật thông tin từ request
+
         car.setBrand(req.getBrand());
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());

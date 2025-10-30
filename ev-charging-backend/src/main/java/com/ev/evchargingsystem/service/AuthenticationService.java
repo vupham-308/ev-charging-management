@@ -88,7 +88,6 @@ public class AuthenticationService implements UserDetailsService {
             return userResponse;
 
         } catch (BadCredentialsException e) {
-            // Ném lại để GlobalExceptionHandler bắt được
             throw e;
         }
     }

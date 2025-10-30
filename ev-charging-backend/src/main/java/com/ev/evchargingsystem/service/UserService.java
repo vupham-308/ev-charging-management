@@ -62,7 +62,6 @@ public class UserService {
 
 
     private UserInfoResponse convertToUserInfoResponse(User user) {
-        // Sử dụng modelMapper để chuyển đổi tự động
         return modelMapper.map(user, UserInfoResponse.class);
     }
 
@@ -103,7 +102,7 @@ public class UserService {
     }
 
     public void updatePassword(UpdatePasswordRequest request) {
-        // Lấy thông tin user đang đăng nhập
+
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = userDetails.getUsername();
         User user = userRepository.findByEmail(username)
@@ -139,7 +138,7 @@ public class UserService {
 
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        //        // nếu là STAFF thì tạo Staff tương ứng
+        // nếu là STAFF thì tạo Staff tương ứng
         if ("STAFF".equalsIgnoreCase(user.getRole())) {
             Staff staff = new Staff();
             staff.setUser(user);

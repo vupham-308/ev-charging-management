@@ -32,7 +32,7 @@ public class StaffController {
     @GetMapping("/station/status")
     @PreAuthorize("hasAuthority('STAFF')")
     public ResponseEntity<?> getStationChargerStatus(Authentication authentication) {
-        String email = authentication.getName(); // lấy email từ token
+        String email = authentication.getName();
         Staff staff = staffService.getByEmail(email);
 
         if (staff == null) {

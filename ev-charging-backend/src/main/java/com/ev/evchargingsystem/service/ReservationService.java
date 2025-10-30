@@ -34,19 +34,18 @@ public class ReservationService {
     }
 
     public String createReservation(String email, ReservationRequest request) {
-        // 1) Lấy user theo email từ token
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.get();
 
-        // 2) Lấy trụ sạc
+
         ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
 
-        // 3) Trụ phải đang AVAILABLE mới cho đặt
+        // Trụ phải đang AVAILABLE mới cho đặt
         if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
             return "This charger point is not available";
         }
 
-        // 4) Validate thời gian
+        // Validate thời gian
         Date start = request.getStartDate();
         Date end = request.getEndDate();
         Date current = new Date(System.currentTimeMillis());
@@ -65,13 +64,13 @@ public class ReservationService {
             return "Chỉ có thể đặt chỗ trong tối đa 30 phút";
         }
 
-        // (Optional) Không cho đặt ở quá khứ
+        // Không cho đặt ở quá khứ
         Date now = new Date();
         if (end.before(now)) {
             return "Thời gian đặt chỗ phải ở tương lai";
         }
 
-        // 5) Tạo reservation (status = PENDING để đúng CHECK constraint)
+
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setChargerPoint(cp);
@@ -80,7 +79,7 @@ public class ReservationService {
         reservation.setStatus("PENDING");
         reservationRepository.save(reservation);
 //
-//        // 6) Đánh dấu trụ đã được giữ chỗ
+//        // Đánh dấu trụ đã được giữ chỗ
 //        cp.setStatus("RESERVED");
 //        chargerPointRepository.save(cp);
 
