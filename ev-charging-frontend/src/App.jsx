@@ -56,10 +56,7 @@ function App() {
       path: "/register",
       element: <RegisterPage />,
     },
-    {
-      path: "/staff",
-      element: <StaffDashboard />,
-    },
+    { path: "/staff", element: <StaffDashboard /> },
     {
       path: "/driver",
       element: <DriverDashboard />,
@@ -164,7 +161,6 @@ function App() {
 
   return (
     <>
-      
       <RouterProvider router={router} />
       <ToastContainer />
     </>

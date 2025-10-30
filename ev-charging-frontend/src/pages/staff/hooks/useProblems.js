@@ -1,7 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { getProblems } from "../services/problemService";
+import {
+  getProblems,
+  updateProblemStatus,
+  respondProblemReport,
+} from "../services/problemService";
 
 export const useProblems = () => {
   const [problems, setProblems] = useState([]);
@@ -19,9 +21,35 @@ export const useProblems = () => {
     }
   };
 
+  const handleUpdateStatus = async (status, body) => {
+    try {
+      await updateProblemStatus(status, body);
+      await fetchProblems(); // cập nhật lại danh sách sau khi sửa
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
+  
+
+  const handleRespond = async (problemId, body) => {
+    try {
+      await respondProblemReport(problemId, body);
+      await fetchProblems();
+    } catch (error) {
+      console.error("Error responding to problem:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProblems();
   }, []);
 
-  return { problems, isLoading, fetchProblems };
+  return {
+    problems,
+    isLoading,
+    fetchProblems,
+    handleUpdateStatus,
+    handleRespond,
+  };
 };

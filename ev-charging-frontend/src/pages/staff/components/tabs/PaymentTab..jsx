@@ -13,9 +13,8 @@ export const PaymentTab = () => {
     setProcessingId(sessionId);
     try {
       await handleCashChargingSession(sessionId);
-      message.success("✅ Thanh toán tiền mặt thành công!");
-      // ✅ Cập nhật trực tiếp UI thay vì reload
-      updateSessionStatus(sessionId, "PAID");
+      message.success("✅ Thanh toán tiền mặt thành công!");                                  
+      updateSessionStatus(sessionId, "COMPLETED");
     } catch (error) {
       message.error("❌ Không thể xử lý thanh toán, vui lòng thử lại!");
       console.log(error)
@@ -69,15 +68,7 @@ export const PaymentTab = () => {
                       {session.fee.toLocaleString("vi-VN")} VND
                     </span>
 
-                    {session.status === "PAID" ? (
-                      <Tag
-                        color="green"
-                        className="!rounded-full !px-4 !py-1 text-sm font-medium animate-fade-in"
-                      >
-                        ✅ Đã thanh toán
-                      </Tag>
-                    ) : (
-                      session.paymentMethod === "CASH" &&
+                    {session.paymentMethod === "CASH" &&
                       session.status === "WAITING_TO_PAY" && (
                         <Button
                           loading={processingId === session.id}
@@ -89,8 +80,7 @@ export const PaymentTab = () => {
                             ? "Đang xử lý..."
                             : "Xử lý thanh toán"}
                         </Button>
-                      )
-                    )}
+                      )}
                   </div>
                 </div>
               </Card>
