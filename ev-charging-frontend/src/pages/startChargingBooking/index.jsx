@@ -226,7 +226,7 @@ const ManageStartChargingBooking = () => {
           </Button>
         </Card>
 
-        {/* --- Cột 2: Cài đặt sạc --- */}
+        {/*--- Cột 2: Cài đặt sạc --- */}
         <Card
           style={{
             borderRadius: 12,
