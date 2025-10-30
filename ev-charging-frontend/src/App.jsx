@@ -1,6 +1,6 @@
 // jsx
 // phối hợp JS & HTML 1 cách dễ dàng
-
+import React, { useEffect } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import LoginPage from "./pages/login";
@@ -33,12 +33,30 @@ import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
 import ManageTopup from "./pages/topup";
 import ManagePaymentSuccess from "./pages/paymentSuccess";
-
+import { useDispatch } from "react-redux";
+import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
+import TermsPrivacyPage from "./pages/terms";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
+function AppContent() {
+  const dispatch = useDispatch();
 
-function App() {
+  // ✅ Khôi phục account từ localStorage khi load app (chỉ chạy 1 lần)
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        dispatch(setAccount(parsedUser));
+      } catch (err) {
+        console.error("Error parsing user:", err);
+        localStorage.removeItem("user");
+      }
+    }
+  }, [dispatch]);
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -57,6 +75,10 @@ function App() {
     {
       path: "/register",
       element: <RegisterPage />,
+    },
+    {
+      path: "/terms",
+      element: <TermsPrivacyPage />,
     },
     {
       path: "/staff",
@@ -178,6 +200,10 @@ function App() {
       <ToastContainer />
     </>
   );
+}
+
+function App() {
+  return <AppContent />;
 }
 
 export default App;

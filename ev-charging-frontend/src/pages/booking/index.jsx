@@ -23,7 +23,36 @@ const ManageBooking = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [reservations, setReservations] = useState([]);
 
+  const allTimes = [
+    "08:00",
+    "08:30",
+    "09:00",
+    "09:30",
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
+    "12:00",
+    "12:30",
+    "13:00",
+    "13:30",
+    "14:00",
+    "14:30",
+    "15:00",
+    "15:30",
+    "16:00",
+    "16:30",
+    "17:00",
+    "17:30",
+    "18:00",
+    "18:30",
+    "19:00",
+    "19:30",
+  ];
+
+  // 🧠 Gọi API lấy trạm + trụ
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,6 +70,44 @@ const ManageBooking = () => {
     };
     fetchData();
   }, [stationId]);
+
+  // ⚙️ Gọi API lấy các khung giờ đã được đặt
+  useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const res = await api.get("/reservations/my");
+        setReservations(res.data || []);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách đặt chỗ:", error);
+      }
+    };
+    fetchReservations();
+  }, []);
+
+  // 🔍 Lọc ra khung giờ đã bị đặt (theo ngày + trụ sạc)
+  const bookedSlots = reservations.filter((r) => {
+    return (
+      selectedDate &&
+      selectedCharger &&
+      r.stationId === Number(stationId) &&
+      dayjs(r.startDate).isSame(selectedDate, "day")
+    );
+  });
+
+  // Kiểm tra xem 1 khung giờ có bị trùng không
+  const isTimeBooked = (time) => {
+    const selectedStart = dayjs(
+      `${selectedDate?.format("YYYY-MM-DD")} ${time}`
+    );
+    return bookedSlots.some((slot) => {
+      const start = dayjs(slot.startDate);
+      const end = dayjs(slot.endDate);
+      return (
+        selectedStart.isAfter(start.subtract(1, "minute")) &&
+        selectedStart.isBefore(end)
+      );
+    });
+  };
 
   const handleConfirmClick = () => {
     if (!selectedDate || !selectedTime || !selectedCharger) {
@@ -73,9 +140,7 @@ const ManageBooking = () => {
       };
 
       await api.post("/reservations/create", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       message.success("Đặt chỗ thành công!");
@@ -233,49 +298,37 @@ const ManageBooking = () => {
               style={{ width: "100%" }}
               placeholder="Chọn ngày"
               className="rounded-lg"
-              onChange={(date) => setSelectedDate(date)}
+              onChange={(date) => {
+                setSelectedDate(date);
+                setSelectedTime(null);
+              }}
+              disabledDate={(current) =>
+                current && current < dayjs().startOf("day")
+              }
             />
+
             <div>
               <p className="text-gray-600 mb-2 font-medium">Chọn khung giờ</p>
               <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1 border border-gray-200 rounded-xl">
-                {[
-                  "08:00",
-                  "08:30",
-                  "09:00",
-                  "09:30",
-                  "10:00",
-                  "10:30",
-                  "11:00",
-                  "11:30",
-                  "12:00",
-                  "12:30",
-                  "13:00",
-                  "13:30",
-                  "14:00",
-                  "14:30",
-                  "15:00",
-                  "15:30",
-                  "16:00",
-                  "16:30",
-                  "17:00",
-                  "17:30",
-                  "18:00",
-                  "18:30",
-                  "19:00",
-                  "19:30",
-                ].map((time) => (
-                  <button
-                    key={time}
-                    onClick={() => setSelectedTime(time)}
-                    className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
-                      selectedTime === time
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
+                {allTimes.map((time) => {
+                  const booked = isTimeBooked(time);
+                  return (
+                    <button
+                      key={time}
+                      disabled={booked}
+                      onClick={() => !booked && setSelectedTime(time)}
+                      className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
+                        booked
+                          ? "bg-red-100 text-red-400 cursor-not-allowed"
+                          : selectedTime === time
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

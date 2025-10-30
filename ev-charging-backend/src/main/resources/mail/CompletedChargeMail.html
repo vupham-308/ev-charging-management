@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>EV Charging Station - Xe của bạn đã sạc đầy</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 40px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+            color: white;
+            text-align: center;
+            padding: 24px 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .content {
+            padding: 24px 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .content h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .info-box {
+            background-color: #f0f8ff;
+            border-left: 4px solid #007bff;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .info-box p {
+            margin: 6px 0;
+        }
+        .footer {
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 16px;
+            font-size: 13px;
+            color: #888;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚡ EV Charging Station Management System</h1>
+        <p>Thông báo sạc đầy pin</p>
+    </div>
+
+    <div class="content">
+        <h2>Xin chào {{userName}},</h2>
+        <p>Chúng tôi xin thông báo rằng quá trình sạc xe điện của bạn đã hoàn tất thành công. Xe của bạn hiện đã được sạc <strong>đầy {{goalBattery}}%</strong> và sẵn sàng để sử dụng.</p>
+
+        <div class="info-box">
+            <p><strong>📍 Trạm sạc:</strong> {{stationName}}</p>
+            <p><strong>⚙️ Cổng sạc:</strong> {{chargerPoint}}</p>
+            <p><strong>🔋 Bắt đầu lúc:</strong> {{startTime}}</p>
+            <p><strong>✅ Kết thúc lúc:</strong> {{endTime}}</p>
+            <p><strong>💰 Chi phí:</strong> {{totalCost}} VNĐ</p>
+        </div>
+
+        <p>Cảm ơn bạn đã sử dụng dịch vụ của <strong>EV Charging Station Management System</strong>.
+            Chúc bạn có một hành trình an toàn và trọn vẹn! 🚗⚡</p>
+
+        <p style="margin-top: 24px;">Trân trọng,<br><strong>Đội ngũ EV Charging Station</strong></p>
+    </div>
+
+    <div class="footer">
+        © 2025 EV Charging Station Management System<br>
+        <a href="http://localhost:5173/">Truy cập hệ thống</a> |
+        <a href="mailto:evcharginginfo@gmail.com">Liên hệ hỗ trợ</a>
+    </div>
+</div>
+</body>
+</html>

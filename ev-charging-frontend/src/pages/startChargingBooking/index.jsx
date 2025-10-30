@@ -104,6 +104,7 @@ const ManageStartChargingBooking = () => {
       // ✅ Tạo payload gửi lên
       const payload = {
         carId: selectedCar.id,
+
         goalBattery: targetBattery,
         paymentMethod,
       };

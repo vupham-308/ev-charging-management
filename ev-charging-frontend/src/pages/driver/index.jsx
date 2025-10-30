@@ -45,7 +45,7 @@ const useAnimateOnScroll = () => {
 
 const DriverDashboard = () => {
   useAnimateOnScroll();
-  const account = useSelector((store) => store.account); // Redux state, adjust as needed
+  // const account = useSelector((store) => store.account); // Redux state, adjust as needed
 
   // --- START: Authentication State (simulated for this example) ---
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Change to true to test logged in state
@@ -58,21 +58,27 @@ const DriverDashboard = () => {
 
   const dispatch = useDispatch();
   const location = useLocation();
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      dispatch(setAccount(parsedUser));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedUser = localStorage.getItem("user");
+  //   if (savedUser) {
+  //     const parsedUser = JSON.parse(savedUser);
+  //     dispatch(setAccount(parsedUser));
+  //   }
+  // }, []);
+
+  const account = useSelector((store) => store.account);
 
   useEffect(() => {
-    if (account && account.fullName) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!(account && account.id));
   }, [account]);
+
+  // useEffect(() => {
+  //   if (account && account.fullName) {
+  //     setIsLoggedIn(true);
+  //   } else {
+  //     setIsLoggedIn(false);
+  //   }
+  // }, [account]);
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -231,7 +237,7 @@ const DriverDashboard = () => {
             Báo cáo sự cố
           </Link>
         </nav>
-        <Outlet />
+
         {/* --- AUTH SECTION --- */}
         <div className="flex items-center gap-4">
           {account ? (
@@ -335,6 +341,7 @@ const DriverDashboard = () => {
               >
                 Tìm Trạm Gần Nhất
               </button>
+              <Outlet />
               {/* CHỈNH CHU: "Gần Nhất" cụ thể hơn */}
             </div>
             <div
@@ -516,13 +523,7 @@ const DriverDashboard = () => {
             id="uudai"
             className="relative py-28 md:py-36 px-6 text-center overflow-hidden"
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage:
-                  "url('https://ecoswitch.vn/wp-content/uploads/2023_sac.jpg')",
-              }}
-            >
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat">
               {/* Add a stronger gradient overlay for better text contrast */}
               <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent"></div>
             </div>

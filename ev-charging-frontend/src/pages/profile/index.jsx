@@ -117,8 +117,6 @@ const ProfilePage = () => {
     setPassword({ current: "", new: "", confirm: "" });
   };
 
-  localStorage.setItem("user", JSON.stringify(user));
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-xl">
