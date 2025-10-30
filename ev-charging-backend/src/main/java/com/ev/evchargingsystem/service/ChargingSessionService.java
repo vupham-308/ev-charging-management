@@ -197,7 +197,7 @@ public class ChargingSessionService {
         charge.setEndTime(new Date(current.getTime() + timeCharge*60*1000));
         double fee = timeCharge*point.getChargerCost().getCost();
         //check trạng thái trụ sạc
-        if(!point.getStatus().equals("AVAILABLE")){
+        if(point.getStatus().equals("OCCUPIED")||point.getStatus().equals("OUT_OF_SERVICE")){
             throw new RuntimeException("Trụ sạc không khả dụng");
         }
         //nếu create 1 trụ sạc đang ở trạng thái RESERVED, cần kiểm tra xem

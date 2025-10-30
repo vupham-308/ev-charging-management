@@ -94,7 +94,7 @@ public class ReservationService {
     }
 
     //tự động load, trước 10p trước giờ hẹn sẽ set trạng thái trụ về Reserved
-    @Scheduled(fixedRate = 15000)//chạy mỗi 15s
+    @Scheduled(fixedRate = 10000)//chạy mỗi 10s
     public void setStatusRever(){
         List<Reservation> reservations = reservationRepository.findByStatus("PENDING");
         Date current = new Date(System.currentTimeMillis());

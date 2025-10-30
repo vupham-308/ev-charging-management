@@ -31,13 +31,15 @@ public class PaymentController {
 
     @GetMapping("/success/{id}")
     public ResponseEntity paymentCallback(@PathVariable("id") int id,
-        @RequestParam Map<String, String> params, HttpServletResponse response) throws NoSuchAlgorithmException, InvalidKeyException {
+        @RequestParam Map<String, String> params, HttpServletResponse response) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+        Transaction t = paymentService.paymentCallback(id, params);
         try {
-            Transaction t = paymentService.paymentCallback(id, params);
             String url = "http://localhost:5173/payment-return?vnp_Amount="+t.getTotalAmount()+"&vnp_ResponseCode=00";
                 response.sendRedirect(url);
             return ResponseEntity.ok(t);
         }catch (RuntimeException e){
+            String url = "http://localhost:5173/payment-return?vnp_Amount="+t.getTotalAmount()+"&vnp_ResponseCode=1";
+            response.sendRedirect(url);
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
