@@ -241,7 +241,7 @@ const ManageStartChargingBooking = () => {
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontWeight: 500, marginBottom: 6 }}>Xe của bạn</p>
             <Select
-              placeholder="Chọn xe"
+              placeholder="Chọn xe "
               style={{ width: "100%" }}
               onChange={(id) =>
                 setSelectedCar(cars.find((car) => car.id === id))
