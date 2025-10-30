@@ -1,6 +1,4 @@
-"use client";
-
-import { Header } from "./components/Header.";
+import { Header } from "./components/Header";
 import { TabNavigation } from "./components/TabNavigation.";
 import { IssuesTab } from "./components/tabs/IssuesTab";
 import { MonitoringTab } from "./components/tabs/MonitoringTab.";
@@ -8,7 +6,6 @@ import { PaymentTab } from "./components/tabs/PaymentTab.";
 import { ReportsTab } from "./components/tabs/ReportsTab.";
 import { MaintenanceTab } from "./components/tabs/MaintenanceTab.";
 import { useAuth } from "./hooks/useAuth";
-import { useProblems } from "./hooks/useProblems";
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";
 import { useStations } from "./hooks/useStations";
@@ -18,9 +15,8 @@ const StaffDashboard = () => {
   const { logout } = useAuth();
   const { activeTab, setActiveTab } = useTabs();
   const { stations, isLoading: stationsLoading } = useStations();
-  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints();
-  const { problems, isLoading: problemsLoading } = useProblems();
-
+  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints(); 
+  
   const isMonitoringLoading = stationsLoading || pointsLoading;
 
   const renderTabContent = () => {
@@ -38,13 +34,14 @@ const StaffDashboard = () => {
           />
         );
       case TAB_KEYS.PAYMENT:
-        return <PaymentTab />;
+        return <PaymentTab
+          />;
       case TAB_KEYS.ISSUES:
-        return <IssuesTab problems={problems} isLoading={problemsLoading} />;
+        return <IssuesTab />;
       case TAB_KEYS.REPORTS:
         return <ReportsTab />;
       case TAB_KEYS.MAINTENANCE:
-        return <MaintenanceTab />;
+        return <MaintenanceTab chargerPoints={chargerPoints} isLoading={pointsLoading} />;
       default:
         return (
           <MonitoringTab
