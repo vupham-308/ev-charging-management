@@ -175,13 +175,13 @@ const EVChargeHomePage = () => {
           <Link to="map" className="hover:text-primary transition-colors">
             Bản đồ trạm
           </Link>
-          <a href="#PhienSac" className="hover:text-primary transition-colors">
+          <a href="login" className="hover:text-primary transition-colors">
             Phiên Sạc
           </a>
           <Link to="login" className="hover:text-primary transition-colors">
             Xe Của Tôi
           </Link>
-          <a href="#datcho" className="hover:text-primary transition-colors">
+          <a href="login" className="hover:text-primary transition-colors">
             Đặt Chỗ
           </a>
         </nav>

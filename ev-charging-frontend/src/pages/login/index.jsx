@@ -43,6 +43,18 @@ const LoginPage = () => {
       toast.success("Successfully login!");
       localStorage.setItem("token", token);
 
+      if (!token) {
+        console.error("❌ Chưa có token đăng nhập!");
+        return;
+      }
+
+      const responseUser = await api.get("/profile/get", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("📦 API Response:", response.data);
+      localStorage.setItem("user", JSON.stringify(responseUser.data));
       // lưu state
       dispatch(login(response.data));
 
@@ -122,19 +134,6 @@ const LoginPage = () => {
                 prefix={<LockOutlined />}
               />
             </Form.Item>
-
-            <Row justify="space-between" align="middle">
-              <Col>
-                <Form.Item name="rememberMe" valuePropName="checked" noStyle>
-                  <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-              </Col>
-              <Col>
-                <a href="#" onClick={(e) => e.preventDefault()}>
-                  Forgot your password?
-                </a>
-              </Col>
-            </Row>
 
             <Form.Item style={{ marginTop: 8 }}>
               <Button

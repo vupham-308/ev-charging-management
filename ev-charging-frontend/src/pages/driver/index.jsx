@@ -18,6 +18,7 @@ import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setAccount } from "../../redux/accountSlice";
+
 import api from "../../config/axios";
 
 // --- Custom Hook for Scroll-triggered Animations ---
@@ -44,7 +45,7 @@ const useAnimateOnScroll = () => {
 
 const DriverDashboard = () => {
   useAnimateOnScroll();
-  const account = useSelector((store) => store.account); // Redux state, adjust as needed
+  // const account = useSelector((store) => store.account); // Redux state, adjust as needed
 
   // --- START: Authentication State (simulated for this example) ---
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Change to true to test logged in state
@@ -56,23 +57,28 @@ const DriverDashboard = () => {
   };
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      dispatch(setAccount(parsedUser));
-    }
-  }, []);
+  const location = useLocation();
+  // useEffect(() => {
+  //   const savedUser = localStorage.getItem("user");
+  //   if (savedUser) {
+  //     const parsedUser = JSON.parse(savedUser);
+  //     dispatch(setAccount(parsedUser));
+  //   }
+  // }, []);
+
+  const account = useSelector((store) => store.account);
 
   useEffect(() => {
-    // Simulate checking if user is logged in based on Redux or other logic
-    if (account && account.id) {
-      // Assuming 'account' has an 'id' when logged in
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!(account && account.id));
   }, [account]);
+
+  // useEffect(() => {
+  //   if (account && account.fullName) {
+  //     setIsLoggedIn(true);
+  //   } else {
+  //     setIsLoggedIn(false);
+  //   }
+  // }, [account]);
 
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -85,7 +91,11 @@ const DriverDashboard = () => {
   useEffect(() => {
     const fetchBalance = async () => {
       try {
-        const res = await api.get("/balance");
+        const token = localStorage.getItem("token");
+        const res = await api.get("/balance", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         console.log("💰 Số dư tài khoản:", res.data);
         setBalance(res.data);
       } catch (err) {
@@ -176,7 +186,6 @@ const DriverDashboard = () => {
 
   const sectionClasses = "py-20 md:py-28 px-6 md:px-12 max-w-7xl mx-auto";
 
-  const location = useLocation();
   const isMainPage =
     location.pathname === "/driver" || location.pathname === "/driver/";
   useEffect(() => {
@@ -332,6 +341,7 @@ const DriverDashboard = () => {
               >
                 Tìm Trạm Gần Nhất
               </button>
+              <Outlet />
               {/* CHỈNH CHU: "Gần Nhất" cụ thể hơn */}
             </div>
             <div
@@ -513,13 +523,7 @@ const DriverDashboard = () => {
             id="uudai"
             className="relative py-28 md:py-36 px-6 text-center overflow-hidden"
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage:
-                  "url('https://ecoswitch.vn/wp-content/uploads/2023_sac.jpg')",
-              }}
-            >
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat">
               {/* Add a stronger gradient overlay for better text contrast */}
               <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent"></div>
             </div>

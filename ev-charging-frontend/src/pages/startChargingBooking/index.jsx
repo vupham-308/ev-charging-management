@@ -104,6 +104,7 @@ const ManageStartChargingBooking = () => {
       // ✅ Tạo payload gửi lên
       const payload = {
         carId: selectedCar.id,
+
         goalBattery: targetBattery,
         paymentMethod,
       };
@@ -225,7 +226,7 @@ const ManageStartChargingBooking = () => {
           </Button>
         </Card>
 
-        {/* --- Cột 2: Cài đặt sạc --- */}
+        {/*--- Cột 2: Cài đặt sạc --- */}
         <Card
           style={{
             borderRadius: 12,
@@ -240,7 +241,7 @@ const ManageStartChargingBooking = () => {
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontWeight: 500, marginBottom: 6 }}>Xe của bạn</p>
             <Select
-              placeholder="Chọn xe"
+              placeholder="Chọn xe "
               style={{ width: "100%" }}
               onChange={(id) =>
                 setSelectedCar(cars.find((car) => car.id === id))

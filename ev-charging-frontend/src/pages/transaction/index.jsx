@@ -21,26 +21,44 @@ const ManageTransaction = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
+      // ❌ Nếu chưa đăng nhập
+      if (!token) {
+        message.warning("Bạn chưa đăng nhập!");
+        navigate("/login");
+        return;
+      }
+
       try {
         setLoading(true);
 
-        // Lấy giao dịch
-        const resTransactions = await api.get("/my");
+        // ✅ Gọi API có kèm token
+        const resTransactions = await api.get("/my", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setTransactions(resTransactions.data);
 
-        // Lấy số dư ví
-        const resBalance = await api.get("/balance");
+        const resBalance = await api.get("/balance", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBalance(resBalance.data);
       } catch (err) {
         console.error("❌ Lỗi khi tải dữ liệu ví:", err);
         message.error("Không thể tải dữ liệu ví điện tử!");
+        if (err.response?.status === 401) {
+          message.warning(
+            "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!"
+          );
+          navigate("/login");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const formatCurrency = (value) =>
     value?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -137,6 +155,7 @@ const ManageTransaction = () => {
             height: 40,
             padding: "0 20px",
           }}
+          onClick={() => navigate("/topup")}
         >
           Nạp tiền
         </Button>
@@ -282,7 +301,7 @@ const ManageTransaction = () => {
                         type="secondary"
                         style={{ fontSize: 13, marginTop: 4 }}
                       >
-                        Mã giao dịch: TXN{t.id}
+                        Mã giao dịch: {t.id}
                       </Text>
                     </div>
                   </div>
