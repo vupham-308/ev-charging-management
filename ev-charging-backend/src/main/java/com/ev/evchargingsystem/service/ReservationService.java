@@ -144,9 +144,9 @@ public class ReservationService {
             // Lấy tên trụ và trạm
             if (r.getChargerPoint() != null) {
                 dto.setChargerPointName(r.getChargerPoint().getName());
+                dto.setCharcherpointId(r.getChargerPoint().getId());
                 if (r.getChargerPoint().getStation() != null) {
                     dto.setStationName(r.getChargerPoint().getStation().getName());
-                    dto.setStationId(r.getChargerPoint().getStation().getId());
                 }
             }
             result.add(dto);
@@ -181,7 +181,6 @@ public class ReservationService {
                     dto.setChargerPointName(r.getChargerPoint().getName());
                     if (r.getChargerPoint().getStation() != null) {
                         dto.setStationName(r.getChargerPoint().getStation().getName());
-                        dto.setStationId(r.getChargerPoint().getStation().getId());
                     }
                 }
                 result.add(dto);
