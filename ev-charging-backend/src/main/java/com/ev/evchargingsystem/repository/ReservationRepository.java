@@ -1,5 +1,6 @@
 package com.ev.evchargingsystem.repository;
 
+import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Reservation;
 import com.ev.evchargingsystem.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     List<Reservation> findByUserIdAndStatus(int userId, String status);
 
     List<Reservation> findByStatus(String status);
+
+    List<Reservation> findByChargerPointIdAndStatus(int chargerPointId, String status);
 
     void deleteByUser(User user);
 

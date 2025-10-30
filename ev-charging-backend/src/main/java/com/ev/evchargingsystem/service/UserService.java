@@ -11,6 +11,7 @@ import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.*;
+import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,12 +36,15 @@ public class UserService {
     private ModelMapper modelMapper; // Inject ModelMapper Bean
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
-    StaffRepository staffRepository;
-
+    private StaffRepository staffRepository;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private OtpService otpService;
 
     public User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -174,5 +181,57 @@ public class UserService {
         userRepository.save(user);
 
         return Optional.of(modelMapper.map(user, UserResponse.class));
+    }
+
+    public String generatePassword(){
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        int PASSWORD_LENGTH = 10;
+            SecureRandom random = new SecureRandom();
+            StringBuilder sb = new StringBuilder(PASSWORD_LENGTH);
+            for (int i = 0; i < PASSWORD_LENGTH; i++) {
+                int index = random.nextInt(CHARACTERS.length());
+                sb.append(CHARACTERS.charAt(index));
+            }
+            return sb.toString();
+    }
+
+    public boolean sendOtp(String email) throws MessagingException {
+        if(otpService.sendOtp(email)){
+            return true;
+        }
+        return false;
+    }
+
+    public User verify(String otp, String email) {
+        if(otpService.verifyOtp(email,otp)){
+            return userRepository.findUserByEmail(email);
+        }
+        return null;
+    }
+
+    public User changePassword(User user, String newPass) {
+        user.setPassword(passwordEncoder.encode(newPass));
+        return userRepository.save(user);
+    }
+
+    public void sendEmailChangedPassword(User user) throws MessagingException {
+        String title = "EV Charging Station: Mật khẩu của bạn đã được thay đổi";
+        String body = emailService.loadTemplate("/mail/ChangedPassword.html")
+                .replace("{{userName}}", user.getFullName())
+                .replace("{{email}}",user.getEmail())
+                .replace("{{time}}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+
+        emailService.sendMail(user.getEmail(), title, body);
+    }
+
+    public User findOrCreateUser(String email, String name) {
+        User user = userRepository.findUserByEmail(email);
+        if(user!=null){
+            return user;
+        }
+        else{
+            return createUser(user);
+        }
+
     }
 }

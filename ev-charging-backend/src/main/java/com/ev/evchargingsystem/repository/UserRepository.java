@@ -14,6 +14,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     List<User> findByFullNameContainingIgnoreCase(String fullName);
 
+    User findUserByEmail(String email);
+
     @Query("SELECT COUNT(u) FROM User u WHERE u.active = true")
     long countTotalUsers();
 
