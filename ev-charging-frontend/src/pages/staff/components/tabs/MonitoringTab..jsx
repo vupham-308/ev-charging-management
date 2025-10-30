@@ -5,7 +5,7 @@ import {
 } from "@ant-design/icons";
 import { FaHeartbeat } from "react-icons/fa";
 import React from "react";
-import { Button, Tag, Card, Spin } from "antd";
+import { Button, Card } from "antd";
 
 const statusStyles = {
   AVAILABLE: {
@@ -44,7 +44,6 @@ export const MonitoringTab = ({
   reserved,
   outOfService,
   chargerPoints = [],
-  isLoading,
 }) => {
   const stats = [
     {
@@ -128,7 +127,7 @@ export const MonitoringTab = ({
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-800">
-                          CH{String(point.id).padStart(3, "0")}
+                          {point.id}
                         </h3>
                         <p className="text-gray-600 text-sm">
                           {point.capacity} kW • {point.portType}
@@ -174,7 +173,7 @@ export const MonitoringTab = ({
                       {point.status === "RESERVED" && <p>Đã được đặt chỗ</p>}
                       {point.status === "OCCUPIED" && <p>Đang sạc</p>}
                       {point.status === "OUT_OF_SERVICE" && (
-                        <p className="text-red-600 font-medium">Đang bảo trì</p>
+                        <p className="text-red-600 font-medium">Đang bảo trì</p>  
                       )}
                     </div>
 

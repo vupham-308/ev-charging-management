@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Card, Button, Spin, message, Tag, Select } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
+import { toast } from "react-toastify";
+import { Outlet } from "react-router-dom";
 
 const ManageStartCharging = () => {
   const { stationId } = useParams();
@@ -28,6 +30,7 @@ const ManageStartCharging = () => {
           api.get(`/cars`),
           api.get(`/chargerPoint/getAllAvailable/${stationId}`),
           api.get(`/review/station/${stationId}`),
+          api.get("/balance"),
         ]);
 
         setStation(stationRes.data);
@@ -67,21 +70,52 @@ const ManageStartCharging = () => {
     return options;
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!canContinue) {
       message.warning("⚠️ Vui lòng chọn đầy đủ thông tin!");
       return;
     }
 
-    navigate("/driver/confirmBill", {
-      state: {
-        station,
-        selectedCar,
-        selectedCharger,
-        targetBattery,
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {
+        carId: selectedCar.id,
+        pointId: selectedCharger.id,
+        goalBattery: targetBattery,
         paymentMethod,
-      },
-    });
+      };
+
+      console.log("📦 Gửi tạo phiên sạc:", payload);
+      const res = await api.post("/charge", payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("✅ Phản hồi từ /charge:", res.data);
+
+      navigate("/driver/confirmBill", {
+        state: {
+          chargeData: res.data, // Dữ liệu từ backend
+          station,
+          selectedCar,
+          selectedCharger,
+          targetBattery,
+          paymentMethod,
+        },
+      });
+    } catch (err) {
+      console.error("❌ Lỗi khi tạo phiên sạc:", err);
+
+      // Lấy thông báo lỗi thật từ backend (nếu có)
+      const errorMsg =
+        err.response?.data?.message || // Nếu backend trả về { message: "..."}
+        err.response?.data || // Nếu chỉ trả về chuỗi đơn giản
+        "Không thể tạo phiên sạc!"; // fallback nếu không có gì
+
+      message.error(errorMsg);
+      toast.warning(errorMsg);
+    }
   };
 
   if (loading)
@@ -155,6 +189,9 @@ const ManageStartCharging = () => {
               borderRadius: 8,
               fontWeight: 500,
             }}
+            onClick={() =>
+              navigate(`/driver/startCharging/${stationId}/stationReport`)
+            }
           >
             Báo cáo sự cố
           </Button>
@@ -307,6 +344,7 @@ const ManageStartCharging = () => {
           ))}
         </Card>
       </div>
+      <Outlet />
     </div>
   );
 };

@@ -8,7 +8,7 @@ import {
 
 export const TABS = [
   { key: "Giám sát", icon: DashboardOutlined },
-  { key: "Thanh toán", icon: CreditCardOutlined },
+  { key: "Phiên sạc", icon: CreditCardOutlined },
   { key: "Sự cố", icon: WarningOutlined },
   { key: "Báo cáo", icon: BarChartOutlined },
   { key: "Quản lí trụ sạc", icon: ToolOutlined },
@@ -16,7 +16,7 @@ export const TABS = [
 
 export const TAB_KEYS = {
   MONITORING: "Giám sát",
-  PAYMENT: "Thanh toán",
+  PAYMENT: "Phiên sạc",
   ISSUES: "Sự cố",
   REPORTS: "Báo cáo",
   MAINTENANCE: "Quản lí trụ sạc",

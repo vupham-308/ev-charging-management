@@ -23,7 +23,7 @@ const ManageMyBooking = () => {
   }, []);
 
   const handleStart = (booking) => {
-    navigate(`/driver/startCharging/${booking.id}`, {
+    navigate(`/driver/startChargingBooking/${booking.id}`, {
       state: { booking },
     });
   };
