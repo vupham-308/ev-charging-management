@@ -99,7 +99,7 @@ public class StationController {
     @GetMapping("/admin/dashboard-status/{stationId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<StaffDashboardResponse> getDashboardForAdmin(@PathVariable int stationId) {
-        StaffDashboardResponse response = stationService.getTodayStatsByStationId(stationId);
+        StaffDashboardResponse response = stationService.getThisWeekStatsByStationId(stationId);
         return ResponseEntity.ok(response);
     }
 
