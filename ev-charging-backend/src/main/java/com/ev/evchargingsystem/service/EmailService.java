@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
@@ -29,12 +30,11 @@ public class EmailService {
         mailSender.send(mimeMessage);
     }
 
-    public String loadTemplate(String path) {
-        try {
-            ClassPathResource resource = new ClassPathResource(path);
-            return Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Không thể đọc file template: " + path, e);
+    public String loadTemplate(String templateName) {
+        try (InputStream inputStream = new ClassPathResource(templateName).getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể đọc file template: " + templateName, e);
         }
     }
 

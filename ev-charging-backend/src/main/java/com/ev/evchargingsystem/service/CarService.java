@@ -1,10 +1,12 @@
 package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.Car;
+import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.CarCreateRequest;
 import com.ev.evchargingsystem.model.response.CarResponse;
 import com.ev.evchargingsystem.repository.CarRepository;
+import com.ev.evchargingsystem.repository.ChargingSessionRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,8 @@ public class CarService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ChargingSessionRepository chargingSessionRepository;
 
     // Lấy thông tin người dùng đang đăng nhập
     private User getCurrentUser() {
@@ -107,6 +111,12 @@ public class CarService {
         Car car = carRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy xe với ID: " + id));
 
+        List<ChargingSession> list = chargingSessionRepository.findChargingSessionByCar(car);
+        for(ChargingSession c : list){
+            if(c.getStatus().equals("ONGOING")){
+                throw new RuntimeException("Xe đang trong phiên sạc, không thể xóa");
+            }
+        }
         if (!car.isActive()) {
             throw new RuntimeException("Xe này đã bị xóa");
         }

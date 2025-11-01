@@ -48,7 +48,7 @@ public class ProblemReportController {
         }
     }
 
-    @Operation(summary = "Staff: lấy tất cả problem theo stationId")
+    @Operation(summary = "Staff: lấy tất cả problem tại station staff đang làm việc")
     @PreAuthorize("hasAuthority('STAFF')")
     @GetMapping("/get-all-by-staff")
     public ResponseEntity getAllByStaff() {
@@ -80,15 +80,15 @@ public class ProblemReportController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @Operation(summary = "Staff, Admin: chỉnh sửa trạng thái")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
-    @PutMapping("/admin/set/{status}")
-    public ResponseEntity setStatus(int id, @PathVariable("status") String status) {
-        try {
-            return ResponseEntity.ok(problemReportService.setStatus(id, status));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+//
+//    @Operation(summary = "Staff, Admin: chỉnh sửa trạng thái")
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('STAFF')")
+//    @PutMapping("/admin/set/{status}")
+//    public ResponseEntity setStatus(int id, @PathVariable("status") String status) {
+//        try {
+//            return ResponseEntity.ok(problemReportService.setStatus(id, status));
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
 }

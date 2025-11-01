@@ -155,46 +155,51 @@ public class ReservationService {
         return result;
     }
 
-    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
-        List<ReservationResponse> result = new ArrayList<>();
-        for (Reservation r : reservations) {
-            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
-            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
-            if (reservationDate.equals(date)) {
-                ReservationResponse dto = new ReservationResponse();
-                dto.setId(r.getId());
-                dto.setStatus(r.getStatus());
-                dto.setStartDate(r.getStartDate());
-                dto.setEndDate(r.getEndDate());
 
-            // Lấy tên trụ và trạm
-            if (r.getChargerPoint() != null) {
-                dto.setChargerpointId(r.getChargerPoint().getId());
-                dto.setChargerPointName(r.getChargerPoint().getName());
-                if (r.getChargerPoint().getStation() != null) {
-                    dto.setStationName(r.getChargerPoint().getStation().getName());
-                }
-            }
-            result.add(dto);
-                // Lấy tên trụ và trạm
-                if (r.getChargerPoint() != null) {
-                    dto.setChargerPointName(r.getChargerPoint().getName());
-                    if (r.getChargerPoint().getStation() != null) {
-                        dto.setStationName(r.getChargerPoint().getStation().getName());
-                    }
-                }
-                result.add(dto);
-            }
-        }
-        return result;
-    }
+//
+//    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
+//        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
+//        List<ReservationResponse> result = new ArrayList<>();
+//        for (Reservation r : reservations) {
+//            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
+//            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
+//            if (reservationDate.equals(date)) {
+//                ReservationResponse dto = new ReservationResponse();
+//                dto.setId(r.getId());
+//                dto.setStatus(r.getStatus());
+//                dto.setStartDate(r.getStartDate());
+//                dto.setEndDate(r.getEndDate());
+//
+//            // Lấy tên trụ và trạm
+//            if (r.getChargerPoint() != null) {
+//                dto.setChargerpointId(r.getChargerPoint().getId());
+//                dto.setChargerPointName(r.getChargerPoint().getName());
+//                if (r.getChargerPoint().getStation() != null) {
+//                    dto.setStationName(r.getChargerPoint().getStation().getName());
+//                }
+//            }
+//            result.add(dto);
+//                // Lấy tên trụ và trạm
+//                if (r.getChargerPoint() != null) {
+//                    dto.setChargerPointName(r.getChargerPoint().getName());
+//                    if (r.getChargerPoint().getStation() != null) {
+//                        dto.setStationName(r.getChargerPoint().getStation().getName());
+//                    }
+//                }
+//                result.add(dto);
+//            }
+//        }
+//        return result;
+//    }
 
     public void cancelReservation(int reservationId) {
         User currentUser = getCurrentUser();
+        Reservation reservation = reservationRepository.findById(reservationId).get();
 
-        Reservation reservation = reservationRepository.findByIdAndUserId(reservationId, currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt chỗ của bạn với ID: " + reservationId));
+        if(currentUser.getRole().equals("USER")) {
+            reservation = reservationRepository.findByIdAndUserId(reservationId, currentUser.getId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt chỗ của bạn với ID: " + reservationId));
+        }
 
         if (reservation.getStatus().equalsIgnoreCase("CANCELLED") ||
                 reservation.getStatus().equalsIgnoreCase("COMPLETED")) {
@@ -202,6 +207,33 @@ public class ReservationService {
         }
 
         reservation.setStatus("CANCELLED");
+        ChargerPoint p = reservation.getChargerPoint();
+        p.setStatus("AVAILABLE");
+        chargerPointRepository.save(p);
         reservationRepository.save(reservation);
+    }
+
+    public List<ReservationResponse> getAllReservations() {
+        List<ReservationResponse> result = new ArrayList<>();
+        List<Reservation> reservations = reservationRepository.findAllByStatus("PENDING");
+        for(Reservation r: reservations){
+            ReservationResponse dto = new ReservationResponse();
+            dto.setId(r.getId());
+            dto.setStatus(r.getStatus());
+            dto.setStartDate(r.getStartDate());
+            dto.setEndDate(r.getEndDate());
+
+            // Lấy tên trụ và trạm
+            if (r.getChargerPoint() != null) {
+                dto.setChargerPointName(r.getChargerPoint().getName());
+                dto.setChargerpointId(r.getChargerPoint().getId());
+                if (r.getChargerPoint().getStation() != null) {
+                    dto.setStationName(r.getChargerPoint().getStation().getName());
+                    dto.setStationId(r.getChargerPoint().getStation().getId());
+                }
+            }
+            result.add(dto);
+        }
+        return result;
     }
 }

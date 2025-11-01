@@ -30,19 +30,16 @@ public class PaymentController {
     }
 
     @GetMapping("/success/{id}")
-    public ResponseEntity paymentCallback(@PathVariable("id") int id,
+    public void paymentCallback(@PathVariable("id") int id,
         @RequestParam Map<String, String> params, HttpServletResponse response) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         Transaction t = paymentService.paymentCallback(id, params);
+        String url="http://localhost:5173/payment-return?vnp_Amount=0&vnp_ResponseCode=1";
         try {
-            String url = "http://localhost:5173/payment-return?vnp_Amount="+t.getTotalAmount()+"&vnp_ResponseCode=00";
-                response.sendRedirect(url);
-            return ResponseEntity.ok(t);
-        }catch (RuntimeException e){
-            String url = "http://localhost:5173/payment-return?vnp_Amount="+t.getTotalAmount()+"&vnp_ResponseCode=1";
+            if(t!=null&&t.getStatus().equals("COMPLETED")){
+                url = "http://localhost:5173/payment-return?vnp_Amount=" + t.getTotalAmount() + "&vnp_ResponseCode=00";}
             response.sendRedirect(url);
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }catch (Exception e){
+            response.sendRedirect(url);
         }
     }
 
