@@ -1,22 +1,23 @@
 import { useState } from "react";
-import { Card, InputNumber, Select, Button, Typography, message } from "antd";
+import { Card, InputNumber, Select, Button, Typography } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const ManageTopup = () => {
-  const [amount, setAmount] = useState(0.1);
+  const [amount, setAmount] = useState(5000);
   const [method, setMethod] = useState("VNPAY");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleTopup = async () => {
-    if (!amount || amount <= 0) {
-      message.warning("Vui lòng nhập số tiền hợp lệ!");
-      return;
+    // ✅ Kiểm tra số tiền nạp tối thiểu
+    if (!amount || amount < 5000) {
+      toast.warning("💰 Số tiền nạp tối thiểu là 5.000 VND!");
+      return; // ❌ Không gọi API, không chuyển trang
     }
 
     setLoading(true);
@@ -29,26 +30,25 @@ const ManageTopup = () => {
       const data = res.data;
       console.log("Topup Response:", data);
 
-      // ✅ Kiểm tra nếu là link thanh toán (VNPay chưa redirect)
+      // ✅ Nếu backend trả về link thanh toán VNPay
       if (typeof data === "string" && data.startsWith("http")) {
-        message.success("Đang chuyển đến trang thanh toán...");
+        toast.info("🔄 Đang chuyển đến trang thanh toán...");
         window.location.href = data;
         return;
       }
 
-      // ✅ Nếu backend trả về object giao dịch
+      // ✅ Nếu backend trả về object giao dịch hoàn tất
       if (data && data.status === "COMPLETED") {
-        message.success(
-          `Nạp ${data.totalAmount.toLocaleString()} VND thành công!`
+        toast.success(
+          `✅ Nạp ${data.totalAmount.toLocaleString("vi-VN")} VND thành công!`
         );
-        // (tuỳ chọn) điều hướng lại trang quản lý giao dịch
         navigate("/transaction");
       } else {
-        message.warning("Giao dịch chưa hoàn tất hoặc không hợp lệ!");
+        toast.warning("⚠️ Giao dịch chưa hoàn tất hoặc không hợp lệ!");
       }
     } catch (error) {
       console.error("Topup error:", error);
-      message.error("Nạp tiền thất bại!");
+      toast.error("❌ Nạp tiền thất bại!");
     } finally {
       setLoading(false);
     }
@@ -73,32 +73,35 @@ const ManageTopup = () => {
             Chọn số tiền và phương thức thanh toán
           </Text>
 
+          {/* 💰 Nhập số tiền nạp */}
           <div>
             <Text strong>Số tiền nạp</Text>
             <InputNumber
-              min={0.1}
-              step={0.1}
+              min={1000}
+              step={1000}
               value={amount}
-              onChange={setAmount}
+              onChange={(val) => setAmount(Math.floor(val || 0))}
               className="w-full mt-2"
               addonAfter="VND"
+              formatter={(value) =>
+                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              }
+              parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
             />
           </div>
 
+          {/* 💳 Phương thức thanh toán */}
           <div>
             <Text strong>Phương thức thanh toán</Text>
             <Select
               value={method}
               onChange={setMethod}
               className="w-full mt-2"
-              options={[
-                { label: "VNPAY", value: "VNPAY" },
-                { label: "Momo", value: "Momo" },
-                { label: "ZaloPay", value: "ZaloPay" },
-              ]}
+              options={[{ label: "VNPAY", value: "VNPAY" }]}
             />
           </div>
 
+          {/* 🧭 Nút hành động */}
           <div className="flex justify-end gap-3 mt-6">
             <Button onClick={() => navigate(-1)}>Hủy</Button>
             <Button type="primary" loading={loading} onClick={handleTopup}>

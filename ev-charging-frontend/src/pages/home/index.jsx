@@ -181,9 +181,12 @@ const EVChargeHomePage = () => {
           <Link to="login" className="hover:text-primary transition-colors">
             Xe Của Tôi
           </Link>
-          <a href="login" className="hover:text-primary transition-colors">
+          <Link to="login" className="hover:text-primary transition-colors">
             Đặt Chỗ
-          </a>
+          </Link>
+          <Link to="login" className="hover:text-primary transition-colors">
+            Báo cáo sự cố
+          </Link>
         </nav>
 
         {/* --- AUTH SECTION --- */}
@@ -350,7 +353,7 @@ const EVChargeHomePage = () => {
                   className="flex transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${currentFeature * 100}%)` }}
                 >
-                  {chargingFeatures.map((feature, index) => (
+                  {chargingFeatures.map((feature) => (
                     <div
                       key={feature.name}
                       className="flex-shrink-0 w-full grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch bg-secondary-bg"
@@ -412,7 +415,9 @@ const EVChargeHomePage = () => {
           </section>
 
           {/* --- Testimonials Section --- */}
-          <section className={sectionClasses}>
+          <section
+            className={`${sectionClasses} border-2 border-gray-300 rounded-2xl p-6`}
+          >
             <h2 className="text-4xl font-bold text-center mb-16 reveal">
               Khách Hàng Nói Gì Về Chúng Tôi
             </h2>
@@ -462,23 +467,16 @@ const EVChargeHomePage = () => {
           {/* --- Call to Action Section (Ưu đãi) --- */}
           <section
             id="uudai"
-            className="relative py-28 md:py-36 px-6 text-center overflow-hidden"
+            className={`${sectionClasses} border-2 border-gray-300 rounded-2xl p-6 relative text-center overflow-hidden mt-10 mb-10`}
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage:
-                  "url('https://ecoswitch.vn/wp-content/uploads/2023_sac.jpg')",
-              }}
-            >
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-2xl">
               {/* Add a stronger gradient overlay for better text contrast */}
-              <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent"></div>
+              <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent rounded-2xl"></div>
             </div>
             <div className="relative z-10 max-w-3xl mx-auto">
               <h2 className="text-4xl font-bold text-center mb-16 reveal">
                 Ưu Đãi Đặc Biệt Chờ Đón Bạn!
-              </h2>{" "}
-              {/* CHỈNH CHU: Ngắn gọn và mời gọi hơn */}
+              </h2>
               <p
                 className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-10 reveal"
                 style={{ transitionDelay: "150ms" }}
@@ -486,15 +484,13 @@ const EVChargeHomePage = () => {
                 Tham gia cộng đồng EV Charge ngay hôm nay để không bỏ lỡ những
                 chương trình khuyến mãi hấp dẫn và quyền lợi thành viên độc
                 quyền.
-              </p>{" "}
-              {/* CHỈNH CHU: Thêm "cộng đồng" và "quyền lợi độc quyền" */}
+              </p>
               <button
-                className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-black hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-xl shadow-primary/40 reveal"
+                className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-xl shadow-primary/40 reveal"
                 style={{ transitionDelay: "300ms" }}
               >
                 Đăng Ký Ngay Để Nhận Ưu Đãi
-              </button>{" "}
-              {/* CHỈNH CHU: Cụ thể hóa hành động và lợi ích */}
+              </button>
             </div>
           </section>
         </>
