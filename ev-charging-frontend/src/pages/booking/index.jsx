@@ -54,7 +54,7 @@ const ManageBooking = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const res = await api.get("/reservations/my");
+        const res = await api.get("/reservations/lock");
         setReservations(res.data || []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách đặt chỗ:", error);
