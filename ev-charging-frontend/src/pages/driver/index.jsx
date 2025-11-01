@@ -22,7 +22,7 @@ import { logout, setAccount } from "../../redux/accountSlice";
 import api from "../../config/axios";
 
 // --- Custom Hook for Scroll-triggered Animations ---
-const useAnimateOnScroll = () => {
+const useAnimateOnScroll = (pathname) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -40,24 +40,24 @@ const useAnimateOnScroll = () => {
     elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]); // thêm dependency pathname
 };
 
 const DriverDashboard = () => {
-  useAnimateOnScroll();
+  const location = useLocation();
+  useAnimateOnScroll(location.pathname);
   // const account = useSelector((store) => store.account); // Redux state, adjust as needed
 
   // --- START: Authentication State (simulated for this example) ---
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Change to true to test logged in state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const user = {
-    fullName: "", // Using 'fullName' to match Redux example
     avatar:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=2080",
   };
 
   const dispatch = useDispatch();
-  const location = useLocation();
+
   // useEffect(() => {
   //   const savedUser = localStorage.getItem("user");
   //   if (savedUser) {
@@ -83,6 +83,7 @@ const DriverDashboard = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     dispatch(logout());
     navigate("/");
   };
@@ -186,11 +187,22 @@ const DriverDashboard = () => {
 
   const sectionClasses = "py-20 md:py-28 px-6 md:px-12 max-w-7xl mx-auto";
 
-  const isMainPage =
-    location.pathname === "/driver" || location.pathname === "/driver/";
+  const isMainPage = location.pathname === "/driver";
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  const [hoverTimeout, setHoverTimeout] = useState(null);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeout) clearTimeout(hoverTimeout);
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => setIsDropdownOpen(false), 200); // 200ms delay
+    setHoverTimeout(timeout);
+  };
 
   return (
     <div className="bg-dark-bg text-text-color font-sans overflow-x-hidden">
@@ -243,8 +255,8 @@ const DriverDashboard = () => {
           {account ? (
             <div
               className="text-white relative"
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <div className="flex items-center gap-3 cursor-pointer">
                 {balance !== null && (
@@ -266,19 +278,24 @@ const DriverDashboard = () => {
 
               {isDropdownOpen && (
                 <div className="absolute right-0 top-full mt-2 w-48 bg-[#111] rounded-lg shadow-lg border border-gray-700 py-2">
-                  <a
-                    href="/profile"
+                  <Link
+                    to="/driver/profile"
                     className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
+                    onClick={() => setIsDropdownOpen(false)}
                   >
                     <FiUser /> Hồ sơ của tôi
-                  </a>
-                  <a
-                    href="/transaction"
+                  </Link>
+
+                  <Link
+                    to="/driver/transaction"
                     className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
+                    onClick={() => setIsDropdownOpen(false)}
                   >
                     <FiShoppingCart /> Quản lý giao dịch
-                  </a>
+                  </Link>
+
                   <div className="border-t border-gray-700 my-2"></div>
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 transition"
@@ -318,39 +335,6 @@ const DriverDashboard = () => {
                 }}
               ></div>
               <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/70 to-transparent"></div>
-            </div>
-            <div className="z-10 px-4">
-              <h1
-                className="text-5xl md:text-7xl font-bold mb-4 opacity-0 animate-fade-in-up text-white"
-                style={{ animationDelay: "0.2s" }}
-              >
-                Sạc Tối Ưu, Vạn Dặm An Tâm.
-              </h1>{" "}
-              {/* CHỈNH CHU: Ngắn gọn, nhấn mạnh tối ưu và an tâm */}
-              <p
-                className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-8 opacity-0 animate-fade-in-up"
-                style={{ animationDelay: "0.5s" }}
-              >
-                Hệ thống trạm sạc thông minh toàn diện, mang đến trải nghiệm sạc
-                xe điện đẳng cấp và tiện lợi.
-              </p>{" "}
-              {/* CHỈNH CHU: Tập trung vào hệ thống thông minh và trải nghiệm đẳng cấp */}
-              <button
-                onClick={() => navigate("/driver/map")}
-                className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-white hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-lg shadow-primary/30 opacity-0 animate-fade-in-up"
-              >
-                Tìm Trạm Gần Nhất
-              </button>
-              <Outlet />
-              {/* CHỈNH CHU: "Gần Nhất" cụ thể hơn */}
-            </div>
-            <div
-              className="absolute bottom-10 left-1/2 -translate-x-1/2 opacity-0 animate-fade-in-up"
-              style={{ animationDelay: "1.2s" }}
-            >
-              <div className="w-6 h-10 border-2 border-text-muted rounded-full flex justify-center pt-2 animate-pulse-slow">
-                <div className="w-1 h-2 bg-text-muted rounded-full"></div>
-              </div>
             </div>
           </section>
 
@@ -409,7 +393,7 @@ const DriverDashboard = () => {
                   className="flex transition-transform duration-700 ease-in-out"
                   style={{ transform: `translateX(-${currentFeature * 100}%)` }}
                 >
-                  {chargingFeatures.map((feature, index) => (
+                  {chargingFeatures.map((feature) => (
                     <div
                       key={feature.name}
                       className="flex-shrink-0 w-full grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch bg-secondary-bg"
@@ -471,7 +455,9 @@ const DriverDashboard = () => {
           </section>
 
           {/* --- Testimonials Section --- */}
-          <section className={sectionClasses}>
+          <section
+            className={`${sectionClasses} border-2 border-gray-300 rounded-2xl p-6`}
+          >
             <h2 className="text-4xl font-bold text-center mb-16 reveal">
               Khách Hàng Nói Gì Về Chúng Tôi
             </h2>
@@ -521,17 +507,16 @@ const DriverDashboard = () => {
           {/* --- Call to Action Section (Ưu đãi) --- */}
           <section
             id="uudai"
-            className="relative py-28 md:py-36 px-6 text-center overflow-hidden"
+            className={`${sectionClasses} border-2 border-gray-300 rounded-2xl p-6 relative text-center overflow-hidden mt-10 mb-10`}
           >
-            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat">
+            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-2xl">
               {/* Add a stronger gradient overlay for better text contrast */}
-              <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent"></div>
+              <div className="absolute inset-0 bg-dark-bg/80 md:bg-dark-bg/70 from-dark-bg/90 to-transparent rounded-2xl"></div>
             </div>
             <div className="relative z-10 max-w-3xl mx-auto">
               <h2 className="text-4xl font-bold text-center mb-16 reveal">
                 Ưu Đãi Đặc Biệt Chờ Đón Bạn!
-              </h2>{" "}
-              {/* CHỈNH CHU: Ngắn gọn và mời gọi hơn */}
+              </h2>
               <p
                 className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto mb-10 reveal"
                 style={{ transitionDelay: "150ms" }}
@@ -539,15 +524,13 @@ const DriverDashboard = () => {
                 Tham gia cộng đồng EV Charge ngay hôm nay để không bỏ lỡ những
                 chương trình khuyến mãi hấp dẫn và quyền lợi thành viên độc
                 quyền.
-              </p>{" "}
-              {/* CHỈNH CHU: Thêm "cộng đồng" và "quyền lợi độc quyền" */}
+              </p>
               <button
-                className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:bg-black hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-xl shadow-primary/40 reveal"
+                className="bg-primary text-dark-bg font-semibold px-10 py-4 rounded-full hover:-translate-y-1 transform transition-all duration-300 text-lg shadow-xl shadow-primary/40 reveal"
                 style={{ transitionDelay: "300ms" }}
               >
                 Đăng Ký Ngay Để Nhận Ưu Đãi
-              </button>{" "}
-              {/* CHỈNH CHU: Cụ thể hóa hành động và lợi ích */}
+              </button>
             </div>
           </section>
         </>
@@ -585,12 +568,12 @@ const DriverDashboard = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#report"
+                <Link
+                  to="incidentReport"
                   className="hover:text-primary transition-colors flex items-center gap-2"
                 >
                   <FiEdit3 /> Báo cáo sự cố
-                </a>
+                </Link>
               </li>
               <li>
                 <a

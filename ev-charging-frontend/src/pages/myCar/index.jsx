@@ -1,10 +1,22 @@
 import { useState, useEffect } from "react";
-import { Button, Card, Progress, message, Spin } from "antd";
+import {
+  Button,
+  Card,
+  Progress,
+  message,
+  Spin,
+  Empty,
+  Tooltip,
+  Tag,
+} from "antd";
 import {
   CarOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
+  BgColorsOutlined,
+  NumberOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
@@ -15,25 +27,19 @@ const ManageMyCar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Kiểm tra xem có đang ở trang con (add/edit) không
   const isChildRoute = location.pathname !== "/driver/myCar";
 
-  // 🔹 Hàm gọi API lấy danh sách xe
   const fetchCars = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-
       const response = await api.get("/cars", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const result = Array.isArray(response.data)
         ? response.data
         : response.data.data || [];
-
       setCars(result);
-      console.log("📦 Dữ liệu xe:", result);
     } catch (error) {
       console.error("❌ Lỗi khi tải danh sách xe:", error);
       if (error.response?.status === 403) {
@@ -63,30 +69,41 @@ const ManageMyCar = () => {
         const exists = prevCars.some(
           (car) => car.id === location.state.newCar.id
         );
-        if (!exists) {
-          console.log("🆕 Xe mới được thêm:", location.state.newCar);
-          return [...prevCars, location.state.newCar];
-        }
+        if (!exists) return [...prevCars, location.state.newCar];
         return prevCars;
       });
     }
   }, [location.state]);
 
-  // 🔹 Điều hướng
   const handleAddCar = () => navigate("/driver/myCar/addCar");
   const handleEditCar = (id) => navigate(`/driver/myCar/editCar/${id}`);
   const handleDeleteCar = (id) => navigate(`/driver/myCar/deleteCar/${id}`);
 
-  // 🔹 Nếu đang ở trang con
   if (isChildRoute) return <Outlet />;
 
-  // 🔹 Giao diện
+  // 🌈 Token màu đơn tính
+  const token = {
+    bg: "#F8FAFC",
+    cardBg: "#FFFFFF",
+    textMain: "#0F172A",
+    textSub: "#475569",
+    border: "#E2E8F0",
+    accent: "#1E293B",
+  };
+
+  // 🌡️ Màu gradient pin theo mức
+  const getBatteryColor = (percent) => {
+    if (percent >= 80) return "#16a34a"; // xanh lá
+    if (percent >= 40) return "#facc15"; // vàng
+    return "#ef4444"; // đỏ
+  };
+
   return (
     <div
       style={{
-        padding: "40px 60px",
-        backgroundColor: "#f7f8fb",
+        backgroundColor: token.bg,
         minHeight: "100vh",
+        padding: "40px 60px",
       }}
     >
       {/* Header */}
@@ -95,24 +112,42 @@ const ManageMyCar = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 30,
+          marginBottom: 40,
         }}
       >
-        <div>
-          <h2 style={{ fontSize: "1.6rem", margin: 0 }}>Xe của tôi</h2>
-          <p style={{ color: "#555", margin: 0 }}>
-            Quản lý thông tin các xe điện
-          </p>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            background: token.accent,
+            color: "white",
+            padding: "18px 28px",
+            borderRadius: 16,
+            boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+          }}
+        >
+          <CarOutlined style={{ fontSize: 28 }} />
+          <div>
+            <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 600 }}>
+              Xe của tôi
+            </h2>
+            <p style={{ margin: 0, fontSize: "0.9rem", opacity: 0.8 }}>
+              Quản lý thông tin xe điện bạn sở hữu
+            </p>
+          </div>
         </div>
+
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleAddCar}
           style={{
-            backgroundColor: "#00021f",
-            border: "none",
-            height: 40,
-            fontWeight: 500,
+            backgroundColor: token.accent,
+            borderRadius: 12,
+            height: 44,
+            fontWeight: 600,
+            boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
           }}
         >
           Thêm xe
@@ -121,101 +156,185 @@ const ManageMyCar = () => {
 
       {/* Danh sách xe */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "40px" }}>
+        <div style={{ textAlign: "center", padding: "60px 0" }}>
           <Spin size="large" />
         </div>
       ) : cars.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#888", padding: "40px" }}>
-          🚘 Chưa có xe nào trong danh sách.
-        </p>
+        <Empty
+          description={<span>Chưa có xe nào trong danh sách</span>}
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          style={{ marginTop: 80 }}
+        />
       ) : (
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))",
-            gap: "24px",
+            gridTemplateColumns: "repeat(2, 1fr)", // ✅ chỉ 2 xe mỗi hàng
+            gap: "28px",
           }}
         >
           {cars.map((car) => (
             <Card
               key={car.id}
+              hoverable
               style={{
-                borderRadius: "12px",
-                border: "2px solid #0a0a23",
-                background: "white",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                padding: "10px 25px 25px",
+                borderRadius: 16,
+                border: `1px solid ${token.border}`,
+                background: token.cardBg,
+                boxShadow: "0 6px 14px rgba(15, 23, 42, 0.05)",
+                transition: "all 0.3s ease",
+                position: "relative",
               }}
-              bodyStyle={{ padding: "0" }}
+              bodyStyle={{ padding: 24 }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "translateY(-4px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
             >
-              <div>
-                <h3 style={{ fontSize: "1.1rem", marginBottom: 4 }}>
-                  {car.brand || "Tên xe"}
-                </h3>
-                <p style={{ color: "#666", marginBottom: 16 }}>
-                  {car.color || "Màu"} • {car.licensePlate || "Biển số"}
-                </p>
+              {/* Icon góc trên */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  color: token.accent,
+                  opacity: 0.1,
+                  fontSize: 64,
+                }}
+              >
+                <CarOutlined />
+              </div>
 
-                <div style={{ color: "#333", marginBottom: 8 }}>Mức pin</div>
+              {/* Nội dung xe */}
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontWeight: 600,
+                    fontSize: "1.15rem",
+                    color: token.textMain,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <CarOutlined /> {car.brand || "Tên xe"}
+                </h3>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    marginTop: 12,
+                  }}
+                >
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <BgColorsOutlined style={{ color: token.textSub }} />
+                    <span style={{ color: token.textSub }}>
+                      Màu: <b>{car.color || "Không rõ"}</b>
+                    </span>
+                  </div>
+
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <NumberOutlined style={{ color: token.textSub }} />
+                    <span style={{ color: token.textSub }}>
+                      Biển số: <b>{car.licensePlate || "Chưa có"}</b>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Pin */}
+                <div
+                  style={{
+                    color: token.textMain,
+                    fontWeight: 500,
+                    marginTop: 20,
+                    marginBottom: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  <ThunderboltOutlined /> Mức pin
+                </div>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
+                    gap: 10,
                     marginBottom: 20,
                   }}
                 >
                   <Progress
                     percent={car.initBattery || 0}
                     showInfo={false}
-                    strokeColor="#00021f"
-                    trailColor="#d9d9d9"
+                    strokeColor={getBatteryColor(car.initBattery || 0)}
+                    trailColor="#E2E8F0"
                     style={{ flex: 1 }}
                   />
-                  <span
+                  <Tag
+                    color={getBatteryColor(car.initBattery || 0)}
                     style={{
-                      marginLeft: 10,
+                      color: "#fff",
                       fontWeight: 600,
-                      color: "#00021f",
+                      borderRadius: 6,
                     }}
                   >
                     {car.initBattery || 0}%
-                  </span>
+                  </Tag>
                 </div>
 
+                {/* Hành động */}
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    gap: 14, // tăng nhẹ khoảng cách
+                    marginTop: 10,
                   }}
                 >
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => handleEditCar(car.id)}
-                    style={{
-                      borderRadius: 8,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      width: "120px",
-                    }}
-                  >
-                    Sửa
-                  </Button>
+                  <Tooltip title="Sửa xe">
+                    <Button
+                      size="large" // ✅ làm nút to hơn
+                      icon={<EditOutlined />}
+                      onClick={() => handleEditCar(car.id)}
+                      style={{
+                        borderRadius: 10,
+                        color: token.accent,
+                        borderColor: token.accent,
+                        padding: "8px 16px", // ✅ tăng kích thước vùng bấm
+                        fontWeight: 500,
+                      }}
+                    >
+                      Sửa
+                    </Button>
+                  </Tooltip>
 
-                  <Button
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDeleteCar(car.id)}
-                    style={{
-                      borderRadius: "8px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: "40px",
-                      height: "40px",
-                    }}
-                  />
+                  <Tooltip title="Xóa xe">
+                    <Button
+                      size="large" // ✅ làm nút to hơn
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleDeleteCar(car.id)}
+                      style={{
+                        borderRadius: 10,
+                        backgroundColor: "#DC2626",
+                        borderColor: "#DC2626",
+                        color: "white",
+                        padding: "8px 16px", // ✅ tăng kích thước vùng bấm
+                        fontWeight: 500,
+                      }}
+                    >
+                      Xóa
+                    </Button>
+                  </Tooltip>
                 </div>
               </div>
             </Card>

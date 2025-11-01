@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { Card, Button, Tag, Spin, message, Progress } from "antd";
-import { useLocation } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
+import {
+  WarningOutlined,
+  ThunderboltOutlined,
+  CarOutlined,
+} from "@ant-design/icons";
 
 const ManageChargingSession = () => {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const sessionData = location.state;
   const [chargingSessions, setChargingSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +25,7 @@ const ManageChargingSession = () => {
           const res = await api.get("/chargingsessions");
           setChargingSessions(res.data);
         }
-      } catch (err) {
+      } catch {
         message.error("❌ Lỗi khi tải thông tin phiên sạc!");
       } finally {
         setLoading(false);
@@ -30,17 +34,10 @@ const ManageChargingSession = () => {
     fetchSession();
   }, [sessionData]);
 
-  useEffect(() => {
-    if (sessionData) {
-      setChargingSessions(sessionData);
-    }
-  }, [sessionData]);
-
   const handleStopCharging = async (id) => {
     try {
       await api.post(`/stop/${id}`);
       message.success("🛑 Đã dừng sạc!");
-      // Cập nhật lại danh sách sau khi dừng
       setChargingSessions((prev) => prev.filter((s) => s.id !== id));
       toast.success("Dừng sạc thành công");
     } catch (error) {
@@ -51,123 +48,325 @@ const ManageChargingSession = () => {
 
   if (loading)
     return (
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 50 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "70vh",
+        }}
+      >
         <Spin tip="Đang tải thông tin..." size="large" />
       </div>
     );
 
-  if (!chargingSessions)
+  if (!chargingSessions || chargingSessions.length === 0)
     return (
-      <p style={{ textAlign: "center", marginTop: 50 }}>
-        Không có phiên sạc đang hoạt động
+      <p
+        style={{
+          textAlign: "center",
+          marginTop: 100,
+          color: "#000000ff",
+          fontSize: 22,
+        }}
+      >
+        Hiện tại không có phiên sạc nào đang hoạt động
       </p>
     );
 
   return (
-    <div style={{ padding: "40px 80px" }}>
-      <h2 style={{ fontWeight: 600, fontSize: 20, marginBottom: 20 }}>
-        Tất cả phiên sạc
+    <div
+      style={{
+        padding: "50px 120px",
+        backgroundColor: "#fff",
+        minHeight: "100vh",
+      }}
+    >
+      <h2
+        style={{
+          fontWeight: 700,
+          fontSize: 24,
+          color: "#00021f",
+          marginBottom: 30,
+        }}
+      >
+        Phiên sạc hiện tại
       </h2>
 
-      {Array.isArray(chargingSessions) ? (
-        chargingSessions.length === 0 ? (
-          <p style={{ textAlign: "center", marginTop: 50 }}>
-            Không có phiên sạc nào đang hoạt động
-          </p>
-        ) : (
-          chargingSessions.map((session) => (
-            <Card
-              key={session.id}
+      {chargingSessions.map((session) => (
+        <Card
+          key={session.id}
+          style={{
+            borderRadius: 16,
+            border: "1px solid #eee",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            padding: 28,
+            maxWidth: 1000,
+            margin: "0 auto",
+          }}
+          bodyStyle={{ padding: 0 }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "#f8f9fa",
+              borderRadius: 12,
+              padding: "20px 28px",
+              marginBottom: 30,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <CarOutlined style={{ fontSize: 28, color: "#0f172a" }} />
+              <div>
+                <p style={{ color: "#64748b", marginBottom: 4 }}>Xe đang sạc</p>
+                <h2 style={{ fontWeight: 700, fontSize: 20 }}>
+                  {session.car.licensePlate}
+                </h2>
+              </div>
+            </div>
+          </div>
+
+          {/* Pin + Info chung 1 hàng */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 40,
+              marginBottom: 40,
+            }}
+          >
+            {/* Cột trái - Pin & Progress */}
+            <div
               style={{
-                borderRadius: 16,
-                boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
-                padding: 32,
-                maxWidth: 950,
-                margin: "20px auto",
+                flex: 1,
+                textAlign: "center",
               }}
             >
-              <div
+              <h1
                 style={{
+                  fontSize: 42,
+                  color: "#16a34a",
+                  fontWeight: 800,
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
                 }}
               >
-                <div>
-                  <p style={{ color: "#666", marginBottom: 4 }}>Xe đang sạc</p>
-                  <h2 style={{ fontWeight: 600, fontSize: 22 }}>
-                    {session.car.licensePlate}
-                  </h2>
-                </div>
+                <ThunderboltOutlined
+                  style={{
+                    color: "#facc15",
+                    fontSize: 36,
+                    filter: "drop-shadow(0 0 6px rgba(250, 204, 21, 0.6))",
+                  }}
+                />
+                {session.initBattery}%
+              </h1>
 
-                <div style={{ textAlign: "right", lineHeight: "1.8em" }}>
-                  <div>
-                    <b>Trạm:</b> {session.point.station.name}
-                  </div>
-                  <div>
-                    <b>Trụ sạc:</b> {session.point.name}
-                  </div>
-                  <div>
-                    <b>Giá điện:</b>{" "}
-                    {session.point.chargerCost.cost.toLocaleString("vi-VN")}{" "}
-                    đ/phút
-                  </div>
-                  <div>
-                    <b>Thanh toán:</b>{" "}
-                    {session.paymentMethod === "BALANCE"
-                      ? "Số dư tài khoản"
-                      : "Tiền mặt"}
-                  </div>
-                  <b>Trạng thái:</b>{" "}
-                  {session.status === "ONGOING"
-                    ? "Đang sạc"
-                    : session.status === "COMPLETED"
-                    ? "Hoàn tất"
-                    : session.status === "PENDING"
-                    ? "Đang khởi tạo"
-                    : session.status}
-                </div>
-              </div>
+              <p style={{ color: "#64748b", fontSize: 15 }}>Mức pin hiện tại</p>
 
               <Progress
                 percent={(session.initBattery / session.goalBattery) * 100}
                 showInfo={false}
-                strokeColor="#000"
-                trailColor="#ddd"
-                style={{ maxWidth: 600, margin: "16px auto" }}
+                strokeColor="#16a34a"
+                trailColor="#e5e7eb"
+                style={{ maxWidth: 300, margin: "20px auto" }}
               />
 
-              <div style={{ textAlign: "center", marginTop: 10 }}>
-                <h3 style={{ fontSize: 22, fontWeight: 600 }}>
-                  {session.initBattery}% → {session.goalBattery}%
-                </h3>
-                <p style={{ color: "#666" }}>Dung lượng pin</p>
-              </div>
-
-              <Button
-                danger
-                block
-                size="large"
-                onClick={() => handleStopCharging(session.id)}
+              <div
                 style={{
-                  borderRadius: 8,
-                  fontWeight: 600,
-                  backgroundColor: "#c70024",
-                  border: "none",
-                  marginTop: 20,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  maxWidth: 300,
+                  margin: "0 auto",
+                  color: "#000",
                 }}
               >
-                Dừng sạc
-              </Button>
-            </Card>
-          ))
-        )
-      ) : (
-        <p style={{ textAlign: "center", marginTop: 50 }}>
-          {chargingSessions || "Không có dữ liệu phiên sạc"}
-        </p>
-      )}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  {/* Cột Mục tiêu */}
+                  <div style={{ textAlign: "center" }}>
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        fontSize: 20,
+                        color: "#0f172a",
+                        background:
+                          "linear-gradient(90deg, #e0f7e9 0%, #b9f0c1 100%)",
+                        borderRadius: 8,
+                        padding: "6px 14px",
+                        display: "inline-block",
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      {session.goalBattery}%
+                    </div>
+                    <p
+                      style={{
+                        color: "#64748b",
+                        marginTop: 6,
+                        fontSize: 14,
+                        textAlign: "center",
+                      }}
+                    >
+                      Mục tiêu
+                    </p>
+                  </div>
+
+                  {/* Cột Trạng thái */}
+                  <div style={{ textAlign: "center" }}>
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        fontSize: 20,
+                        color:
+                          session.status === "ONGOING"
+                            ? "#1677ff"
+                            : session.status === "COMPLETED"
+                            ? "#16a34a"
+                            : "#faad14",
+                        background:
+                          session.status === "ONGOING"
+                            ? "linear-gradient(90deg, #e6f0ff 0%, #cce0ff 100%)"
+                            : session.status === "COMPLETED"
+                            ? "linear-gradient(90deg, #e6f8ed 0%, #baf7c5 100%)"
+                            : "linear-gradient(90deg, #fffbe6 0%, #fff2cc 100%)",
+                        borderRadius: 8,
+                        padding: "6px 14px",
+                        display: "inline-block",
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.08)",
+                        transition: "all 0.3s ease",
+                        minWidth: 100,
+                      }}
+                    >
+                      {session.status === "ONGOING"
+                        ? "Đang sạc"
+                        : session.status === "COMPLETED"
+                        ? "Hoàn tất"
+                        : "Khởi tạo"}
+                    </div>
+                    <p
+                      style={{
+                        color: "#64748b",
+                        marginTop: 6,
+                        fontSize: 14,
+                        textAlign: "center",
+                      }}
+                    >
+                      Trạng thái
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Cột phải - Info */}
+            <div
+              style={{
+                flex: 1,
+                color: "#1e293b",
+                fontSize: 15,
+                lineHeight: "1.9em",
+                paddingLeft: 40,
+                borderLeft: "2px solid #f0f0f0",
+              }}
+            >
+              <div>
+                <b>Trạm:</b> {session.point.station.name}
+              </div>
+              <div>
+                <b>Trụ sạc:</b> {session.point.name}
+              </div>
+              <div>
+                <b>Giá điện:</b>{" "}
+                {session.point.chargerCost.cost.toLocaleString("vi-VN")} đ/phút
+              </div>
+              <div>
+                <b>Bắt đầu:</b>{" "}
+                {new Date(session.date).toLocaleTimeString("vi-VN")}
+              </div>
+              <div>
+                <b>Thanh toán:</b>{" "}
+                {session.paymentMethod === "BALANCE"
+                  ? "Số dư tài khoản"
+                  : "Tiền mặt"}
+              </div>
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingBottom: 10,
+            }}
+          >
+            <Button
+              danger
+              size="large"
+              style={{
+                flex: 1,
+                borderRadius: 8,
+                fontWeight: 700,
+                backgroundColor: "#c70024",
+                border: "none",
+                height: 50,
+                fontSize: 17,
+                color: "#fff",
+                textShadow: "0 1px 3px rgba(0,0,0,0.2)", // ⚡ Làm sáng chữ
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#a5001e"; // đỏ tối hơn khi hover
+                e.currentTarget.style.textShadow =
+                  "0 1px 6px rgba(255,255,255,0.6)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#c70024";
+                e.currentTarget.style.textShadow = "0 1px 3px rgba(0,0,0,0.2)";
+              }}
+              onClick={() => handleStopCharging(session.id)}
+            >
+              Dừng sạc
+            </Button>
+
+            <Button
+              size="large"
+              style={{
+                flex: 1,
+                borderRadius: 8,
+                fontWeight: 700,
+                backgroundColor: "#fff7e6",
+                border: "1px solid #faad14",
+                color: "#fa8c16",
+                height: 50,
+                fontSize: 16,
+              }}
+              icon={<WarningOutlined />}
+              onClick={() =>
+                navigate(
+                  `/driver/chargingSession/stationReport/${session.point.station.id}`
+                )
+              }
+            >
+              Báo cáo sự cố
+            </Button>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 };
