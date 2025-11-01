@@ -13,7 +13,7 @@ const ManageMap = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // ✅ Hook điều hướng
+  const navigate = useNavigate();
 
   // 🔹 Lấy danh sách trạm
   useEffect(() => {

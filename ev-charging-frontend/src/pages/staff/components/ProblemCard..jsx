@@ -1,14 +1,14 @@
-import { Badge, Tag, Card } from "antd"
-import { ThunderboltOutlined, CheckCircleOutlined } from "@ant-design/icons"
+import { Badge, Tag, Card } from "antd";
+import { ThunderboltOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import {
   getStatusColor,
   getStatusBorderColor,
   getStatusBgColor,
-} from "../utils/statusHelpers"
-import { formatDateTime } from "../utils/dateHelpers"
+} from "../utils/statusHelpers";
+import { formatDateTime } from "../utils/dateHelpers";
 
 export const ProblemCard = ({ problem }) => {
-  const statusColor = getStatusColor(problem.status)
+  const statusColor = getStatusColor(problem.status);
 
   return (
     <Card
@@ -36,18 +36,22 @@ export const ProblemCard = ({ problem }) => {
               ? "warning"
               : "default"
           }
-          text={<Tag color={statusColor}>{problem.status || "Chưa cập nhật"}</Tag>}
+          text={
+            <Tag color={statusColor}>{problem.status || "Chưa cập nhật"}</Tag>
+          }
         />
       </div>
 
       <div className="space-y-2 text-gray-600">
         <p className="flex items-start gap-2">
-          <span className="font-medium text-gray-700 min-w-[120px]">Mô tả:</span>
+          <span className="font-medium text-gray-700 min-w-[120px]">
+            Mô tả:
+          </span>
           <span>{problem.description || "Không có mô tả"}</span>
         </p>
         <p className="flex items-center gap-2">
-          <span className="font-medium text-gray-700 min-w-[120px]">Charger Point:</span>
-          <Tag color="blue">{problem.chargerPoint || "N/A"}</Tag>
+          <span className="font-medium text-gray-700 min-w-[120px]">Trạm:</span>
+          <Tag color="blue">{problem?.station?.name || "N/A"}</Tag>
         </p>
         <p className="flex items-center gap-2">
           <span className="font-medium text-gray-700 min-w-[120px]">
@@ -58,8 +62,10 @@ export const ProblemCard = ({ problem }) => {
           </span>
         </p>
         <p className="flex items-center gap-2">
-          <span className="font-medium text-gray-700 min-w-[120px]">Báo cáo bởi:</span>
-          <Tag color="purple">{problem.reportedBy || "Khách hàng"}</Tag>
+          <span className="font-medium text-gray-700 min-w-[120px]">
+            Báo cáo bởi:
+          </span>
+          <Tag color="purple">{problem?.user?.fullName || "Khách hàng"}</Tag>
         </p>
 
         {problem.status === "SOLVED" && (
@@ -89,5 +95,5 @@ export const ProblemCard = ({ problem }) => {
         )}
       </div>
     </Card>
-  )
-}
+  );
+};

@@ -15,14 +15,10 @@ import {
   MailOutlined,
   PhoneOutlined,
   LockOutlined,
-  ManOutlined,
-  WomanOutlined,
 } from "@ant-design/icons";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-// If you're on AntD v5, import the base reset once in your app entry:
-// import "antd/dist/reset.css";
 
 const { Option } = Select;
 
@@ -38,13 +34,12 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const response = await api.post("account/register", values);
-      toast.success("Successfully create new account!");
+      toast.success("Successfully created new account!");
       navigate("/login");
       console.log(response);
-      // eslint-disable-next-line no-unused-vars
-    } catch (e) {
+    } catch {
       message.error("Registration failed. Please try again.");
-      toast.warning("Registration failed. Please try again. ");
+      toast.warning("Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -76,13 +71,17 @@ const RegisterPage = () => {
               gender: "MALE",
               agree: false,
             }}
-            requiredMark={false}
+            requiredMark={false} // không dùng dấu sao mặc định
           >
             <Row gutter={16}>
               {/* Full Name */}
               <Col span={24}>
                 <Form.Item
-                  label="Full name"
+                  label={
+                    <>
+                      Full name <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   name="fullName"
                   rules={[
                     { required: true, message: "Full name is required" },
@@ -107,7 +106,11 @@ const RegisterPage = () => {
               {/* Phone */}
               <Col xs={24} md={12}>
                 <Form.Item
-                  label="Phone"
+                  label={
+                    <>
+                      Phone <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   name="phone"
                   rules={[
                     { required: true, message: "Phone is required" },
@@ -136,7 +139,11 @@ const RegisterPage = () => {
               {/* Email */}
               <Col span={24}>
                 <Form.Item
-                  label="Email"
+                  label={
+                    <>
+                      Email <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   name="email"
                   rules={[
                     { required: true, message: "Email is required" },
@@ -162,7 +169,11 @@ const RegisterPage = () => {
               {/* Password */}
               <Col xs={24} md={12}>
                 <Form.Item
-                  label="Password"
+                  label={
+                    <>
+                      Password <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   name="password"
                   rules={[
                     { required: true, message: "Password is required" },
@@ -183,7 +194,11 @@ const RegisterPage = () => {
               {/* Confirm Password */}
               <Col xs={24} md={12}>
                 <Form.Item
-                  label="Confirm password"
+                  label={
+                    <>
+                      Confirm password <span style={{ color: "red" }}>*</span>
+                    </>
+                  }
                   name="confirmPassword"
                   dependencies={["password"]}
                   hasFeedback
@@ -224,9 +239,16 @@ const RegisterPage = () => {
             >
               <Checkbox>
                 I agree to the{" "}
-                <a href="#" onClick={(e) => e.preventDefault()}>
+                <a
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/terms");
+                  }}
+                  className="text-blue-600 hover:underline"
+                >
                   Terms &amp; Privacy
-                </a>
+                </a>{" "}
+                <span style={{ color: "red" }}>*</span>
               </Checkbox>
             </Form.Item>
 

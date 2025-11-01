@@ -1,11 +1,13 @@
-import { Card } from "antd"
-import { WarningOutlined } from "@ant-design/icons"
-import { ProblemCard } from "../ProblemCard."
-import { StatusBadges } from "../StatusBadges."
-import { getStatusCounts } from "../../utils/problemHelpers"
+import { Card } from "antd";
+import { WarningOutlined } from "@ant-design/icons";
+import { ProblemCard } from "../ProblemCard.";
+import { StatusBadges } from "../StatusBadges.";
+import { getStatusCounts } from "../../utils/problemHelpers";
+import { useProblems } from "./../../hooks/useProblems";
 
-export const IssuesTab = ({ problems, isLoading }) => {
-  const statusCounts = getStatusCounts(problems)
+export const IssuesTab = () => {
+  const { problems, isLoading } = useProblems();
+  const statusCounts = getStatusCounts(problems);
 
   return (
     // 👉 căn giữa toàn bộ nội dung, giống độ rộng của thanh tab
@@ -46,5 +48,5 @@ export const IssuesTab = ({ problems, isLoading }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

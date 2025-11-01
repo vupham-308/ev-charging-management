@@ -13,13 +13,10 @@ import {
   FiSave,
   FiXCircle,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 
 const ProfilePage = () => {
-  const navigate = useNavigate();
-
   const [user, setUser] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -117,8 +114,6 @@ const ProfilePage = () => {
     setPassword({ current: "", new: "", confirm: "" });
   };
 
-  localStorage.setItem("user", JSON.stringify(user));
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-xl">
@@ -129,24 +124,12 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-dark-bg text-text-color font-sans">
-      {/* Header */}
-      <div className="fixed top-0 left-0 w-full bg-black/90 backdrop-blur-lg border-b border-gray-700 z-50 flex items-center px-6 md:px-12 py-4">
-        <button
-          onClick={() => {
-            navigate("/driver");
-          }}
-          className="flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-lg"
-        >
-          <FiArrowLeft /> Quay lại
-        </button>
-        <h1 className="flex-1 text-center text-2xl font-bold text-white tracking-wide">
-          Hồ sơ cá nhân
-        </h1>
-        <div className="w-[80px] md:w-[120px]"></div>
-      </div>
+      <h1 className="text-3xl font-bold text-center text-black tracking-wide mt-16 mb-10">
+        Hồ sơ cá nhân
+      </h1>
 
       {/* Nội dung */}
-      <div className="pt-28 pb-20 px-6 md:px-12 max-w-5xl mx-auto space-y-10">
+      <div className="pb-20 px-6 md:px-12 max-w-5xl mx-auto space-y-10">
         {/* --- Thông tin cơ bản --- */}
         <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg hover:border-primary transition-all duration-300">
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">
