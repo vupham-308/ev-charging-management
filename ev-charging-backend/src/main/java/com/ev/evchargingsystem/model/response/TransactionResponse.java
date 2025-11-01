@@ -12,6 +12,7 @@ import java.util.Date;
 public class TransactionResponse {
     private int id;
     private double totalAmount;
+    private String stationName;
     private String paymentMethod;
     private String paymentType;
     private String status;

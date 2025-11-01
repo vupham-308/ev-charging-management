@@ -69,8 +69,11 @@ public class UserService {
 
 
     private UserInfoResponse convertToUserInfoResponse(User user) {
-        // Sử dụng modelMapper để chuyển đổi tự động
-        return modelMapper.map(user, UserInfoResponse.class);
+        Staff staff = staffRepository.findStaffByUser(user);
+        if(staff !=null){
+            return new UserInfoResponse(user.getId(),user.getFullName(),user.getPhone(),user.getEmail(),user.getRole(),staff.getStation());
+        }
+        return new UserInfoResponse(user.getId(),user.getFullName(),user.getPhone(),user.getEmail(),user.getRole(),null);
     }
 
 //    public void deleteUser(Integer id) {
