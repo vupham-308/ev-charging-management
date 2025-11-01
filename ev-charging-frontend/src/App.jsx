@@ -32,10 +32,10 @@ import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
 import ManageTopup from "./pages/topup";
-import ManagePaymentSuccess from "./pages/paymentSuccess";
 import { useDispatch } from "react-redux";
 import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
 import TermsPrivacyPage from "./pages/terms";
+import PaymentReturn from "./pages/paymentReturn";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -122,6 +122,11 @@ function AppContent() {
           element: <ManageChargingSession />,
         },
         {
+          path: "chargingSession/stationReport/:stationId",
+          element: <ManageStationReport />,
+        },
+
+        {
           path: "incidentReport",
           element: <ManageIncidentReport />,
         },
@@ -143,24 +148,25 @@ function AppContent() {
             },
           ],
         },
+        {
+          path: "profile",
+          element: <ProfilePage />,
+        },
+        {
+          path: "transaction",
+          element: <ManageTransaction />,
+        },
+        {
+          path: "topup",
+          element: <ManageTopup />,
+        },
+        {
+          path: "payment-return",
+          element: <PaymentReturn />,
+        },
       ],
     },
-    {
-      path: "/profile",
-      element: <ProfilePage />,
-    },
-    {
-      path: "/transaction",
-      element: <ManageTransaction />,
-    },
-    {
-      path: "topup",
-      element: <ManageTopup />,
-    },
-    {
-      path: "payment/:id",
-      element: <ManagePaymentSuccess />,
-    },
+
     //  Route dành cho Admin có layout dùng Outlet
     {
       path: "/admin",

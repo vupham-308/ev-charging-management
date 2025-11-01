@@ -1,25 +1,21 @@
 import { useEffect, useState } from "react";
 import { Card, Button, Spin, message, Tag, Select } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Outlet } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
-import { Outlet, useLocation } from "react-router-dom";
+
 const ManageStartChargingBooking = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
 
-  const location = useLocation();
-  const booking = location.state?.booking;
-
   const [station, setStation] = useState(null);
   const [cars, setCars] = useState([]);
-  const [chargers, setChargers] = useState([]);
+  const [chargerInfo, setChargerInfo] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const [selectedCar, setSelectedCar] = useState(null);
-  const [selectedCharger, setSelectedCharger] = useState(null);
   const [targetBattery, setTargetBattery] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [canContinue, setCanContinue] = useState(false);
@@ -27,26 +23,29 @@ const ManageStartChargingBooking = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const myRes = await api.get("/reservations/my");
+        const myActiveBooking = myRes.data.find(
+          (r) => r.stationId === Number(stationId) && r.status !== "CANCELLED"
+        );
+
+        if (!myActiveBooking) {
+          message.warning("⚠️ Bạn chưa có đặt chỗ nào cho trạm này!");
+          setLoading(false);
+          return;
+        }
+
+        const pointID = myActiveBooking.chargerpointId;
+
         const [stationRes, carRes, chargerRes, reviewRes] = await Promise.all([
           api.get(`/station/get/${stationId}`),
           api.get(`/cars`),
-          api.get(`/chargerPoint/getAllAvailable/${stationId}`),
+          api.get(`/chargerPoint/get/${pointID}`),
           api.get(`/review/station/${stationId}`),
-          api.get("/balance"),
         ]);
 
         setStation(stationRes.data);
         setCars(carRes.data);
-        setChargers(chargerRes.data);
-
-        if (booking?.chargerPointId) {
-          const bookedCharger = {
-            id: booking.chargerPointId,
-            name: booking.chargerPointName,
-          };
-          setSelectedCharger(bookedCharger);
-        }
-
+        setChargerInfo(chargerRes.data);
         setReviews(reviewRes.data);
 
         if (reviewRes.data.length > 0) {
@@ -55,25 +54,22 @@ const ManageStartChargingBooking = () => {
             reviewRes.data.length;
           setAverageRating(avg.toFixed(1));
         }
-
-        // eslint-disable-next-line no-unused-vars
       } catch (error) {
+        console.error(error);
         message.error("❌ Lỗi khi tải dữ liệu!");
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, [stationId]);
 
   useEffect(() => {
     setCanContinue(
-      selectedCar &&
-        targetBattery &&
-        paymentMethod &&
-        (booking || selectedCharger)
+      selectedCar && chargerInfo && targetBattery && paymentMethod
     );
-  }, [selectedCar, selectedCharger, targetBattery, paymentMethod, booking]);
+  }, [selectedCar, chargerInfo, targetBattery, paymentMethod]);
 
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
@@ -93,51 +89,28 @@ const ManageStartChargingBooking = () => {
 
     try {
       const token = localStorage.getItem("token");
-
-      // ✅ Lấy ID trụ sạc
-      const chargerPointId = booking?.chargerPointId || selectedCharger?.id;
-      if (!chargerPointId) {
-        message.error("Không tìm thấy trụ sạc!");
-        return;
-      }
-
-      // ✅ Tạo payload gửi lên
       const payload = {
         carId: selectedCar.id,
-
+        pointId: chargerInfo.id,
         goalBattery: targetBattery,
         paymentMethod,
       };
 
-      console.log("📦 Gửi tạo phiên sạc:", payload, "với trụ:", chargerPointId);
+      const res = await api.post("/charge", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      // ✅ Gọi API mới
-      const res = await api.post(
-        `/reservation-charge/${chargerPointId}`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log("✅ Phản hồi từ /reservation-charge:", res.data);
-      message.success("Tạo phiên sạc thành công!");
-
-      // ✅ Chuyển tới trang xác nhận hóa đơn
       navigate("/driver/confirmBill", {
         state: {
-          chargeData: res.data, // dữ liệu backend trả về
+          chargeData: res.data,
           station,
           selectedCar,
-          selectedCharger,
+          selectedCharger: chargerInfo,
           targetBattery,
           paymentMethod,
         },
       });
     } catch (err) {
-      console.error("❌ Lỗi khi tạo phiên sạc:", err);
       const errorMsg =
         err.response?.data?.message ||
         err.response?.data ||
@@ -161,18 +134,15 @@ const ManageStartChargingBooking = () => {
       </p>
     );
 
-  const { name, address, pointChargerAvailable, pointChargerTotal } = station;
-
   return (
     <div style={{ padding: "30px 60px" }}>
       <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>
         Bắt đầu sạc
       </h1>
       <p style={{ color: "#666", marginBottom: 24 }}>
-        Chọn trạm sạc và bắt đầu phiên sạc
+        Trụ sạc đã được bạn đặt trước đó
       </p>
 
-      {/* Layout 3 cột */}
       <div
         style={{
           display: "grid",
@@ -180,7 +150,7 @@ const ManageStartChargingBooking = () => {
           gap: 24,
         }}
       >
-        {/* --- Cột 1: Thông tin trạm --- */}
+        {/* --- Cột 1: Trạm --- */}
         <Card
           style={{
             borderRadius: 12,
@@ -189,44 +159,14 @@ const ManageStartChargingBooking = () => {
           }}
         >
           <h3 style={{ marginBottom: 8, fontWeight: 600 }}>Trạm đã chọn</h3>
-          <p style={{ fontSize: 16, fontWeight: 500 }}>{name}</p>
-          <p style={{ color: "#777", marginBottom: 8 }}>{address}</p>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <p style={{ color: "#1890ff" }}>
-              {pointChargerAvailable}/{pointChargerTotal} trụ trống
-            </p>
-          </div>
-
+          <p style={{ fontSize: 16, fontWeight: 500 }}>{station.name}</p>
+          <p style={{ color: "#777", marginBottom: 8 }}>{station.address}</p>
           <Tag color="green" style={{ borderRadius: 12 }}>
             Sạc nhanh
           </Tag>
-
-          <Button
-            danger
-            type="default"
-            style={{
-              width: "100%",
-              marginTop: 16,
-              borderRadius: 8,
-              fontWeight: 500,
-            }}
-            onClick={() =>
-              navigate(`/driver/startCharging/${stationId}/stationReport`)
-            }
-          >
-            Báo cáo sự cố
-          </Button>
         </Card>
 
-        {/*--- Cột 2: Cài đặt sạc --- */}
+        {/* --- Cột 2: Cài đặt sạc --- */}
         <Card
           style={{
             borderRadius: 12,
@@ -235,13 +175,12 @@ const ManageStartChargingBooking = () => {
           }}
         >
           <h3 style={{ marginBottom: 8, fontWeight: 600 }}>Cài đặt sạc</h3>
-          <p style={{ color: "#777", marginBottom: 16 }}>Chọn xe và trụ sạc</p>
 
-          {/* Chọn xe */}
+          {/* Xe */}
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontWeight: 500, marginBottom: 6 }}>Xe của bạn</p>
             <Select
-              placeholder="Chọn xe "
+              placeholder="Chọn xe"
               style={{ width: "100%" }}
               onChange={(id) =>
                 setSelectedCar(cars.find((car) => car.id === id))
@@ -255,54 +194,64 @@ const ManageStartChargingBooking = () => {
             </Select>
           </div>
 
-          {/* Chọn trụ sạc */}
-          <p style={{ fontWeight: 500, marginBottom: 6 }}>Trụ sạc</p>
-          {booking ? (
-            <div
+          {/* Trụ sạc đã đặt */}
+          <div style={{ marginBottom: 16 }}>
+            <p
               style={{
-                backgroundColor: "#f6ffed",
-                border: "1px solid #b7eb8f",
-                borderRadius: 8,
-                padding: "10px 12px",
+                color: "#28a745",
+                fontWeight: 600,
                 marginBottom: 8,
                 display: "flex",
-                justifyContent: "space-between",
                 alignItems: "center",
+                gap: 6,
               }}
             >
-              <p style={{ margin: 0, fontWeight: 500, color: "#000" }}>
-                {booking.chargerPointName}
-              </p>
-              <Tag
-                color="green"
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  backgroundColor: "#28a745",
+                }}
+              ></span>
+              Trụ sạc đã đặt
+            </p>
+
+            <Card
+              style={{
+                width: "100%", // ✅ bằng với Select box
+                border: "1px solid #28a745",
+                borderRadius: 10,
+                backgroundColor: "#f6fff8",
+                color: "#155724",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                padding: "10px 16px",
+                fontWeight: 500,
+              }}
+            >
+              <p
                 style={{
                   margin: 0,
-                  borderRadius: 6,
-                  fontWeight: 500,
-                  fontSize: 13,
+                  fontSize: 15,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  flexWrap: "wrap", // ✅ tự xuống dòng nếu nhỏ
                 }}
               >
-                Trụ đã đặt trước
-              </Tag>
-            </div>
-          ) : (
-            <Select
-              placeholder="Chọn trụ sạc"
-              style={{ width: "100%" }}
-              onChange={(id) =>
-                setSelectedCharger(chargers.find((c) => c.id === id))
-              }
-            >
-              {chargers.map((ch) => (
-                <Select.Option key={ch.id} value={ch.id}>
-                  {ch.name} • {ch.capacity}kW • {ch.chargerCost?.portType} •{" "}
-                  {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/kWh
-                </Select.Option>
-              ))}
-            </Select>
-          )}
+                <strong>{chargerInfo?.name}</strong>
+                <span>• {chargerInfo?.capacity}kW</span>
+                <span>• {chargerInfo?.chargerCost?.portType}</span>
+                <span>
+                  • {chargerInfo?.chargerCost?.cost?.toLocaleString("vi-VN")}{" "}
+                  đ/kWh
+                </span>
+              </p>
+            </Card>
+          </div>
 
-          {/* Mục tiêu pin */}
+          {/* Mức pin */}
           <div style={{ marginBottom: 16 }}>
             <p style={{ fontWeight: 500, marginBottom: 6 }}>Mục tiêu pin (%)</p>
             <Select
@@ -319,7 +268,7 @@ const ManageStartChargingBooking = () => {
             </Select>
           </div>
 
-          {/* Phương thức thanh toán */}
+          {/* Thanh toán */}
           <div style={{ marginBottom: 24 }}>
             <p style={{ fontWeight: 500, marginBottom: 6 }}>
               Phương thức thanh toán
@@ -334,7 +283,6 @@ const ManageStartChargingBooking = () => {
             </Select>
           </div>
 
-          {/* Nút tiếp tục */}
           <Button
             type="primary"
             block
@@ -351,7 +299,7 @@ const ManageStartChargingBooking = () => {
           </Button>
         </Card>
 
-        {/* --- Cột 3: Đánh giá trạm --- */}
+        {/* --- Cột 3: Đánh giá --- */}
         <Card
           style={{
             borderRadius: 12,
@@ -359,13 +307,10 @@ const ManageStartChargingBooking = () => {
             padding: 16,
           }}
         >
-          <h3 style={{ marginBottom: 8, fontWeight: 600 }}>
-            Đánh giá trạm sạc
-          </h3>
+          <h3 style={{ marginBottom: 8, fontWeight: 600 }}>Đánh giá trạm</h3>
           <p style={{ color: "#777", marginBottom: 12 }}>
             Chia sẻ từ các tài xế khác
           </p>
-
           <div style={{ marginBottom: 12 }}>
             <span
               style={{
@@ -382,7 +327,6 @@ const ManageStartChargingBooking = () => {
               {reviews.length} đánh giá
             </span>
           </div>
-
           {reviews.slice(0, 3).map((r) => (
             <div
               key={r.id}

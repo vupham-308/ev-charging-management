@@ -7,7 +7,7 @@ import {
   MailOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Card, Button, Spin, DatePicker, Modal, message } from "antd";
+import { Card, Button, Spin, DatePicker, Modal, message, Tooltip } from "antd";
 import api from "../../config/axios";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
@@ -25,32 +25,11 @@ const ManageBooking = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [reservations, setReservations] = useState([]);
 
-  const allTimes = [
-    "08:00",
-    "08:30",
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-    "12:30",
-    "13:00",
-    "13:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-    "17:00",
-    "17:30",
-    "18:00",
-    "18:30",
-    "19:00",
-    "19:30",
-  ];
+  const allTimes = Array.from({ length: 48 }, (_, i) => {
+    const hour = Math.floor(i / 2);
+    const minute = i % 2 === 0 ? "00" : "30";
+    return `${hour.toString().padStart(2, "0")}:${minute}`;
+  });
 
   // 🧠 Gọi API lấy trạm + trụ
   useEffect(() => {
@@ -312,21 +291,61 @@ const ManageBooking = () => {
               <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1 border border-gray-200 rounded-xl">
                 {allTimes.map((time) => {
                   const booked = isTimeBooked(time);
+
+                  // Hàm lấy tên trụ sạc đã bị đặt vào khung giờ time
+                  const chargersBooked = bookedSlots
+                    .filter((slot) => {
+                      const start = dayjs(slot.startDate);
+                      const end = dayjs(slot.endDate);
+                      const selectedStart = dayjs(
+                        `${selectedDate?.format("YYYY-MM-DD")} ${time}`
+                      );
+                      return (
+                        selectedStart.isAfter(start.subtract(1, "minute")) &&
+                        selectedStart.isBefore(end)
+                      );
+                    })
+                    .map((slot) => {
+                      const charger = chargers.find(
+                        (c) => c.id === slot.chargerPointId
+                      );
+                      return charger
+                        ? charger.name || `Trụ #${charger.id}`
+                        : "Trụ đã đặt vào thời gian này";
+                    });
+
+                  const tooltipTitle = booked
+                    ? ` ${chargersBooked.join(", ")}`
+                    : "";
+
+                  // 🕒 Nếu là hôm nay => chặn giờ trong quá khứ
+                  const now = dayjs();
+                  const selectedStart = dayjs(
+                    `${selectedDate?.format("YYYY-MM-DD")} ${time}`
+                  );
+                  const isPast =
+                    selectedDate &&
+                    selectedDate.isSame(now, "day") &&
+                    selectedStart.isBefore(now);
+
+                  const disabled = booked || isPast;
+
                   return (
-                    <button
-                      key={time}
-                      disabled={booked}
-                      onClick={() => !booked && setSelectedTime(time)}
-                      className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
-                        booked
-                          ? "bg-red-100 text-red-400 cursor-not-allowed"
-                          : selectedTime === time
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {time}
-                    </button>
+                    <Tooltip key={time} title={tooltipTitle} placement="top">
+                      <button
+                        disabled={disabled}
+                        onClick={() => !disabled && setSelectedTime(time)}
+                        className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
+                          disabled
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : selectedTime === time
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                        }`}
+                      >
+                        {time}
+                      </button>
+                    </Tooltip>
                   );
                 })}
               </div>

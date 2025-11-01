@@ -26,12 +26,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  /*
-    1. Cập nhật => dispatch
-    2. Get => selector
-
-  */
-
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   const onFinish = async (values) => {
