@@ -16,6 +16,7 @@ import Users from "./pages/admin/Users";
 import IncidentManagement from "./pages/admin/IncidentManagement";
 import ChargingRates from "./pages/admin/ChargingRates";
 import ChargingStations from "./pages/admin/ChargingStations";
+import StationDetail from "./pages/admin/StationDetail";
 
 import ManageMap from "./pages/map";
 import ManageMyCar from "./pages/myCar";
@@ -177,6 +178,10 @@ function AppContent() {
         {
           path: "users",
           element: <Users />,
+        },
+        {
+          path: "station/:id",
+          element: <StationDetail />,
         },
         {
           path: "stations",

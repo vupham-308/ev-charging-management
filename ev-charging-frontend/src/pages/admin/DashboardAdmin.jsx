@@ -8,6 +8,7 @@ const Dashboard = () => {
     const [stationStats, setStationStats] = useState(null);
     const [userStats, setUserStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [revenue, setRevenue] = useState(null); // ✅ Đổi tên state cho đúng ý nghĩa
 
     // Giữ nguyên dữ liệu mẫu cho Top trạm sạc (chưa có API)
     const topStations = [
@@ -59,10 +60,20 @@ const Dashboard = () => {
         }
     };
 
+    //Tong doanh thu
+    const fetchTotalRevenue = async () => {
+        try {
+            const res = await api.get("station/admin/total-revenue-month");
+            setRevenue(res.data); //  API trả về số, gán trực tiếp
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải doanh thu tháng!");
+        }
+    };
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            await Promise.all([fetchStationStats(), fetchUserStats()]);
+            await Promise.all([fetchStationStats(), fetchUserStats(), fetchTotalRevenue()]);
             setLoading(false);
         };
         loadData();
@@ -89,7 +100,7 @@ const Dashboard = () => {
                         <h2>{stationStats?.totalStations ?? 0}</h2>
                         <p>
                             {stationStats?.activeStations ?? 0} hoạt động,{" "}
-{stationStats?.inactiveStations ?? 0} ngưng hoạt động
+                            {stationStats?.inactiveStations ?? 0} ngưng hoạt động
                         </p>
                     </div>
                     <div className="card-icon blue">
@@ -128,8 +139,7 @@ const Dashboard = () => {
                 <div className="card">
                     <div className="card-info">
                         <h4>Doanh thu tháng</h4>
-                        <h2>3350.5M</h2>
-                        <p className="increase">+12.5% so với tháng trước</p>
+                        <h2>{revenue ? `${revenue.toLocaleString("vi-VN")} VND` : "0 VND"}</h2>
                     </div>
                     <div className="card-icon green">
                         <i className="fa-solid fa-dollar-sign"></i>
@@ -157,7 +167,7 @@ const Dashboard = () => {
 
                 {/* Phân bố người dùng */}
                 <div className="panel">
-<h4>Người dùng theo vai trò</h4>
+                    <h4>Người dùng theo vai trò</h4>
                     <p>Phân bố người dùng trong hệ thống</p>
                     <div className="role-card driver">
                         <i className="fa-solid fa-user"></i> Tài xế{" "}
