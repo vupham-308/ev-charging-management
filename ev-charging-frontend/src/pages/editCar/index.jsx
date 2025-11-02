@@ -7,7 +7,6 @@ import {
   FiTruck,
   FiDroplet,
   FiHash,
-  FiBatteryCharging,
 } from "react-icons/fi";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
@@ -233,34 +232,6 @@ const ManageEditCar = () => {
               placeholder="VD: 51A-123.45"
               size="large"
               style={{
-                borderRadius: 10,
-                borderColor: "#cbd5e1",
-              }}
-            />
-          </div>
-
-          {/* Pin */}
-          <div style={{ marginBottom: 22 }}>
-            <label
-              style={{
-                fontWeight: 600,
-                marginBottom: 6,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                color: "#334155",
-              }}
-            >
-              <FiBatteryCharging /> Mức pin khởi tạo (%)
-            </label>
-            <InputNumber
-              min={0}
-              max={100}
-              value={initBattery}
-              onChange={(value) => setInitBattery(value)}
-              size="large"
-              style={{
-                width: "100%",
                 borderRadius: 10,
                 borderColor: "#cbd5e1",
               }}

@@ -95,7 +95,7 @@ const ManageMap = () => {
               borderRadius: "8px",
             }}
           >
-            Bộ lọc
+            Tìm kiếm
           </Button>
         </div>
 

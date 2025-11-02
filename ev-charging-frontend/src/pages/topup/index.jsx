@@ -42,7 +42,7 @@ const ManageTopup = () => {
         toast.success(
           `✅ Nạp ${data.totalAmount.toLocaleString("vi-VN")} VND thành công!`
         );
-        navigate("/transaction");
+        navigate("/driver/transaction");
       } else {
         toast.warning("⚠️ Giao dịch chưa hoàn tất hoặc không hợp lệ!");
       }

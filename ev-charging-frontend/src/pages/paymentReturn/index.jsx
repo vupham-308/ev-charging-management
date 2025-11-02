@@ -19,13 +19,13 @@ const PaymentReturn = () => {
 
       // Chờ 1 chút rồi chuyển về trang transaction
       setTimeout(() => {
-        navigate("/transaction");
+        navigate("/driver/transaction");
       });
     } else {
       // ❌ Hiển thị toast thất bại
       toast.error("Thanh toán thất bại hoặc bị hủy!");
       setTimeout(() => {
-        navigate("/transaction");
+        navigate("/driver/transaction");
       });
     }
   }, [location, navigate]);
