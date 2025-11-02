@@ -160,13 +160,12 @@ function AppContent() {
           path: "topup",
           element: <ManageTopup />,
         },
-        {
-          path: "payment-return",
-          element: <PaymentReturn />,
-        },
       ],
     },
-
+    {
+      path: "payment-return",
+      element: <PaymentReturn />,
+    },
     //  Route dành cho Admin có layout dùng Outlet
     {
       path: "/admin",

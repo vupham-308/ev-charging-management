@@ -69,6 +69,7 @@ const ManageBooking = () => {
       selectedDate &&
       selectedCharger &&
       r.stationId === Number(stationId) &&
+      r.chargerpointId === selectedCharger && // 🔹 Chỉ lấy slot của trụ đã chọn
       dayjs(r.startDate).isSame(selectedDate, "day")
     );
   });

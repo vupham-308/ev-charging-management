@@ -38,9 +38,9 @@ const ManageConfirmBill = () => {
   }
 
   const { station, selectedCharger } = state;
+  const { brand: carName } = state.selectedCar || {};
   const {
     point,
-    carName,
     paymentMethod: method,
     minute,
     fee,

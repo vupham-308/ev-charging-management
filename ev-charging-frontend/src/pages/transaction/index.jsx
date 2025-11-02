@@ -58,7 +58,12 @@ const ManageTransaction = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        setTransactions(resTransactions.data);
+
+        const sortedTransactions = [...resTransactions.data].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+        setTransactions(sortedTransactions);
+
         setBalance(resBalance.data);
         setReport(resReport.data);
       } catch (err) {
@@ -193,7 +198,7 @@ const ManageTransaction = () => {
             padding: "0 24px",
             backdropFilter: "blur(8px)",
           }}
-          onClick={() => navigate("/topup")}
+          onClick={() => navigate("/driver/topup")}
         >
           Nạp tiền
         </Button>

@@ -11,7 +11,7 @@ import {
   FaArrowLeft,
 } from "react-icons/fa";
 import api from "../../config/axios";
-
+import { useEffect } from "react";
 const { TextArea } = Input;
 
 const ManageStationReport = () => {
@@ -21,6 +21,23 @@ const ManageStationReport = () => {
   const [problemTitle, setProblemTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [stationName, setStationName] = useState("");
+
+  useEffect(() => {
+    const fetchStation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get(`/station/get/${stationId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStationName(res.data.name);
+      } catch (err) {
+        console.error("❌ Lỗi khi tải thông tin trạm:", err);
+        setStationName("Không xác định");
+      }
+    };
+    fetchStation();
+  }, [stationId]);
 
   const handleSubmit = async () => {
     if (!problemTitle || !description) {
@@ -74,9 +91,7 @@ const ManageStationReport = () => {
             <FaChargingStation className="text-green-600" />
             Trạm sạc:
           </div>
-          <p className="ml-6 mt-1 text-gray-700 font-semibold">
-            Trung tâm thương mại Vincom
-          </p>
+          <p className="ml-6 mt-1 text-gray-700 font-semibold">{stationName}</p>
         </div>
 
         {/* Tiêu đề sự cố */}
