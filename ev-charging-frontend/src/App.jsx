@@ -16,6 +16,7 @@ import Users from "./pages/admin/Users";
 import IncidentManagement from "./pages/admin/IncidentManagement";
 import ChargingRates from "./pages/admin/ChargingRates";
 import ChargingStations from "./pages/admin/ChargingStations";
+import StationDetail from "./pages/admin/StationDetail";
 
 import ManageMap from "./pages/map";
 import ManageMyCar from "./pages/myCar";
@@ -76,14 +77,14 @@ function AppContent() {
       path: "/register",
       element: <RegisterPage />,
     },
+
+    { path: "/staff", element: <StaffDashboard /> },
+
     {
       path: "/terms",
       element: <TermsPrivacyPage />,
     },
-    {
-      path: "/staff",
-      element: <StaffDashboard />,
-    },
+
     {
       path: "/driver",
       element: <DriverDashboard />,
@@ -183,6 +184,10 @@ function AppContent() {
         {
           path: "users",
           element: <Users />,
+        },
+        {
+          path: "station/:id",
+          element: <StationDetail />,
         },
         {
           path: "stations",

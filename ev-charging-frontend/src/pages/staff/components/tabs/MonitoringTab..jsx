@@ -6,6 +6,7 @@ import {
 import { FaHeartbeat } from "react-icons/fa";
 import React from "react";
 import { Button, Card } from "antd";
+import { formatDateTime } from "../../utils/dateHelpers";
 
 const statusStyles = {
   AVAILABLE: {
@@ -170,10 +171,37 @@ export const MonitoringTab = ({
                       {point.status === "AVAILABLE" && (
                         <p>Sẵn sàng cho khách hàng tiếp theo</p>
                       )}
-                      {point.status === "RESERVED" && <p>Đã được đặt chỗ</p>}
+                      {point.status === "RESERVED" && (
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 font-medium">
+                              Đặt bởi:
+                            </span>
+                            <span className="font-semibold text-gray-800">
+                              {point?.reservation?.user?.fullName}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 font-medium">
+                              Thời gian:
+                            </span>
+                            <span className="font-medium text-gray-800">
+                              {`${
+                                formatDateTime(
+                                  point.reservation.startDate
+                                ).split(" ")[1]
+                              } - ${
+                                formatDateTime(point.reservation.endDate).split(
+                                  " "
+                                )[1]
+                              }`}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                       {point.status === "OCCUPIED" && <p>Đang sạc</p>}
                       {point.status === "OUT_OF_SERVICE" && (
-                        <p className="text-red-600 font-medium">Đang bảo trì</p>  
+                        <p className="text-red-600 font-medium">Đang bảo trì</p>
                       )}
                     </div>
 

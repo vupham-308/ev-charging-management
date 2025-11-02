@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../admin/ChargingStations.css";
 import api from "../../config/axios";
 import { Spin, message, Modal, Form, Input, Button, Select } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -14,6 +15,7 @@ const ChargingStations = () => {
     const [editingStation, setEditingStation] = useState(null);
     const [form] = Form.useForm();
     const [modal, contextHolder] = Modal.useModal();
+    const navigate = useNavigate();
 
     // Lấy danh sách trạm
     const fetchStations = async () => {
@@ -55,7 +57,7 @@ const ChargingStations = () => {
     // Xem chi tiết trạm
     const handleView = async (id) => {
         try {
-            const res = await api.get(`station/get/${id}`);
+            const res = await api.get(`station/admin/detail/${id}`);
             const data = res.data;
             Modal.info({
                 title: "Chi tiết trạm sạc",
@@ -191,7 +193,7 @@ const ChargingStations = () => {
                                     </div>
 
                                     <div className="station-actions">
-                                        <button onClick={() => handleView(s.id)}>👁 Xem</button>
+                                        <button onClick={() => navigate(`/admin/station/${s.id}`)}>👁 Xem</button>
                                         <button onClick={() => openModal(s)}>✏️ Sửa</button>
                                         <button onClick={() => handleDelete(s.id)}>🗑 Xóa</button>
                                     </div>
