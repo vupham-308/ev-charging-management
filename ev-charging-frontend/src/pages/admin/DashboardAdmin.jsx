@@ -7,36 +7,9 @@ import { Spin, message } from "antd";
 const Dashboard = () => {
     const [stationStats, setStationStats] = useState(null);
     const [userStats, setUserStats] = useState(null);
+    const [revenue, setRevenue] = useState(null);
+    const [topStations, setTopStations] = useState([]); // 🟢 Dữ liệu từ API thật
     const [loading, setLoading] = useState(true);
-    const [revenue, setRevenue] = useState(null); // ✅ Đổi tên state cho đúng ý nghĩa
-
-    // Giữ nguyên dữ liệu mẫu cho Top trạm sạc (chưa có API)
-    const topStations = [
-        {
-            id: 1,
-            name: "Sân bay Tân Sơn Nhất",
-            address: "Sân bay Tân Sơn Nhất, Quận Tân Bình, TP.HCM",
-            revenue: "79.48M VND",
-        },
-        {
-            id: 2,
-            name: "Trạm nghỉ cao tốc Long Thành",
-            address: "Cao tốc TP.HCM - Long Thành, Đồng Nai",
-            revenue: "53.82M VND",
-        },
-        {
-            id: 3,
-            name: "Trung tâm thương mại Vincom",
-            address: "123 Nguyễn Huệ, Quận 1, TP.HCM",
-            revenue: "28.67M VND",
-        },
-        {
-            id: 4,
-            name: "Ga Metro Bến Thành",
-            address: "456 Lê Lợi, Quận 1, TP.HCM",
-            revenue: "13.04M VND",
-        },
-    ];
 
     // 🟢 Gọi API thống kê trạm
     const fetchStationStats = async () => {
@@ -60,20 +33,37 @@ const Dashboard = () => {
         }
     };
 
-    //Tong doanh thu
+    // 🟢 Gọi API doanh thu tháng
     const fetchTotalRevenue = async () => {
         try {
             const res = await api.get("station/admin/total-revenue-month");
-            setRevenue(res.data); //  API trả về số, gán trực tiếp
+            setRevenue(res.data);
         } catch (error) {
             console.error(error);
             message.error("Không thể tải doanh thu tháng!");
         }
     };
+
+    // 🟢 Gọi API top doanh thu trạm sạc
+    const fetchTopStations = async () => {
+        try {
+            const res = await api.get("station/top-revenue");
+            setTopStations(res.data || []);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải top doanh thu trạm sạc!");
+        }
+    };
+
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            await Promise.all([fetchStationStats(), fetchUserStats(), fetchTotalRevenue()]);
+            await Promise.all([
+                fetchStationStats(),
+                fetchUserStats(),
+                fetchTotalRevenue(),
+                fetchTopStations(),
+            ]);
             setLoading(false);
         };
         loadData();
@@ -135,7 +125,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Doanh thu (chưa có API) */}
+                {/* Doanh thu tháng */}
                 <div className="card">
                     <div className="card-info">
                         <h4>Doanh thu tháng</h4>
@@ -187,22 +177,28 @@ const Dashboard = () => {
             {/* ---- Top Stations ---- */}
             <div className="panel top-stations">
                 <h4>Top trạm sạc theo doanh thu</h4>
-                <p>5 trạm có doanh thu cao nhất hôm nay</p>
+                <p>5 trạm có doanh thu cao nhất</p>
                 <div className="station-list">
-                    {topStations.map((s) => (
-                        <div key={s.id} className="station-item">
-                            <div className="station-left">
-                                <div className="station-rank">{s.id}</div>
-                                <div className="station-info">
-                                    <h5>{s.name}</h5>
-                                    <span>{s.address}</span>
+                    {topStations.length > 0 ? (
+                        topStations.map((s, index) => (
+                            <div key={s.stationId} className="station-item">
+                                <div className="station-left">
+                                    <div className="station-rank">{index + 1}</div>
+                                    <div className="station-info">
+                                        <h5>{s.stationName}</h5>
+                                        <span>{s.address}</span>
+                                    </div>
+                                </div>
+                                <div className="station-right">
+                                    <span className="revenue">
+                                        {s.totalRevenue.toLocaleString("vi-VN")} VND
+                                    </span>
                                 </div>
                             </div>
-                            <div className="station-right">
-                                <span className="revenue">{s.revenue}</span>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p>Không có dữ liệu doanh thu.</p>
+                    )}
                 </div>
             </div>
         </div>

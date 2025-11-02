@@ -34,7 +34,6 @@ const LoginPage = () => {
       const response = await api.post("account/login", values);
 
       const { token, role } = response.data;
-      toast.success("Successfully login!");
       localStorage.setItem("token", token);
 
       if (!token) {

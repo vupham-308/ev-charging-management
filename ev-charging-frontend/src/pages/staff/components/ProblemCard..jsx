@@ -42,15 +42,7 @@ export const ProblemCard = ({ problem }) => {
 
   const statusColor = getStatusColor(localStatus);
 
-  // --- Mở modal cập nhật trạng thái (chỉ khi PENDING) ---
-  const openStatusModal = () => {
-    if (localStatus !== "PENDING") {
-      message.warning("Chỉ có thể cập nhật trạng thái khi đang ở trạng thái PENDING!");
-      return;
-    }
-    setNewStatus(localStatus);
-    setIsStatusModalVisible(true);
-  };
+
 
   // --- Mở modal phản hồi (chỉ khi PENDING) ---
   const openRespondModal = () => {
@@ -188,7 +180,7 @@ export const ProblemCard = ({ problem }) => {
 
               {localResponse && (
                 <div className="ml-6 bg-gray-50 border-l-4 border-green-400 px-3 py-2 rounded-md text-gray-800 italic">
-                  {localResponse}
+                  {localResponse.replace(/Đã được trả lời bởi.*/i, "").trim()}
                 </div>
               )}
             </div>
@@ -197,13 +189,13 @@ export const ProblemCard = ({ problem }) => {
 
         {/* --- Nút hành động (chỉ khi PENDING) --- */}
         {localStatus === "PENDING" && (
-          <div className="flex gap-2 mt-4">
-            <Button type="primary" onClick={openStatusModal}>
-              Cập nhật trạng thái
-            </Button>
-            <Button onClick={openRespondModal}>Phản hồi</Button>
-          </div>
-        )}
+  <div className="flex gap-2 mt-4">
+    <Button type="primary" onClick={openRespondModal}>
+      Phản hồi
+    </Button>
+  </div>
+)}
+
       </Card>
 
       {/* --- Modal cập nhật trạng thái --- */}

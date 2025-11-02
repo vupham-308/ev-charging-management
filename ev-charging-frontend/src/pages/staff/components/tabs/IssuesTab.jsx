@@ -41,7 +41,9 @@ export const IssuesTab = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-1 gap-4">
-            {problems.map((problem) => (
+            {[...problems]
+              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 👈 Sắp xếp theo ngày tạo (mới nhất trước)
+              .map((problem) => (
               <ProblemCard key={problem.id} problem={problem} />
             ))}
           </div>
