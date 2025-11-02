@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
@@ -220,14 +221,18 @@ public class StationService {
         );
     }
 
-    public StaffDashboardResponse getTodayStatsByStationId(int stationId) {
+    public StaffDashboardResponse getThisWeekStatsByStationId(int stationId) {
         // Lấy trạm theo id
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy trạm với ID: " + stationId));
 
+        // Lấy khoảng thời gian đầu và cuối tuần hiện tại
         LocalDate today = LocalDate.now();
-        Date start = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Date end = Date.from(today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+        LocalDate endOfWeek = today.with(DayOfWeek.SUNDAY).plusDays(1);
+
+        Date start = Date.from(startOfWeek.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(endOfWeek.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         double revenue = transactionRepository.sumByStationAndDateRange(stationId, start, end);
         long customers = chargingSessionRepository.countDistinctUserByStationAndDate(stationId, start, end);

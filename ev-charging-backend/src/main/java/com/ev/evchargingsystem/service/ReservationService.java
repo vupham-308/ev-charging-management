@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.ChargerPoint;
+import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.entity.Reservation;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.ReservationRequest;
@@ -124,6 +125,7 @@ public class ReservationService {
         }
     }
 
+
     public List<ReservationResponse> getUserReservations(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
@@ -208,8 +210,10 @@ public class ReservationService {
 
         reservation.setStatus("CANCELLED");
         ChargerPoint p = reservation.getChargerPoint();
-        p.setStatus("AVAILABLE");
-        chargerPointRepository.save(p);
+        if(p.getStatus().equals("RESERVED")) {
+            p.setStatus("AVAILABLE");
+            chargerPointRepository.save(p);
+        }
         reservationRepository.save(reservation);
     }
 

@@ -95,13 +95,13 @@ public class StationController {
         return ResponseEntity.ok(detail);
     }
 
-    @Operation(summary = "ADMIN xem doanhthu, số người dùng, phiên sạc trong ngày của trạm sạc")
     @GetMapping("/admin/dashboard-status/{stationId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<StaffDashboardResponse> getDashboardForAdmin(@PathVariable int stationId) {
-        StaffDashboardResponse response = stationService.getTodayStatsByStationId(stationId);
+        StaffDashboardResponse response = stationService.getThisWeekStatsByStationId(stationId);
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/top-revenue")
     @PreAuthorize("hasAuthority('ADMIN')")
