@@ -82,11 +82,17 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Integer id) {
+        User currentUser = getCurrentUser(); // lấy user đang đăng nhập
+
+        if (currentUser.getId()==(id)) {
+            throw new RuntimeException("Không thể tự xóa chính mình");
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy User với id: " + id));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User này đã xóa");
+            throw new RuntimeException("User này đã bị xóa");
         }
 
         user.setActive(false);
