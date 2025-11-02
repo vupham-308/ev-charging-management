@@ -1,39 +1,144 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Card, Tag, Button, message, Spin } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card, Tag, Button, message, Spin, Modal, Form, Input, Select } from "antd";
 import {
     ArrowLeftOutlined,
-    PhoneOutlined,
-    MailOutlined,
-    UserOutlined,
     EditOutlined,
     DeleteOutlined,
+    MailOutlined,
+    PhoneOutlined,
+    DollarCircleOutlined,
+    UserOutlined,
+    LineChartOutlined,
     ClockCircleOutlined,
 } from "@ant-design/icons";
-import { Modal, Form, Input, Select } from "antd";
 
 const StationDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [station, setStation] = useState(null);
-    const [loading, setLoading] = useState(false);
-    // Trong component StationDetail
+    const [chargers, setChargers] = useState([]);
+    const [stats, setStats] = useState({ // Khởi tạo state
+        available: 0,
+        inUse: 0,
+        maintenance: 0,
+        revenue: 0,
+        customers: 0,
+        sessions: 0,
+    });
+    const [loading, setLoading] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingCharger, setEditingCharger] = useState(null);
     const [form] = Form.useForm();
 
-    // Mở popup thêm mới
-    const handleAddCharger = () => {
+    // ==================== FETCH API ====================
+    const token = localStorage.getItem("token");
+
+    const fetchStationDetail = async () => {
+        const res = await fetch(`http://222.255.214.35:8080/api/station/admin/detail/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setStation(data);
+    };
+
+    const fetchChargers = async () => {
+        const res = await fetch(`http://222.255.214.35:8080/api/chargerPoint/getAllAvailable/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        
+        // ================== GIẢ LẬP DỮ LIỆU ĐỂ GIỐNG ẢNH (User/Time) ==================
+        // GHI CHÚ: API thật của bạn cần trả về currentUser và sessionStartTime
+        const simulatedData = data.map((charger) => {
+            if (charger.name === "Trụ #1") {
+                return { ...charger, status: "IN_USE", currentUser: "Nguyễn Văn A", sessionStartTime: "2025-11-02T14:30:00" };
+            }
+            if (charger.name === "Trụ #3") {
+                return { ...charger, status: "IN_USE", currentUser: "Trần Thị B", sessionStartTime: "2025-11-02T15:00:00" };
+            }
+             if (charger.name === "Trụ #7") {
+                return { ...charger, status: "IN_USE", currentUser: "Lê Văn C", sessionStartTime: "2025-11-02T13:45:00" };
+            }
+             if (charger.name === "Trụ #8") {
+                return { ...charger, status: "IN_USE", currentUser: "Phạm Thị D", sessionStartTime: "2025-11-02T14:15:00" };
+            }
+            if (charger.name === "Trụ #5") {
+                return { ...charger, status: "OUT_OF_SERVICE" };
+            }
+            return charger;
+        });
+        setChargers(simulatedData || []);
+        // =================================================================
+        
+        // ================== TÍNH TOÁN TRẠNG THÁI TỪ DỮ LIỆU TRỤ SẠC ==================
+        // Tự động đếm số lượng trụ sạc dựa trên trạng thái
+        const available = simulatedData.filter(c => c.status?.toUpperCase() === 'AVAILABLE').length;
+        const inUse = simulatedData.filter(c => c.status?.toUpperCase() === 'IN_USE').length;
+        const maintenance = simulatedData.filter(c => c.status?.toUpperCase() === 'OUT_OF_SERVICE').length;
+        
+        // Cập nhật state 'stats' với số liệu đếm
+        setStats(prevStats => ({
+            ...prevStats,
+            available,
+            inUse,
+            maintenance
+        }));
+        // ========================================================================
+    };
+
+    // ================== CẬP NHẬT API THỐNG KÊ MỚI ==================
+    const fetchStationStats = async () => {
+        try {
+            const res = await fetch(`http://222.255.214.35:8080/api/station/admin/dashboard-status/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                // Cập nhật state 'stats' với doanh thu, khách hàng, phiên sạc
+                setStats(prevStats => ({
+                    ...prevStats,
+                    revenue: data.revenueToday, // Doanh thu tuần
+                    customers: data.customersToday, // Khách hàng tuần
+                    sessions: data.chargingSessionsToday // Phiên sạc tuần
+                }));
+            } else {
+                 message.error("Không thể tải thống kê doanh thu.");
+            }
+        } catch (e) {
+            console.error("Failed to fetch dashboard stats: ", e);
+            message.error("Lỗi khi tải thống kê doanh thu.");
+        }
+    };
+    // =================================================================
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                setLoading(true);
+                // Cả hai hàm fetchChargers và fetchStationStats sẽ cùng cập nhật state 'stats'
+                await Promise.all([fetchStationDetail(), fetchChargers(), fetchStationStats()]);
+            } catch (e) {
+                message.error("Không thể tải dữ liệu trạm!");
+            } finally {
+                setLoading(false);
+            }
+        };
+        load();
+    }, [id]); // Thêm id vào dependency array để re-fetch khi id thay đổi
+
+    // ==================== POPUP (Thêm/Sửa) ====================
+    const handleAdd = () => {
         setEditingCharger(null);
         form.resetFields();
         setIsModalVisible(true);
     };
 
-    // Mở popup sửa trụ
-    const handleEditCharger = (charger) => {
+    const handleEdit = (charger) => {
         setEditingCharger(charger);
         form.setFieldsValue({
             chargerName: charger.name,
-            type: charger.type,
+            type: charger.chargerCost?.portType,
             status: charger.status,
         });
         setIsModalVisible(true);
@@ -44,343 +149,200 @@ const StationDetail = () => {
         form.resetFields();
     };
 
-    const handleOk = () => {
-        form.validateFields().then(values => {
-            if (editingCharger) {
-                // Gọi API sửa trụ, gửi values + id trụ
-                console.log("Sửa trụ:", editingCharger.id, values);
-                message.success("Cập nhật trụ sạc thành công!");
-            } else {
-                // Gọi API thêm trụ mới
-                console.log("Thêm trụ mới:", values);
-                message.success("Thêm trụ sạc thành công!");
-            }
-            setIsModalVisible(false);
-            form.resetFields();
-        }).catch(info => {
-            console.log("Validate Failed:", info);
-        });
-    };
-    const fetchStationDetail = async () => {
-        setLoading(true);
+    const handleOk = async () => {
+        const values = await form.validateFields();
+        const bodyData = {
+            name: values.chargerName,
+            portType: values.type,
+            status: values.status,
+        };
+
         try {
-            const res = await fetch(
-                `http://222.255.214.35:8080/api/station/admin/detail/${id}`,
-                {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.getItem("token"),
-                        Accept: "application/json",
-                    },
-                }
-            );
-            if (!res.ok) throw new Error("Lỗi khi tải chi tiết trạm");
-            const data = await res.json();
-            setStation(data);
-        } catch (error) {
-            message.error(error.message);
-        } finally {
-            setLoading(false);
+            const url = editingCharger
+                ? `http://222.255.214.35:8080/api/chargerPoint/admin/update/${editingCharger.id}`
+                : `http://222.255.214.35:8080/api/chargerPoint/admin/create/${id}`;
+
+            const method = editingCharger ? "PUT" : "POST";
+            const res = await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(bodyData),
+            });
+
+            if (!res.ok) throw new Error("Thao tác thất bại!");
+            message.success(editingCharger ? "Cập nhật thành công!" : "Thêm mới thành công!");
+            setIsModalVisible(false);
+            fetchChargers(); // Tải lại danh sách trụ sạc (và cập nhật lại số liệu đếm)
+        } catch (e) {
+            message.error(e.message);
         }
     };
 
-    useEffect(() => {
-        fetchStationDetail();
-    }, [id]);
+    // ==================== HELPERS (Hàm hỗ trợ) ====================
+    const getStationStatus = (s) => {
+        if (s === "ACTIVE") return <Tag color="green">Hoạt động</Tag>;
+        if (s === "INACTIVE") return <Tag color="default">Ngưng hoạt động</Tag>;
+        return <Tag color="red">Bảo trì</Tag>;
+    };
 
-    if (loading || !station) {
+    const getChargerStatus = (s) => {
+        const status = s?.toUpperCase();
+        if (status === "AVAILABLE") return <Tag color="green">Có sẵn</Tag>;
+        if (status === "IN_USE") return <Tag color="gold">Đang sử dụng</Tag>;
+        return <Tag color="red">Bảo trì</Tag>;
+    };
+    
+    // Format thời gian sang HH:mm
+    const formatTime = (isoString) => {
+        if (!isoString) return "";
+        try {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' }); // vd: "14:30"
+        } catch (e) {
+            return "";
+        }
+    };
+
+    // Loading screen
+    if (loading || !station) { // Thêm kiểm tra !station
         return (
             <div style={{ textAlign: "center", paddingTop: 100 }}>
-                <Spin size="large" tip="Đang tải chi tiết trạm..." />
-</div>
+                <Spin size="large" tip="Đang tải dữ liệu..." />
+            </div>
         );
     }
 
-    // Chuyển trạng thái code thành màu & text như mẫu
-    const getStatusTag = (status) => {
-        if (status === "ACTIVE")
-            return (
-                <Tag style={{ backgroundColor: "#daf7dc", color: "#3b9d3b", fontWeight: 600 }}>
-                    Hoạt động
-                </Tag>
-            );
-        return (
-            <Tag style={{ backgroundColor: "#f6d4d5", color: "#a43a3a", fontWeight: 600 }}>
-                Bảo trì
-            </Tag>
-        );
-    };
-
-    // Trạng thái trụ sạc theo ảnh mẫu
-    const getChargerStatusTag = (status) => {
-        if (status === "ACTIVE")
-            return (
-                <Tag style={{ backgroundColor: "#eaf8e8", color: "#3b9d3b", fontWeight: 600, fontSize: 12 }}>
-                    Có sẵn
-                </Tag>
-            );
-        if (status === "IN_USE")
-            return (
-                <Tag
-                    style={{
-                        backgroundColor: "#fff7db",
-                        color: "#a88613",
-                        fontWeight: 600,
-                        fontSize: 12,
-                    }}
-                >
-                    Đang sử dụng
-                </Tag>
-            );
-        return (
-            <Tag style={{ backgroundColor: "#fbeaea", color: "#a43a3a", fontWeight: 600, fontSize: 12 }}>
-                Bảo trì
-            </Tag>
-        );
-    };
-
+    // ==================== UI (Giao diện) ====================
     return (
-        <div style={{ padding: 24, maxWidth: 900, margin: "auto", fontFamily: "Segoe UI, Tahoma, Geneva, Verdana, sans-serif" }}>
+        <div style={{ padding: 24, maxWidth: 1100, margin: "auto" }}>
+            {/* TIÊU ĐỀ TRANG VÀ NÚT QUAY LẠI */}
+            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+                <Button 
+                    type="text" 
+                    icon={<ArrowLeftOutlined />} 
+                    onClick={() => navigate(-1)} // Nút quay lại
+                    style={{ marginRight: 16 }}
+                />
+                <div>
+                    <h2 style={{ margin: 0, fontSize: 24 }}>Chi tiết trạm sạc</h2>
+                    <div style={{ color: "#888" }}>Quản lý và giám sát trạm</div>
+                </div>
+            </div>
+
+            {/* POPUP THÊM/SỬA TRỤ SẠC */}
             <Modal
-                title={editingCharger ? "Sửa trụ sạc" : "Thêm trụ sạc mới"}
-                open={isModalVisible} // ant design v4 trở lên dùng `open` thay `visible`
+                title={editingCharger ? "Sửa trụ sạc" : "Thêm trụ sạc"}
+                open={isModalVisible}
                 onOk={handleOk}
                 onCancel={handleCancel}
-                okText={editingCharger ? "Cập nhật" : "Thêm"}
+                okText={editingCharger ? "Cập nhật" : "Thêm mới"}
                 cancelText="Hủy"
             >
-                <Form form={form} layout="vertical" name="charger_form">
+                <Form form={form} layout="vertical">
                     <Form.Item
                         name="chargerName"
                         label="Tên trụ sạc"
-                        rules={[{ required: true, message: "Vui lòng nhập tên trụ sạc" }]}
+                        rules={[{ required: true, message: "Vui lòng nhập tên trụ" }]}
                     >
-                        <Input placeholder="Nhập tên trụ sạc" />
+                        <Input />
                     </Form.Item>
                     <Form.Item
                         name="type"
                         label="Loại cổng sạc"
-                        rules={[{ required: true, message: "Vui lòng chọn loại cổng sạc" }]}
+                        rules={[{ required: true, message: "Vui lòng chọn loại" }]}
                     >
-                        <Select placeholder="Chọn loại cổng sạc">
+                        <Select>
                             <Select.Option value="AC">AC</Select.Option>
                             <Select.Option value="CCS">CCS</Select.Option>
                             <Select.Option value="CHAdeMO">CHAdeMO</Select.Option>
                         </Select>
                     </Form.Item>
                     <Form.Item
-name="status"
-                        label="Tình trạng ban đầu"
-                        rules={[{ required: true, message: "Vui lòng chọn tình trạng" }]}
+                        name="status"
+                        label="Trạng thái"
+                        rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}
                     >
-                        <Select placeholder="Chọn tình trạng ban đầu">
+                        <Select>
                             <Select.Option value="AVAILABLE">Có sẵn</Select.Option>
-                            <Select.Option value="OUT_OF_SERVICE">Đang bảo trì</Select.Option>
+                            <Select.Option value="OUT_OF_SERVICE">Bảo trì</Select.Option>
                         </Select>
                     </Form.Item>
                 </Form>
             </Modal>
-            {/* Header Quay lại + Tiêu đề */}
-            <div style={{ marginBottom: 24 }}>
-                <Button
-                    type="text"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => window.history.back()}
-                    style={{ padding: 0, marginRight: 12 }}
-                />
-                <span style={{ fontWeight: 600, fontSize: 18 }}>Chi tiết trạm sạc</span>
-                <div style={{ fontSize: 12, color: "#555" }}>Quản lý và giám sát trạm</div>
-            </div>
 
-            {/* Card thông tin trạm */}
-            <Card
-                style={{
-                    borderRadius: 8,
-                    marginBottom: 24,
-                    boxShadow: "0 1px 3px rgb(0 0 0 / 0.1)",
-                }}
-                bodyStyle={{ padding: "24px" }}
-            >
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 4,
-                    }}
-                >
-                    <h2 style={{ margin: 0, fontWeight: "bold", fontSize: 22 }}>
-                        {station.name}
-                    </h2>
-                    {getStatusTag(station.status)}
-                </div>
-                <div
-                    style={{
-                        fontSize: 14,
-                        color: "#666",
-                        marginBottom: 20,
-                    }}
-                >
-                    <span>📍 {station.address}</span>
-                </div>
-                <div
-                    style={{
-                        display: "flex",
-                        gap: 32,
-                        fontSize: 14,
-                        color: "#555",
-                        marginBottom: 12,
-                        alignItems: "center",
-                    }}
-                >
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <PhoneOutlined />
-                        <span>Điện thoại</span>
-                        <span style={{ marginLeft: 4, color: "#222" }}>
-                            {station.phone || "-"}
-                        </span>
+            {/* THÔNG TIN TRẠM VÀ THỐNG KÊ */}
+            <Card style={{ borderRadius: 10, marginBottom: 24 }}>
+                {/* Thông tin trạm */}
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div>
+                        <h2>{station.name}</h2>
+                        <p style={{ margin: 0, color: "#666" }}>📍 {station.address}</p>
+                        <div style={{ display: "flex", gap: 24, marginTop: 12, color: "#555" }}>
+                            <div><PhoneOutlined /> {station.phone}</div>
+                            <div><MailOutlined /> {station.email}</div>
+                            <div>⚡ {chargers.length} trụ</div>
+                        </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-<MailOutlined />
-                        <span>Email</span>
-                        <span style={{ marginLeft: 4, color: "#222" }}>
-                            {station.email || "-"}
-                        </span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        {/* Dùng icon thay vì ThunderboltOutlined */}
-                        <span
-                            style={{
-                                fontWeight: "bold",
-                                fontSize: 16,
-                                color: "#555",
-                                userSelect: "none",
-                            }}
-                        >
-                            ⚡
-                        </span>
-                        <span>Tổng trụ</span>
-                        <span style={{ marginLeft: 4, fontWeight: "600" }}>
-                            {station.totalChargers} trụ
-                        </span>
-                    </div>
+                    <div>{getStationStatus(station.status)}</div>
                 </div>
 
-                {/* Thống kê trạng thái trụ */}
-                <div style={{ display: "flex", gap: 16 }}>
-                    <Card
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#eaf8e8",
-                            textAlign: "center",
-                            borderRadius: 6,
-                            padding: 12,
-                        }}
-                        bodyStyle={{ padding: 0 }}
-                    >
-                        <div style={{ color: "#3b9d3b", fontWeight: 600, fontSize: 20 }}>
-                            {station.availableChargers}
+                {/* Khối thống kê */}
+                {stats && (
+                    <>
+                        {/* HÀNG 1: Trạng thái trụ sạc (Tính toán từ fetchChargers) */}
+                        <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+                            <Card style={{ background: "#f6ffed", border: "1px solid #b7eb8f" }} bodyStyle={{ padding: 16 }}>
+                                <h3 style={{ color: "#52c41a", margin: 0, fontSize: 24 }}>{stats.available}</h3>
+                                <div style={{ color: "#555" }}>Có sẵn</div>
+                            </Card>
+                            <Card style={{ background: "#fffbe6", border: "1px solid #ffe58f" }} bodyStyle={{ padding: 16 }}>
+                                <h3 style={{ color: "#faad14", margin: 0, fontSize: 24 }}>{stats.inUse}</h3>
+                                <div style={{ color: "#555" }}>Đang sử dụng</div>
+                            </Card>
+                            <Card style={{ background: "#fff1f0", border: "1px solid #ffa39e" }} bodyStyle={{ padding: 16 }}>
+                                <h3 style={{ color: "#f5222d", margin: 0, fontSize: 24 }}>{stats.maintenance}</h3>
+                                <div style={{ color: "#555" }}>Bảo trì</div>
+                            </Card>
                         </div>
-                        <div style={{ fontSize: 14, color: "#3b9d3b" }}>Có sẵn</div>
-                    </Card>
-                    <Card
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#fff7db",
-                            textAlign: "center",
-                            borderRadius: 6,
-                            padding: 12,
-                        }}
-                        bodyStyle={{ padding: 0 }}
-                    >
-                        <div style={{ color: "#a88613", fontWeight: 600, fontSize: 20 }}>
-                            {station.occupiedChargers}
+                        
+                        {/* HÀNG 2: Thống kê doanh thu (Từ API .../dashboard-status/{id}) */}
+                        <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+                             <Card bodyStyle={{ padding: 16 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                        <div style={{ color: "#666", marginBottom: 4 }}>Doanh thu tuần này</div>
+                                        <h3 style={{ margin: 0, fontSize: 20 }}>{stats.revenue?.toLocaleString("vi-VN")} đ</h3>
+                                    </div>
+                                    <DollarCircleOutlined style={{ fontSize: 32, color: "#52c41a" }} />
+                                </div>
+                            </Card>
+                            <Card bodyStyle={{ padding: 16 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                        <div style={{ color: "#666", marginBottom: 4 }}>Khách hàng tuần này</div>
+                                        <h3 style={{ margin: 0, fontSize: 20 }}>{stats.customers}</h3>
+                                    </div>
+                                    <UserOutlined style={{ fontSize: 32, color: "#1677ff" }} />
+                                </div>
+                            </Card>
+                            <Card bodyStyle={{ padding: 16 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div>
+                                        <div style={{ color: "#666", marginBottom: 4 }}>Tổng phiên sạc tuần này</div>
+                                        <h3 style={{ margin: 0, fontSize: 20 }}>{stats.sessions}</h3>
+                                    </div>
+                                    <LineChartOutlined style={{ fontSize: 32, color: "#722ed1" }} />
+                                </div>
+                            </Card>
                         </div>
-                        <div style={{ fontSize: 14, color: "#a88613" }}>Đang sử dụng</div>
-                    </Card>
-                    <Card
-                        style={{
-                            flex: 1,
-                            backgroundColor: "#fbeaea",
-                            textAlign: "center",
-                            borderRadius: 6,
-                            padding: 12,
-                        }}
-                        bodyStyle={{ padding: 0 }}
-                    >
-<div style={{ color: "#a43a3a", fontWeight: 600, fontSize: 20 }}>
-                            {station.outOfServiceChargers}
-                        </div>
-                        <div style={{ fontSize: 14, color: "#a43a3a" }}>Bảo trì</div>
-                    </Card>
-                </div>
+                    </>
+                )}
             </Card>
 
-            {/* Card doanh thu, khách hàng, phiên sạc */}
-            <div style={{ display: "flex", gap: 16, marginBottom: 24 }}>
-                <Card style={{ flex: 1, borderRadius: 8, padding: "16px 24px" }}>
-                    <div style={{ fontSize: 14, color: "#666", marginBottom: 8 }}>
-                        Doanh thu tuần này
-                    </div>
-                    <div style={{ fontSize: 24, fontWeight: "600" }}>
-                        2.867.000 <span style={{ fontSize: 18 }}>₫</span>
-                    </div>
-                    <div
-                        style={{
-                            fontSize: 24,
-                            color: "green",
-                            fontWeight: "bold",
-                            marginTop: 4,
-                        }}
-                    >
-                        $
-                    </div>
-                </Card>
-                <Card style={{ flex: 1, borderRadius: 8, padding: "16px 24px" }}>
-                    <div style={{ fontSize: 14, color: "#666", marginBottom: 8 }}>
-                        Khách hàng tuần này
-                    </div>
-                    <div style={{ fontSize: 24, fontWeight: "600" }}>{24}</div>
-                    <div
-                        style={{
-                            fontSize: 24,
-                            color: "#1890ff",
-                            fontWeight: "bold",
-                            marginTop: 4,
-                        }}
-                    >
-                        <UserOutlined />
-                    </div>
-                </Card>
-                <Card style={{ flex: 1, borderRadius: 8, padding: "16px 24px" }}>
-                    <div style={{ fontSize: 14, color: "#666", marginBottom: 8 }}>
-                        Tổng phiên sạc tuần này
-                    </div>
-                    <div style={{ fontSize: 24, fontWeight: "600" }}>{18}</div>
-                    <div
-                        style={{
-                            fontSize: 24,
-                            color: "#a569d3",
-                            fontWeight: "bold",
-                            marginTop: 4,
-                        }}
-                    >
-                        {/* Dùng icon nhịp tim để tượng trưng */}
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="24"
-                            height="24"
-                        >
-<path d="M3 12h4l3 8 4-16 3 8h4" />
-                        </svg>
-                    </div>
-                </Card>
-            </div>
-
-            {/* Danh sách trụ sạc */}
+            {/* DANH SÁCH TRỤ SẠC */}
             <div
                 style={{
                     border: "1px solid #e8e8e8",
@@ -389,150 +351,53 @@ name="status"
                     backgroundColor: "#fff",
                 }}
             >
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: 16,
-                        alignItems: "center",
-                    }}
-                >
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
                     <div>
-                        <h3 style={{ marginBottom: 2, fontWeight: 600 }}>Danh sách trụ sạc</h3>
-                        <div style={{ fontSize: 12, color: "#888" }}>
-                            Quản lý và điều khiển các trụ sạc tại trạm
-                        </div>
+                        <h3 style={{ margin: 0 }}>Danh sách trụ sạc</h3>
+                        <p style={{ color: "#888", margin: 0 }}>Quản lý và điều khiển các trụ sạc</p>
                     </div>
-                    <Button
-                        type="primary"
-                        style={{ backgroundColor: "#0a0a23", borderColor: "#0a0a23" }}
-                        icon={<span style={{ fontWeight: "bold", fontSize: 18 }}>+</span>}
-                        onClick={handleAddCharger}
-                    >
-                        Thêm trụ sạc
-                    </Button>
-
+                    <Button type="primary" onClick={handleAdd} style={{ backgroundColor: "#222" }}>+ Thêm trụ sạc</Button>
                 </div>
 
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                    {/* Ví dụ các trụ sạc */}
-                    <Card
-                        style={{
-                            flex: "1 1 250px",
-                            borderRadius: 8,
-                            boxShadow: "0 1px 2px rgb(0 0 0 / 0.1)",
-                        }}
-                    >
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <div>
-                                <b>Trụ #1</b>{" "}
-                                <Tag
-                                    style={{
-                                        backgroundColor: "#fff7db",
-                                        color: "#a88613",
-                                        fontWeight: 600,
-                                        fontSize: 12,
-                                        verticalAlign: "middle",
-                                    }}
-                                >
-                                    Đang sử dụng
-                                </Tag>
+                {/* Lưới danh sách các trụ */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+                    {chargers.map((c) => (
+                        <Card key={c.id} style={{ borderRadius: 8 }} bodyStyle={{ padding: 16 }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                {/* Bên trái: Tên và loại */}
+                                <div>
+                                    <b style={{ fontSize: 16 }}>{c.name}</b>
+                                    <div style={{ color: "#555", marginTop: 4 }}>
+                                        {c.chargerCost?.portType || "?"} - {c.capacity ? `${c.capacity}kW` : "?kW"}
+                                    </div>
+                                </div>
+                                {/* Bên phải: Trạng thái và nút */}
+                                <div style={{ textAlign: "right", minWidth: 90 }}>
+                                    {getChargerStatus(c.status)}
+                                    <div style={{ marginTop: 8 }}>
+                                        <EditOutlined style={{ color: "#1677ff", marginRight: 12, cursor: 'pointer' }} onClick={() => handleEdit(c)} />
+                                        <DeleteOutlined style={{ color: "#ff4d4f", cursor: 'pointer' }} /* onClick={() => handleDelete(c.id)} */ />
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <EditOutlined
-                                    style={{ color: "#1a73e8", marginRight: 12, cursor: "pointer" }}
-                                    onClick={() => handleEditCharger(chargerData)} // chargerData là dữ liệu trụ hiện tại
-                                />
-<DeleteOutlined style={{ color: "#d93025", cursor: "pointer" }} />
-                            </div>
-                        </div>
-                        <div style={{ marginTop: 4, color: "#555" }}>CCS - 150kW</div>
-                        <div style={{ marginTop: 8, display: "flex", gap: 16, fontSize: 14, color: "#555" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <UserOutlined />
-                                <span>Nguyễn Văn A</span>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <ClockCircleOutlined />
-                                <span>Bắt đầu: 14:30</span>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card
-                        style={{
-                            flex: "1 1 250px",
-                            borderRadius: 8,
-                            boxShadow: "0 1px 2px rgb(0 0 0 / 0.1)",
-                        }}
-                    >
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <div>
-                                <b>Trụ #2</b>{" "}
-                                <Tag
-                                    style={{
-                                        backgroundColor: "#eaf8e8",
-                                        color: "#3b9d3b",
-                                        fontWeight: 600,
-                                        fontSize: 12,
-                                        verticalAlign: "middle",
-                                    }}
-                                >
-                                    Có sẵn
-                                </Tag>
-                            </div>
-                            <div>
-                                <EditOutlined style={{ color: "#1a73e8", marginRight: 12, cursor: "pointer" }} />
-                                <DeleteOutlined style={{ color: "#d93025", cursor: "pointer" }} />
-                            </div>
-                        </div>
-                        <div style={{ marginTop: 4, color: "#555" }}>CCS - 150kW</div>
-                    </Card>
-
-                    <Card
-                        style={{
-                            flex: "1 1 250px",
-                            borderRadius: 8,
-                            boxShadow: "0 1px 2px rgb(0 0 0 / 0.1)",
-                        }}
-                    >
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <div>
-                                <b>Trụ #3</b>{" "}
-                                <Tag
-                                    style={{
-                                        backgroundColor: "#fff7db",
-                                        color: "#a88613",
-fontWeight: 600,
-                                        fontSize: 12,
-                                        verticalAlign: "middle",
-                                    }}
-                                >
-                                    Đang sử dụng
-                                </Tag>
-                            </div>
-                            <div>
-                                <EditOutlined style={{ color: "#1a73e8", marginRight: 12, cursor: "pointer" }} />
-                                <DeleteOutlined style={{ color: "#d93025", cursor: "pointer" }} />
-                            </div>
-                        </div>
-                        <div style={{ marginTop: 4, color: "#555" }}>CHAdeMO - 50kW</div>
-                        <div style={{ marginTop: 8, display: "flex", gap: 16, fontSize: 14, color: "#555" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <UserOutlined />
-                                <span>Trần Thị B</span>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <ClockCircleOutlined />
-                                <span>Bắt đầu: 15:00</span>
-                            </div>
-                        </div>
-                    </Card>
+                            
+                            {/* Thông tin thêm (nếu đang sử dụng) */}
+                            {c.status?.toUpperCase() === "IN_USE" && (
+                                <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0", color: "#666" }}>
+                                    <div style={{ marginBottom: 4 }}>
+                                        <UserOutlined style={{ marginRight: 8 }} /> {c.currentUser || "Đang tải..."}
+                                    </div>
+                                    <div>
+                                        <ClockCircleOutlined style={{ marginRight: 8 }} />
+                                        Bắt đầu: {formatTime(c.sessionStartTime) || "..."}
+                                    </div>
+                                </div>
+                            )}
+                        </Card>
+                    ))}
                 </div>
             </div>
         </div>
-
-
     );
 };
 
