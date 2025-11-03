@@ -41,6 +41,7 @@ import TermsPrivacyPage from "./pages/terms";
 // là 1 cái function
 // trả về 1 cái giao diện
 function AppContent() {
+  
   const dispatch = useDispatch();
 
   // ✅ Khôi phục account từ localStorage khi load app (chỉ chạy 1 lần)
