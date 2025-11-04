@@ -38,4 +38,8 @@ public class Station {
     private String email;
     @NotNull
     private String status;
+    @NotNull
+    private double latitude;
+    @NotNull
+    private double longitude;
 }

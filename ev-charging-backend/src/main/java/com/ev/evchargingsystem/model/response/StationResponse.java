@@ -32,4 +32,6 @@ public class StationResponse {
     private String phone;
     private String email;
     private String status;
+    private double latitude;
+    private double longitude;
 }
