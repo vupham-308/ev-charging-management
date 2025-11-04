@@ -5,10 +5,12 @@ import { useAuth } from "../hooks/useAuth";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { useProfile } from "../hooks/useProfile";
 
-export const Header = ({ userName, userRole, onLogout }) => {
+export const Header = () => {
   const { logout } = useAuth();
   const [openModal, setOpenModal] = useState(false);
+  const { profile, isLoading, error } = useProfile();
 
   return (
     <>
@@ -18,21 +20,28 @@ export const Header = ({ userName, userRole, onLogout }) => {
             <h1 className="text-xl font-semibold text-gray-900">
               Quản lý trạm sạc
             </h1>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
-                {userName}
-              </span>
-              <span className="text-gray-500">{userRole}</span>
-            </div>
+
+            {isLoading ? (
+              <p className="text-sm text-gray-400">Đang tải thông tin...</p>
+            ) : error ? (
+              <p className="text-sm text-red-500">Lỗi tải hồ sơ</p>
+            ) : (
+              <div className="flex items-center gap-4 text-sm">
+                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
+                  {profile?.fullName || "Không rõ tên"}
+                </span>
+                <span className="text-gray-500">{profile?.role}</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-8">
             <div className="text-right">
-              <p className="text-xs text-gray-500">
-                Trung tâm thương mại Vincom
+              <p className="text-s text-gray-500">
+                {profile?.station.name}
               </p>
               <p className="text-sm font-semibold text-gray-900">
-                123 Nguyễn Huệ, Quận 1
+                {profile?.station.address}
               </p>
             </div>
 
@@ -44,7 +53,7 @@ export const Header = ({ userName, userRole, onLogout }) => {
                 <span className="text-sm font-medium">Đổi mật khẩu</span>
               </button>
               <button
-                onClick={onLogout}
+                onClick={logout}
                 className="font-medium text-gray-800 border border-gray-300 rounded-lg px-4 py-1 hover:bg-gray-100"
               >
                 Đăng xuất
@@ -64,7 +73,7 @@ export const Header = ({ userName, userRole, onLogout }) => {
             autoClose: 2000,
             theme: "colored",
           });
-          setTimeout(() => logout(), 2200); // logout sau khi toast biến mất
+          setTimeout(() => logout(), 2200);
         }}
       />
     </>

@@ -34,8 +34,6 @@ const StaffDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       <Header
-        userName="Trần Thị Bình"
-        userRole="Nhân viên trạm sạc"
         onLogout={logout}
       />
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
