@@ -40,12 +40,20 @@ public class ReservationService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.get();
 
+        // Kiểm tra nếu user có reservation chưa hoàn tất
+        List<Reservation> activeReservations = reservationRepository.findByUserId(user.getId());
+        for (Reservation r : activeReservations) {
+            if (!"COMPLETED".equalsIgnoreCase(r.getStatus()) && !"CANCELLED".equalsIgnoreCase(r.getStatus())) {
+                throw new RuntimeException("Bạn đang có một đặt chỗ chưa hoàn tất. Vui lòng hoàn tất trước khi đặt mới.");
+            }
+        }
+
         // 2) Lấy trụ sạc
         ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
 
         // 3) Trụ phải đang AVAILABLE mới cho đặt
         if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
-            return "This charger point is not available";
+            throw new RuntimeException("This charger point is not available");
         }
 
         // 4) Validate thời gian
@@ -54,26 +62,26 @@ public class ReservationService {
         Date current = new Date(System.currentTimeMillis());
 
         if (start == null || end == null) {
-            return "Thời gian bắt đầu và kết thúc không được để trống";
+            throw new RuntimeException( "Thời gian bắt đầu và kết thúc không được để trống");
         }
         if (current.after(start)) {
-            return "Thời gian đặt chỗ phải ở tương lai";
+            throw new RuntimeException("Thời gian đặt chỗ phải ở tương lai");
         }
         if (end.before(start)) {
-            return "Thời gian kết thúc phải sau thời gian bắt đầu";
+            throw new RuntimeException( "Thời gian kết thúc phải sau thời gian bắt đầu");
         }
         long durationMillis = end.getTime() - start.getTime();
         if (durationMillis > 30 * 60 * 1000L) { // tối đa 30m
-            return "Chỉ có thể đặt chỗ trong tối đa 30 phút";
+            throw new RuntimeException("Chỉ có thể đặt chỗ trong tối đa 30 phút");
         }
 
-        // (Optional) Không cho đặt ở quá khứ
+        // Không cho đặt ở quá khứ
         Date now = new Date();
         if (end.before(now)) {
-            return "Thời gian đặt chỗ phải ở tương lai";
+            throw new RuntimeException( "Thời gian đặt chỗ phải ở tương lai");
         }
 
-        //extra: kiểm tra trùng lặp với các reservation khác
+        //kiểm tra trùng lặp với các reservation khác
         List<Reservation> existingReservations = reservationRepository.findByChargerPointIdAndStatus(cp.getId(), "PENDING");
         for (Reservation r : existingReservations) {
             if (start.before(r.getEndDate()) && end.after(r.getStartDate())) {
@@ -116,8 +124,9 @@ public class ReservationService {
             //2)nếu phiên sạc đang sạc trước đó sạc xong SAU giờ kết
             //thúc của phiên đặt chỗ, đặt chỗ coi như bị hủy
             if(r.getEndDate().before(current)) {
-                if(!r.getChargerPoint().equals("ONGOING")){
-                r.getChargerPoint().setStatus("AVAILABLE");}
+                //if(!r.getChargerPoint().equals("ONGOING")) {
+                if (!"ONGOING".equalsIgnoreCase(r.getChargerPoint().getStatus())) {
+                    r.getChargerPoint().setStatus("AVAILABLE");}
                 r.setStatus("CANCELLED");
                 reservationRepository.save(r);
                 chargerPointRepository.save(r.getChargerPoint());
