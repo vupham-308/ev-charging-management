@@ -83,7 +83,8 @@ public class StationService {
             rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
             rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
             rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
-
+            rp.setLatitude(station.getLatitude());
+            rp.setLongitude(station.getLongitude());
             rp.setPhone(station.getPhone());
             rp.setEmail(station.getEmail());
             rp.setStatus(station.getStatus());
@@ -104,7 +105,8 @@ public class StationService {
         rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
         rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
         rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
-
+        rp.setLatitude(station.getLatitude());
+        rp.setLongitude(station.getLongitude());
         rp.setPhone(station.getPhone());
         rp.setEmail(station.getEmail());
         rp.setStatus(station.getStatus());
@@ -148,6 +150,8 @@ public class StationService {
             rp.setPointChargerAvailable(getPointChargerAvailableByStation(station.getId()));
             rp.setPointChargerOutOfService(getPointChargerOutOfServiceByStation(station.getId()));
             rp.setPortType(chargerPointRepository.findPortTypesByStationID(station.getId()));
+            rp.setLatitude(station.getLatitude());
+            rp.setLongitude(station.getLongitude());
             stationResponseList.add(rp);
         }
         return stationResponseList;
