@@ -1,10 +1,10 @@
 import { Card, Tag, Select, message } from "antd";
-import { useChargerPoints } from "../../hooks/useChargerPoints";
 import { useEffect } from "react";
 import { usePointsStatus } from "../../hooks/usePointsStatus";
+import { useChargerPointsContext } from "../../contexts/ChargerPointsContext";
 
 export const MaintenanceTab = () => {
-    const { chargerPoints, isLoading, fetchChargerPoints } = useChargerPoints();
+  const { points, isLoading, fetchChargerPoints } = useChargerPointsContext();
     const { isLoading: isUpdating, message: apiMsg, handleUpdateStatus } = usePointsStatus();
     useEffect(() => {
     if (apiMsg) message.info(apiMsg);
@@ -62,9 +62,8 @@ export const MaintenanceTab = () => {
   ];
 
   // Lọc bỏ trụ đang sử dụng
-  const filteredPoints = chargerPoints.filter(
-    (point) => point.status !== "OCCUPIED"
-  );
+    const filteredPoints = points.filter((p) => p.status !== "OCCUPIED");
+
 
   const handleSelectChange = async (pointID, newStatus) => {
     await handleUpdateStatus(pointID, newStatus);
