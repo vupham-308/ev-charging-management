@@ -10,12 +10,24 @@ const Dashboard = () => {
     const [revenue, setRevenue] = useState(null);
     const [topStations, setTopStations] = useState([]); // 🟢 Dữ liệu từ API thật
     const [loading, setLoading] = useState(true);
+    const [ChargerStats, setChargerStats] = useState(null);
 
     // 🟢 Gọi API thống kê trạm
     const fetchStationStats = async () => {
         try {
             const res = await api.get("station/station-stats");
             setStationStats(res.data);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải thống kê trạm sạc!");
+        }
+    };
+
+    //trụ sạc
+    const fetchChargerStats = async () => {
+        try {
+            const res = await api.get("chargerPoint/charger-point-stats");
+            setChargerStats(res.data);
         } catch (error) {
             console.error(error);
             message.error("Không thể tải thống kê trạm sạc!");
@@ -63,6 +75,7 @@ const Dashboard = () => {
                 fetchUserStats(),
                 fetchTotalRevenue(),
                 fetchTopStations(),
+                fetchChargerStats()
             ]);
             setLoading(false);
         };
@@ -78,7 +91,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="dashboard-container">
+<div className="dashboard-container">
             <h3 className="section-title">Tổng quan</h3>
 
             {/* ---- Summary Cards ---- */}
@@ -102,9 +115,11 @@ const Dashboard = () => {
                 <div className="card">
                     <div className="card-info">
                         <h4>Tổng số trụ sạc</h4>
-                        <h2>44</h2>
-                        <p>18 sẵn sàng, 21 đang sử dụng</p>
-                    </div>
+                        <h2>{ChargerStats?.totalPoints ?? 0}</h2>
+                        <p>
+                            {ChargerStats?.availablePoints ?? 0} hoạt động,{" "}
+                            {ChargerStats?.occupiedPoints ?? 0} ngưng hoạt động
+                        </p>                    </div>
                     <div className="card-icon yellow">
                         <i className="fa-solid fa-bolt"></i>
                     </div>
@@ -142,7 +157,7 @@ const Dashboard = () => {
                 {/* Tình trạng trạm */}
                 <div className="panel">
                     <h4>Tình trạng trạm sạc</h4>
-                    <p>Phân bố trạng thái các trạm trong hệ thống</p>
+<p>Phân bố trạng thái các trạm trong hệ thống</p>
                     <div className="status-item">
                         <span className="dot active"></span>
                         Hoạt động{" "}
@@ -204,5 +219,4 @@ const Dashboard = () => {
         </div>
     );
 };
-
 export default Dashboard;
