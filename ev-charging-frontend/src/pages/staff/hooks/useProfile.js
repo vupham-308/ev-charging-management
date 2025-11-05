@@ -26,7 +26,7 @@ export const useProfile = () => {
       const cleanData = {
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
-        phone: formData.phone?.trim() || "", // ✅ bảo đảm luôn có field phone
+        phone: formData.phone?.trim() || "",
       };
 
       const res = await updateProfileData(cleanData);

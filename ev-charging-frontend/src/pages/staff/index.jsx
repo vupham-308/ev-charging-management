@@ -34,22 +34,16 @@ const StaffDashboard = () => {
 
   return (
     <ProfileProvider>
-    <div className="min-h-screen bg-white">
-      <Header
-        onLogout={logout}
-      />
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="min-h-screen bg-white">
+        <Header onLogout={logout} />
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="max-w-full">
-        <div className="bg-white text-gray-700 min-h-[500px]">
-
-          
-          <ChargerPointsProvider>{renderTabContent()}</ChargerPointsProvider>
-        
-          
-        </div>
-      </main>
-    </div>
+        <main className="max-w-full">
+          <div className="bg-white text-gray-700 min-h-[500px]">
+            <ChargerPointsProvider>{renderTabContent()}</ChargerPointsProvider>
+          </div>
+        </main>
+      </div>
     </ProfileProvider>
   );
 };
