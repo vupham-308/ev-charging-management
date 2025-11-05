@@ -69,6 +69,11 @@ const ManageConfirmBill = () => {
     }
   };
 
+  const goBackTo =
+    state?.from === "startBooking"
+      ? `/driver/startChargingBooking/${station.id}`
+      : `/driver/startCharging/${station.id}`;
+
   if (loading) {
     return (
       <div className="flex flex-col items-center mt-32">
@@ -137,7 +142,7 @@ const ManageConfirmBill = () => {
           <div className="flex justify-between mt-6">
             <Button
               icon={<ArrowLeftOutlined />}
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(goBackTo)}
               className="rounded-lg"
             >
               Quay lại

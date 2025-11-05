@@ -108,7 +108,10 @@ function AppContent() {
           path: "startChargingBooking/:stationId",
           element: <ManageStartChargingBooking />,
         },
-
+        {
+          path: "startChargingBooking/:stationId/stationReport",
+          element: <ManageStationReport />,
+        },
         {
           path: "myBooking",
           element: <ManageMyBooking />,

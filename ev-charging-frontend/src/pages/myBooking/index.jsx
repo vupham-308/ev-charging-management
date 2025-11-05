@@ -97,7 +97,7 @@ const ManageMyBooking = () => {
             const now = new Date();
             const startTime = new Date(booking.startDate);
             const diffMinutes = (startTime - now) / 60000;
-            const canStart = diffMinutes <= 10;
+            const canStart = diffMinutes <= 30;
 
             return (
               <div

@@ -212,21 +212,6 @@ const ProfilePage = () => {
           </div>
         </section>
 
-        {/* --- Chương trình thành viên --- */}
-        <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg">
-          <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">
-            <FiStar className="text-yellow-400" /> Chương trình thành viên
-          </h2>
-          <div>
-            <h3 className="text-xl font-semibold text-black mb-2">
-              {user?.memberLevel}
-            </h3>
-            <p className="text-yellow-400 font-medium text-lg">
-              {user?.rewardPoints?.toLocaleString()} điểm thưởng
-            </p>
-          </div>
-        </section>
-
         {/* --- Đổi mật khẩu --- */}
         <section className="bg-secondary-bg p-8 rounded-2xl border border-border-color shadow-lg">
           <h2 className="text-3xl font-bold mb-6 flex items-center gap-3 text-black">

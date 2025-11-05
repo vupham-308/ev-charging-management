@@ -150,27 +150,6 @@ const LoginPage = () => {
                 Register now
               </a>
             </div>
-
-            <Divider>Or continue with</Divider>
-
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                type="default"
-                block
-                icon={<FaGoogle />}
-                onClick={() => message.info("Google OAuth not implemented")}
-              >
-                Google
-              </Button>
-              <Button
-                type="default"
-                block
-                icon={<FaGithub />}
-                onClick={() => message.info("GitHub OAuth not implemented")}
-              >
-                GitHub
-              </Button>
-            </div>
           </Form>
         </Card>
       </div>

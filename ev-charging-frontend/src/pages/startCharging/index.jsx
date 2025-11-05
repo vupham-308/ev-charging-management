@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, Button, Spin, message, Tag, Select } from "antd";
-import { useParams, useNavigate, Outlet } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Outlet } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -16,72 +16,175 @@ import {
 const ManageStartCharging = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [station, setStation] = useState(null);
   const [cars, setCars] = useState([]);
   const [chargers, setChargers] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
-  const [loading, setLoading] = useState(true);
 
+  const [loading, setLoading] = useState(true);
+  const [loadingDraft, setLoadingDraft] = useState(false);
+
+  // form state
   const [selectedCar, setSelectedCar] = useState(null);
   const [selectedCharger, setSelectedCharger] = useState(null);
   const [targetBattery, setTargetBattery] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
+
   const [canContinue, setCanContinue] = useState(false);
 
+  // 1) Load base data
   useEffect(() => {
+    let mounted = true;
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [stationRes, carRes, chargerRes, reviewRes] = await Promise.all([
           api.get(`/station/get/${stationId}`),
           api.get(`/cars`),
           api.get(`/chargerPoint/getAllAvailable/${stationId}`),
           api.get(`/review/station/${stationId}`),
         ]);
-
+        if (!mounted) return;
         setStation(stationRes.data);
-        setCars(carRes.data);
-        setChargers(chargerRes.data);
-        setReviews(reviewRes.data);
-
-        if (reviewRes.data.length > 0) {
+        setCars(Array.isArray(carRes.data) ? carRes.data : []);
+        setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
+        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+        if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
-            reviewRes.data.reduce((sum, r) => sum + r.rating, 0) /
+            reviewRes.data.reduce((sum, r) => sum + (r.rating || 0), 0) /
             reviewRes.data.length;
           setAverageRating(avg.toFixed(1));
         }
-      } catch {
+      } catch (err) {
+        console.error("❌ Lỗi khi tải dữ liệu:", err);
         message.error("❌ Lỗi khi tải dữ liệu!");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     fetchData();
+    return () => {
+      mounted = false;
+    };
   }, [stationId]);
 
+  // 2) Enable continue when all required chosen
   useEffect(() => {
     setCanContinue(
-      selectedCar && selectedCharger && targetBattery && paymentMethod
+      Boolean(selectedCar && selectedCharger && targetBattery && paymentMethod)
     );
   }, [selectedCar, selectedCharger, targetBattery, paymentMethod]);
 
+  // helper: build battery options
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
-    const current = selectedCar.initBattery;
+    const current = Number(selectedCar.initBattery || 0);
     const options = [];
-    for (let i = Math.ceil((current + 10) / 10) * 10; i <= 100; i += 10) {
-      options.push(i);
-    }
+    // start next tens above current+10? original used ceiling((current+10)/10)*10
+    const start = Math.max(10, Math.ceil((current + 10) / 10) * 10);
+    for (let i = start; i <= 100; i += 10) options.push(i);
     return options;
   };
 
+  // 3) Try to load draft from backend OR from location.state
+  useEffect(() => {
+    // If location.state has values (e.g., redirected from elsewhere), prefer that first.
+    const applyStateFromLocation = () => {
+      const s = location.state;
+      if (!s) return false;
+      const {
+        selectedCar: locCar,
+        selectedCharger: locCharger,
+        targetBattery: locTarget,
+        paymentMethod: locPayment,
+      } = s;
+      if (locCar) {
+        // if car list loaded, find actual car object
+        const found = cars.find((c) => c.id === locCar.id);
+        setSelectedCar(found || locCar);
+      }
+      if (locCharger) {
+        const foundCh = chargers.find((c) => c.id === locCharger.id);
+        setSelectedCharger(foundCh || locCharger);
+      }
+      if (locTarget) setTargetBattery(locTarget);
+      if (locPayment) setPaymentMethod(locPayment);
+      return Boolean(
+        s.selectedCar || s.selectedCharger || s.targetBattery || s.paymentMethod
+      );
+    };
+
+    // If location.state applied, skip server draft fetch
+    if (applyStateFromLocation()) return;
+    // otherwise fetch draft from backend (if available)
+    let mounted = true;
+    const loadDraft = async () => {
+      try {
+        setLoadingDraft(true);
+        // adjust query param or endpoint name if your backend expects other
+        const res = await api.get(`/get-draft`);
+        const draft = res.data;
+        if (!mounted || !draft) return;
+        // apply draft values; beware order: apply car/changer after lists loaded
+        if (draft.car && cars.length > 0) {
+          const found = cars.find((c) => c.id === draft.car.id);
+          setSelectedCar(found || draft.car);
+        } else if (draft.car) {
+          // set raw draft.car object; when cars load later, effect below will align (we handle below)
+          setSelectedCar(draft.car);
+        }
+
+        if (draft.chargerPoint && chargers.length > 0) {
+          const foundCh = chargers.find((c) => c.id === draft.chargerPoint.id);
+          setSelectedCharger(foundCh || draft.chargerPoint);
+        } else if (draft.chargerPoint) {
+          setSelectedCharger(draft.chargerPoint);
+        }
+
+        if (draft.goalBattery) setTargetBattery(draft.goalBattery);
+        if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod);
+      } catch (err) {
+        console.error("Không lấy được draft:", err);
+        // it's fine if draft not present
+      } finally {
+        if (mounted) setLoadingDraft(false);
+      }
+    };
+
+    // Only call loadDraft after base lists loaded
+    if (!loading) {
+      loadDraft();
+    }
+
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, cars.length, chargers.length, stationId]); // re-run when cars/chargers populated
+
+  // Extra: if selectedCar or selectedCharger was set from draft object (not same reference as list),
+  // when lists arrive we try to sync to actual list object (so Select value matches by id).
+  useEffect(() => {
+    if (!selectedCar || cars.length === 0) return;
+    const found = cars.find((c) => c.id === selectedCar.id);
+    if (found && found !== selectedCar) setSelectedCar(found);
+  }, [cars, selectedCar]);
+
+  useEffect(() => {
+    if (!selectedCharger || chargers.length === 0) return;
+    const found = chargers.find((c) => c.id === selectedCharger.id);
+    if (found && found !== selectedCharger) setSelectedCharger(found);
+  }, [chargers, selectedCharger]);
+
+  // 4) Continue: post to create draft/charge and navigate to confirm
   const handleContinue = async () => {
     if (!canContinue) {
       message.warning("⚠️ Vui lòng chọn đầy đủ thông tin!");
       return;
     }
-
     try {
       const token = localStorage.getItem("token");
       const payload = {
@@ -95,8 +198,10 @@ const ManageStartCharging = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // server returns draft/session info in res.data
       navigate("/driver/confirmBill", {
         state: {
+          from: "startCharging",
           chargeData: res.data,
           station,
           selectedCar,
@@ -116,6 +221,7 @@ const ManageStartCharging = () => {
     }
   };
 
+  // 5) UI loading and empty states
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
@@ -143,9 +249,8 @@ const ManageStartCharging = () => {
           Chọn trạm, xe và trụ để khởi động phiên sạc
         </p>
 
-        {/* Layout 3 cột */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Cột 1: Trạm sạc */}
+          {/* Cột 1: Trạm */}
           <Card
             bordered={false}
             className="shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
@@ -198,6 +303,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn xe"
                 style={{ width: "100%" }}
+                value={selectedCar?.id}
                 onChange={(id) =>
                   setSelectedCar(cars.find((car) => car.id === id))
                 }
@@ -216,6 +322,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn trụ sạc"
                 style={{ width: "100%" }}
+                value={selectedCharger?.id}
                 onChange={(id) =>
                   setSelectedCharger(chargers.find((c) => c.id === id))
                 }
@@ -227,15 +334,31 @@ const ManageStartCharging = () => {
                   </Select.Option>
                 ))}
               </Select>
+              {/* If a charger was set from draft but not in list (edge-case), show it as info */}
+              {!selectedCharger && loadingDraft && (
+                <div className="text-sm text-gray-500 mt-2">
+                  Đang tải bản nháp...
+                </div>
+              )}
+              {selectedCharger &&
+                !chargers.find((c) => c.id === selectedCharger.id) && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Trụ đã chọn:{" "}
+                    <strong>
+                      {selectedCharger.name || selectedCharger.id}
+                    </strong>
+                  </div>
+                )}
             </div>
 
             {/* Mục tiêu pin */}
             <div className="mb-4">
-              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin (%)</p>
+              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin </p>
               <Select
                 placeholder="Chọn mức pin"
                 style={{ width: "100%" }}
                 disabled={!selectedCar}
+                value={targetBattery}
                 onChange={setTargetBattery}
               >
                 {getBatteryOptions().map((val) => (
@@ -255,6 +378,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn phương thức"
                 style={{ width: "100%" }}
+                value={paymentMethod}
                 onChange={setPaymentMethod}
               >
                 <Select.Option value="BALANCE">Số dư tài khoản</Select.Option>
