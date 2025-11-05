@@ -9,6 +9,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";
 import { ChargerPointsProvider } from "./contexts/ChargerPointsContext.jsx";
+import { ProfileProvider } from "./contexts/ProfileContext.jsx";
 
 const StaffDashboard = () => {
   const { logout } = useAuth();
@@ -32,6 +33,7 @@ const StaffDashboard = () => {
   };
 
   return (
+    <ProfileProvider>
     <div className="min-h-screen bg-white">
       <Header
         onLogout={logout}
@@ -40,10 +42,15 @@ const StaffDashboard = () => {
 
       <main className="max-w-full">
         <div className="bg-white text-gray-700 min-h-[500px]">
+
+          
           <ChargerPointsProvider>{renderTabContent()}</ChargerPointsProvider>
+        
+          
         </div>
       </main>
     </div>
+    </ProfileProvider>
   );
 };
 

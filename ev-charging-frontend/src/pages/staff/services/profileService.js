@@ -10,3 +10,25 @@ export const getProfileData = async () => {
     throw error;
   }
 };
+
+export const updateProfileData = async ({ fullName, email, phone }) => {
+  try {
+    const payload = { fullName, email, phone };
+
+    console.log("📤 Sending payload:", payload);
+
+    const response = await api.put("profile/update", payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("✅ Profile updated successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating profile data:",
+      error.response?.data || error
+    );
+    throw error;
+  }
+};
