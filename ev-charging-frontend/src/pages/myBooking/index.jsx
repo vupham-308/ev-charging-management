@@ -94,10 +94,8 @@ const ManageMyBooking = () => {
         <div className="space-y-5 max-w-3xl mx-auto">
           {bookings.map((booking) => {
             const { text, color } = getStatusLabel(booking.status);
-            const now = new Date();
-            const startTime = new Date(booking.startDate);
-            const diffMinutes = (startTime - now) / 60000;
-            const canStart = diffMinutes <= 30;
+
+            const canStart = new Date() >= new Date(booking.startDate);
 
             return (
               <div
@@ -145,8 +143,8 @@ const ManageMyBooking = () => {
                       <Tooltip
                         title={
                           canStart
-                            ? "Bắt đầu sạc ngay"
-                            : "Chỉ có thể bắt đầu sạc trong vòng 10 phút trước thời gian bắt đầu"
+                            ? "Đến giờ, bạn có thể bắt đầu sạc"
+                            : "Chưa đến giờ bắt đầu, vui lòng chờ đến đúng thời gian đặt"
                         }
                       >
                         <button

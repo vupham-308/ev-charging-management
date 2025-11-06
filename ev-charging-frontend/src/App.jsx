@@ -26,7 +26,6 @@ import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
 import ManageChargingSession from "./pages/chargingSession";
-import ManageConfirmBill from "./pages/confirmBill";
 import ManageIncidentReport from "./pages/incidentReport";
 import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
@@ -115,10 +114,6 @@ function AppContent() {
         {
           path: "myBooking",
           element: <ManageMyBooking />,
-        },
-        {
-          path: "confirmBill",
-          element: <ManageConfirmBill />,
         },
         {
           path: "chargingSession",

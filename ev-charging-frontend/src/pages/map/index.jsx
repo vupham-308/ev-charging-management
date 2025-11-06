@@ -397,7 +397,7 @@ const ManageMap = () => {
                 {station.address} <br />
                 {station.distance && (
                   <>
-                    📏 {station.distance.toFixed(2)} km <br />
+                    {station.distance.toFixed(2)} km <br />
                   </>
                 )}
                 🔌 {station.pointChargerAvailable}/{station.pointChargerTotal}{" "}

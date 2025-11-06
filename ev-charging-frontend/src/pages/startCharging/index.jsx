@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Spin, message, Tag, Select } from "antd";
-import { useParams, useNavigate, useLocation, Outlet } from "react-router-dom";
+import { Card, Button, Spin, message, Tag, Select, Modal } from "antd";
+import { useParams, useNavigate, Outlet } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -16,7 +16,6 @@ import {
 const ManageStartCharging = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [station, setStation] = useState(null);
   const [cars, setCars] = useState([]);
@@ -25,17 +24,23 @@ const ManageStartCharging = () => {
   const [averageRating, setAverageRating] = useState(0);
 
   const [loading, setLoading] = useState(true);
-  const [loadingDraft, setLoadingDraft] = useState(false);
 
   // form state
   const [selectedCar, setSelectedCar] = useState(null);
   const [selectedCharger, setSelectedCharger] = useState(null);
   const [targetBattery, setTargetBattery] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
-
   const [canContinue, setCanContinue] = useState(false);
 
-  // 1) Load base data
+  // modal confirm bill
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmData, setConfirmData] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // ⬇️ Thêm state mới ở đầu component
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // Load data
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
@@ -47,11 +52,13 @@ const ManageStartCharging = () => {
           api.get(`/chargerPoint/getAllAvailable/${stationId}`),
           api.get(`/review/station/${stationId}`),
         ]);
+
         if (!mounted) return;
         setStation(stationRes.data);
         setCars(Array.isArray(carRes.data) ? carRes.data : []);
         setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
         setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+
         if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
             reviewRes.data.reduce((sum, r) => sum + (r.rating || 0), 0) /
@@ -71,115 +78,23 @@ const ManageStartCharging = () => {
     };
   }, [stationId]);
 
-  // 2) Enable continue when all required chosen
+  // enable continue
   useEffect(() => {
     setCanContinue(
       Boolean(selectedCar && selectedCharger && targetBattery && paymentMethod)
     );
   }, [selectedCar, selectedCharger, targetBattery, paymentMethod]);
 
-  // helper: build battery options
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
     const current = Number(selectedCar.initBattery || 0);
     const options = [];
-    // start next tens above current+10? original used ceiling((current+10)/10)*10
     const start = Math.max(10, Math.ceil((current + 10) / 10) * 10);
     for (let i = start; i <= 100; i += 10) options.push(i);
     return options;
   };
 
-  // 3) Try to load draft from backend OR from location.state
-  useEffect(() => {
-    // If location.state has values (e.g., redirected from elsewhere), prefer that first.
-    const applyStateFromLocation = () => {
-      const s = location.state;
-      if (!s) return false;
-      const {
-        selectedCar: locCar,
-        selectedCharger: locCharger,
-        targetBattery: locTarget,
-        paymentMethod: locPayment,
-      } = s;
-      if (locCar) {
-        // if car list loaded, find actual car object
-        const found = cars.find((c) => c.id === locCar.id);
-        setSelectedCar(found || locCar);
-      }
-      if (locCharger) {
-        const foundCh = chargers.find((c) => c.id === locCharger.id);
-        setSelectedCharger(foundCh || locCharger);
-      }
-      if (locTarget) setTargetBattery(locTarget);
-      if (locPayment) setPaymentMethod(locPayment);
-      return Boolean(
-        s.selectedCar || s.selectedCharger || s.targetBattery || s.paymentMethod
-      );
-    };
-
-    // If location.state applied, skip server draft fetch
-    if (applyStateFromLocation()) return;
-    // otherwise fetch draft from backend (if available)
-    let mounted = true;
-    const loadDraft = async () => {
-      try {
-        setLoadingDraft(true);
-        // adjust query param or endpoint name if your backend expects other
-        const res = await api.get(`/get-draft`);
-        const draft = res.data;
-        if (!mounted || !draft) return;
-        // apply draft values; beware order: apply car/changer after lists loaded
-        if (draft.car && cars.length > 0) {
-          const found = cars.find((c) => c.id === draft.car.id);
-          setSelectedCar(found || draft.car);
-        } else if (draft.car) {
-          // set raw draft.car object; when cars load later, effect below will align (we handle below)
-          setSelectedCar(draft.car);
-        }
-
-        if (draft.chargerPoint && chargers.length > 0) {
-          const foundCh = chargers.find((c) => c.id === draft.chargerPoint.id);
-          setSelectedCharger(foundCh || draft.chargerPoint);
-        } else if (draft.chargerPoint) {
-          setSelectedCharger(draft.chargerPoint);
-        }
-
-        if (draft.goalBattery) setTargetBattery(draft.goalBattery);
-        if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod);
-      } catch (err) {
-        console.error("Không lấy được draft:", err);
-        // it's fine if draft not present
-      } finally {
-        if (mounted) setLoadingDraft(false);
-      }
-    };
-
-    // Only call loadDraft after base lists loaded
-    if (!loading) {
-      loadDraft();
-    }
-
-    return () => {
-      mounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, cars.length, chargers.length, stationId]); // re-run when cars/chargers populated
-
-  // Extra: if selectedCar or selectedCharger was set from draft object (not same reference as list),
-  // when lists arrive we try to sync to actual list object (so Select value matches by id).
-  useEffect(() => {
-    if (!selectedCar || cars.length === 0) return;
-    const found = cars.find((c) => c.id === selectedCar.id);
-    if (found && found !== selectedCar) setSelectedCar(found);
-  }, [cars, selectedCar]);
-
-  useEffect(() => {
-    if (!selectedCharger || chargers.length === 0) return;
-    const found = chargers.find((c) => c.id === selectedCharger.id);
-    if (found && found !== selectedCharger) setSelectedCharger(found);
-  }, [chargers, selectedCharger]);
-
-  // 4) Continue: post to create draft/charge and navigate to confirm
+  // continue -> open confirm modal
   const handleContinue = async () => {
     if (!canContinue) {
       message.warning("⚠️ Vui lòng chọn đầy đủ thông tin!");
@@ -193,23 +108,17 @@ const ManageStartCharging = () => {
         goalBattery: targetBattery,
         paymentMethod,
       };
-
       const res = await api.post("/charge", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // server returns draft/session info in res.data
-      navigate("/driver/confirmBill", {
-        state: {
-          from: "startCharging",
-          chargeData: res.data,
-          station,
-          selectedCar,
-          selectedCharger,
-          targetBattery,
-          paymentMethod,
-        },
+      setConfirmData({
+        chargeData: res.data,
+        station,
+        selectedCar,
+        selectedCharger,
       });
+      setShowConfirm(true);
     } catch (err) {
       console.error("❌ Lỗi khi tạo phiên sạc:", err);
       const errorMsg =
@@ -221,7 +130,22 @@ const ManageStartCharging = () => {
     }
   };
 
-  // 5) UI loading and empty states
+  // confirm and start charging
+  const handleConfirm = async () => {
+    if (!confirmData?.chargeData?.id) return;
+    try {
+      setConfirmLoading(true);
+      await api.post(`/charging/${confirmData.chargeData.id}`);
+      toast.success("✅ Phiên sạc đã bắt đầu!");
+      setShowConfirm(false);
+      navigate("/driver/chargingSession");
+    } catch {
+      toast.error("❌ Không thể bắt đầu sạc! Vui lòng thử lại.");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
@@ -263,15 +187,12 @@ const ManageStartCharging = () => {
           >
             <p className="text-lg font-medium">{name}</p>
             <p className="text-gray-500 mb-3">{address}</p>
-
             <p className="text-blue-600 font-medium mb-2">
               {pointChargerAvailable}/{pointChargerTotal} trụ trống
             </p>
-
             <Tag color="green" style={{ borderRadius: 12 }}>
               Sạc nhanh
             </Tag>
-
             <Button
               danger
               icon={<FaExclamationTriangle />}
@@ -334,26 +255,11 @@ const ManageStartCharging = () => {
                   </Select.Option>
                 ))}
               </Select>
-              {/* If a charger was set from draft but not in list (edge-case), show it as info */}
-              {!selectedCharger && loadingDraft && (
-                <div className="text-sm text-gray-500 mt-2">
-                  Đang tải bản nháp...
-                </div>
-              )}
-              {selectedCharger &&
-                !chargers.find((c) => c.id === selectedCharger.id) && (
-                  <div className="mt-2 text-sm text-gray-600">
-                    Trụ đã chọn:{" "}
-                    <strong>
-                      {selectedCharger.name || selectedCharger.id}
-                    </strong>
-                  </div>
-                )}
             </div>
 
             {/* Mục tiêu pin */}
             <div className="mb-4">
-              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin </p>
+              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin</p>
               <Select
                 placeholder="Chọn mức pin"
                 style={{ width: "100%" }}
@@ -430,9 +336,109 @@ const ManageStartCharging = () => {
                 </p>
               </div>
             ))}
+
+            {reviews.length > 3 && (
+              <Button
+                type="link"
+                onClick={() => setShowAllReviews(true)}
+                className="p-0 text-blue-600"
+              >
+                Xem thêm đánh giá...
+              </Button>
+            )}
           </Card>
         </div>
       </div>
+
+      {/* Popup Confirm Bill */}
+      <Modal
+        title="Xác nhận thông tin sạc"
+        open={showConfirm}
+        onCancel={() => setShowConfirm(false)}
+        footer={null}
+        centered
+        width={600}
+      >
+        {confirmData ? (
+          <div className="space-y-3">
+            <p>
+              <strong>Trạm:</strong> {confirmData.station.name}
+            </p>
+            <p>
+              <strong>Trụ sạc:</strong> {confirmData.selectedCharger.name} •{" "}
+              {confirmData.selectedCharger.capacity}kW
+            </p>
+            <p>
+              <strong>Xe:</strong> {confirmData.selectedCar.brand}
+            </p>
+            <p>
+              <strong>Pin:</strong> {confirmData.chargeData.initBattery}% →{" "}
+              {confirmData.chargeData.goalBattery}%
+            </p>
+            <p>
+              <strong>Thanh toán:</strong>{" "}
+              {confirmData.chargeData.paymentMethod === "BALANCE"
+                ? "Số dư tài khoản"
+                : "Tiền mặt"}
+            </p>
+            <p>
+              <strong>Ước tính:</strong>{" "}
+              {confirmData.chargeData.fee.toLocaleString("vi-VN")}đ •{" "}
+              {confirmData.chargeData.minute} phút
+            </p>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button onClick={() => setShowConfirm(false)}>Hủy</Button>
+              <Button
+                type="primary"
+                loading={confirmLoading}
+                onClick={handleConfirm}
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-10">
+            <Spin />
+          </div>
+        )}
+      </Modal>
+
+      {/* Popup hiển thị tất cả đánh giá */}
+      <Modal
+        title={`Tất cả đánh giá của trạm ${station.name}`}
+        open={showAllReviews}
+        onCancel={() => setShowAllReviews(false)}
+        footer={null}
+        centered
+        width={700}
+      >
+        {reviews.length > 0 ? (
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="mb-4 border-b border-gray-100 pb-3 last:border-0"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-800">{r.userName}</p>
+                  <span className="text-yellow-500 text-sm">⭐ {r.rating}</span>
+                </div>
+                <p className="text-gray-600 text-sm mt-1">{r.description}</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-10">
+            Chưa có đánh giá nào cho trạm này.
+          </p>
+        )}
+      </Modal>
+
       <Outlet />
     </div>
   );
