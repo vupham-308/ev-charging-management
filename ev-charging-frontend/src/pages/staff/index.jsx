@@ -8,70 +8,43 @@ import { MaintenanceTab } from "./components/tabs/MaintenanceTab.";
 import { useAuth } from "./hooks/useAuth";
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";
-import { useStations } from "./hooks/useStations";
-import { useChargerPoints } from "./hooks/useChargerPoints";
+import { ChargerPointsProvider } from "./contexts/ChargerPointsContext.jsx";
+import { ProfileProvider } from "./contexts/ProfileContext.jsx";
 
 const StaffDashboard = () => {
   const { logout } = useAuth();
   const { activeTab, setActiveTab } = useTabs();
-  const { stations, isLoading: stationsLoading } = useStations();
-  const { chargerPoints, isLoading: pointsLoading } = useChargerPoints(); 
-  
-  const isMonitoringLoading = stationsLoading || pointsLoading;
 
   const renderTabContent = () => {
     switch (activeTab) {
       case TAB_KEYS.MONITORING:
-        return (
-          <MonitoringTab
-            available={stations.available}
-            occupied={stations.occupied}
-            reserved={stations.reserved}
-            outOfService={stations.outOfService}
-            chargerPoints = {chargerPoints} 
-            isLoading={isMonitoringLoading}
-             
-          />
-        );
+        return <MonitoringTab />;
       case TAB_KEYS.PAYMENT:
-        return <PaymentTab
-          />;
+        return <PaymentTab />;
       case TAB_KEYS.ISSUES:
         return <IssuesTab />;
       case TAB_KEYS.REPORTS:
         return <ReportsTab />;
       case TAB_KEYS.MAINTENANCE:
-        return <MaintenanceTab chargerPoints={chargerPoints} isLoading={pointsLoading} />;
+        return <MaintenanceTab />;
       default:
-        return (
-          <MonitoringTab
-            available={stations.available}
-            occupied={stations.occupied}
-            reserved={stations.reserved}
-            outOfService={stations.outOfService}
-            chargerPoints = {chargerPoints} 
-            isLoading={isMonitoringLoading}
-             
-          />
-        );
+        return <MonitoringTab />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header
-        userName="Trần Thị Bình"
-        userRole="Nhân viên trạm sạc"
-        onLogout={logout}
-      />
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+    <ProfileProvider>
+      <div className="min-h-screen bg-white">
+        <Header onLogout={logout} />
+        <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main className="max-w-full">
-        <div className="bg-white text-gray-700 min-h-[500px]">
-          {renderTabContent()}
-        </div>
-      </main>
-    </div>
+        <main className="max-w-full">
+          <div className="bg-white text-gray-700 min-h-[500px]">
+            <ChargerPointsProvider>{renderTabContent()}</ChargerPointsProvider>
+          </div>
+        </main>
+      </div>
+    </ProfileProvider>
   );
 };
 

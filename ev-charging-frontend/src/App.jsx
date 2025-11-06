@@ -16,6 +16,7 @@ import Users from "./pages/admin/Users";
 import IncidentManagement from "./pages/admin/IncidentManagement";
 import ChargingRates from "./pages/admin/ChargingRates";
 import ChargingStations from "./pages/admin/ChargingStations";
+import StationDetail from "./pages/admin/StationDetail";
 
 import ManageMap from "./pages/map";
 import ManageMyCar from "./pages/myCar";
@@ -39,6 +40,7 @@ import PaymentReturn from "./pages/paymentReturn";
 // là 1 cái function
 // trả về 1 cái giao diện
 function AppContent() {
+  
   const dispatch = useDispatch();
 
   // ✅ Khôi phục account từ localStorage khi load app (chỉ chạy 1 lần)
@@ -75,14 +77,14 @@ function AppContent() {
       path: "/register",
       element: <RegisterPage />,
     },
+
+    { path: "/staff", element: <StaffDashboard /> },
+
     {
       path: "/terms",
       element: <TermsPrivacyPage />,
     },
-    {
-      path: "/staff",
-      element: <StaffDashboard />,
-    },
+
     {
       path: "/driver",
       element: <DriverDashboard />,
@@ -180,6 +182,10 @@ function AppContent() {
         {
           path: "users",
           element: <Users />,
+        },
+        {
+          path: "station/:id",
+          element: <StationDetail />,
         },
         {
           path: "stations",

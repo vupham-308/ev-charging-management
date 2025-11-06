@@ -7,41 +7,27 @@ import { Spin, message } from "antd";
 const Dashboard = () => {
     const [stationStats, setStationStats] = useState(null);
     const [userStats, setUserStats] = useState(null);
+    const [revenue, setRevenue] = useState(null);
+    const [topStations, setTopStations] = useState([]); // 🟢 Dữ liệu từ API thật
     const [loading, setLoading] = useState(true);
-
-    // Giữ nguyên dữ liệu mẫu cho Top trạm sạc (chưa có API)
-    const topStations = [
-        {
-            id: 1,
-            name: "Sân bay Tân Sơn Nhất",
-            address: "Sân bay Tân Sơn Nhất, Quận Tân Bình, TP.HCM",
-            revenue: "79.48M VND",
-        },
-        {
-            id: 2,
-            name: "Trạm nghỉ cao tốc Long Thành",
-            address: "Cao tốc TP.HCM - Long Thành, Đồng Nai",
-            revenue: "53.82M VND",
-        },
-        {
-            id: 3,
-            name: "Trung tâm thương mại Vincom",
-            address: "123 Nguyễn Huệ, Quận 1, TP.HCM",
-            revenue: "28.67M VND",
-        },
-        {
-            id: 4,
-            name: "Ga Metro Bến Thành",
-            address: "456 Lê Lợi, Quận 1, TP.HCM",
-            revenue: "13.04M VND",
-        },
-    ];
+    const [ChargerStats, setChargerStats] = useState(null);
 
     // 🟢 Gọi API thống kê trạm
     const fetchStationStats = async () => {
         try {
             const res = await api.get("station/station-stats");
             setStationStats(res.data);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải thống kê trạm sạc!");
+        }
+    };
+
+    //trụ sạc
+    const fetchChargerStats = async () => {
+        try {
+            const res = await api.get("chargerPoint/charger-point-stats");
+            setChargerStats(res.data);
         } catch (error) {
             console.error(error);
             message.error("Không thể tải thống kê trạm sạc!");
@@ -59,10 +45,38 @@ const Dashboard = () => {
         }
     };
 
+    // 🟢 Gọi API doanh thu tháng
+    const fetchTotalRevenue = async () => {
+        try {
+            const res = await api.get("station/admin/total-revenue-month");
+            setRevenue(res.data);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải doanh thu tháng!");
+        }
+    };
+
+    // 🟢 Gọi API top doanh thu trạm sạc
+    const fetchTopStations = async () => {
+        try {
+            const res = await api.get("station/top-revenue");
+            setTopStations(res.data || []);
+        } catch (error) {
+            console.error(error);
+            message.error("Không thể tải top doanh thu trạm sạc!");
+        }
+    };
+
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            await Promise.all([fetchStationStats(), fetchUserStats()]);
+            await Promise.all([
+                fetchStationStats(),
+                fetchUserStats(),
+                fetchTotalRevenue(),
+                fetchTopStations(),
+                fetchChargerStats()
+            ]);
             setLoading(false);
         };
         loadData();
@@ -77,7 +91,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="dashboard-container">
+<div className="dashboard-container">
             <h3 className="section-title">Tổng quan</h3>
 
             {/* ---- Summary Cards ---- */}
@@ -89,7 +103,7 @@ const Dashboard = () => {
                         <h2>{stationStats?.totalStations ?? 0}</h2>
                         <p>
                             {stationStats?.activeStations ?? 0} hoạt động,{" "}
-{stationStats?.inactiveStations ?? 0} ngưng hoạt động
+                            {stationStats?.inactiveStations ?? 0} ngưng hoạt động
                         </p>
                     </div>
                     <div className="card-icon blue">
@@ -101,9 +115,11 @@ const Dashboard = () => {
                 <div className="card">
                     <div className="card-info">
                         <h4>Tổng số trụ sạc</h4>
-                        <h2>44</h2>
-                        <p>18 sẵn sàng, 21 đang sử dụng</p>
-                    </div>
+                        <h2>{ChargerStats?.totalPoints ?? 0}</h2>
+                        <p>
+                            {ChargerStats?.availablePoints ?? 0} hoạt động,{" "}
+                            {ChargerStats?.occupiedPoints ?? 0} ngưng hoạt động
+                        </p>                    </div>
                     <div className="card-icon yellow">
                         <i className="fa-solid fa-bolt"></i>
                     </div>
@@ -124,12 +140,11 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Doanh thu (chưa có API) */}
+                {/* Doanh thu tháng */}
                 <div className="card">
                     <div className="card-info">
                         <h4>Doanh thu tháng</h4>
-                        <h2>3350.5M</h2>
-                        <p className="increase">+12.5% so với tháng trước</p>
+                        <h2>{revenue ? `${revenue.toLocaleString("vi-VN")} VND` : "0 VND"}</h2>
                     </div>
                     <div className="card-icon green">
                         <i className="fa-solid fa-dollar-sign"></i>
@@ -142,7 +157,7 @@ const Dashboard = () => {
                 {/* Tình trạng trạm */}
                 <div className="panel">
                     <h4>Tình trạng trạm sạc</h4>
-                    <p>Phân bố trạng thái các trạm trong hệ thống</p>
+<p>Phân bố trạng thái các trạm trong hệ thống</p>
                     <div className="status-item">
                         <span className="dot active"></span>
                         Hoạt động{" "}
@@ -157,7 +172,7 @@ const Dashboard = () => {
 
                 {/* Phân bố người dùng */}
                 <div className="panel">
-<h4>Người dùng theo vai trò</h4>
+                    <h4>Người dùng theo vai trò</h4>
                     <p>Phân bố người dùng trong hệ thống</p>
                     <div className="role-card driver">
                         <i className="fa-solid fa-user"></i> Tài xế{" "}
@@ -177,26 +192,31 @@ const Dashboard = () => {
             {/* ---- Top Stations ---- */}
             <div className="panel top-stations">
                 <h4>Top trạm sạc theo doanh thu</h4>
-                <p>5 trạm có doanh thu cao nhất hôm nay</p>
+                <p>5 trạm có doanh thu cao nhất</p>
                 <div className="station-list">
-                    {topStations.map((s) => (
-                        <div key={s.id} className="station-item">
-                            <div className="station-left">
-                                <div className="station-rank">{s.id}</div>
-                                <div className="station-info">
-                                    <h5>{s.name}</h5>
-                                    <span>{s.address}</span>
+                    {topStations.length > 0 ? (
+                        topStations.map((s, index) => (
+                            <div key={s.stationId} className="station-item">
+                                <div className="station-left">
+                                    <div className="station-rank">{index + 1}</div>
+                                    <div className="station-info">
+                                        <h5>{s.stationName}</h5>
+                                        <span>{s.address}</span>
+                                    </div>
+                                </div>
+                                <div className="station-right">
+                                    <span className="revenue">
+                                        {s.totalRevenue.toLocaleString("vi-VN")} VND
+                                    </span>
                                 </div>
                             </div>
-                            <div className="station-right">
-                                <span className="revenue">{s.revenue}</span>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p>Không có dữ liệu doanh thu.</p>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
-
 export default Dashboard;

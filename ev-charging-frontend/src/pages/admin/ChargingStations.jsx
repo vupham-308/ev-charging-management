@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../admin/ChargingStations.css";
 import api from "../../config/axios";
 import { Spin, message, Modal, Form, Input, Button, Select } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -14,6 +15,7 @@ const ChargingStations = () => {
     const [editingStation, setEditingStation] = useState(null);
     const [form] = Form.useForm();
     const [modal, contextHolder] = Modal.useModal();
+    const navigate = useNavigate();
 
     // Lấy danh sách trạm
     const fetchStations = async () => {
@@ -21,9 +23,7 @@ const ChargingStations = () => {
         try {
             const res = await api.get("station/getAllStations");
             setStations(res.data);
-        } catch (error) {
-            console.error(error);
-            message.error("Không thể tải danh sách trạm sạc!");
+
         } finally {
             setLoading(false);
         }
@@ -33,7 +33,7 @@ const ChargingStations = () => {
         fetchStations();
     }, []);
 
-    // Tìm kiếm trạm
+    // Tìm kiếm trạm (giữ nguyên)
     const handleSearch = async (value) => {
         setSearch(value);
         if (!value.trim()) {
@@ -52,30 +52,7 @@ const ChargingStations = () => {
         }
     };
 
-    // Xem chi tiết trạm
-    const handleView = async (id) => {
-        try {
-            const res = await api.get(`station/get/${id}`);
-            const data = res.data;
-            Modal.info({
-                title: "Chi tiết trạm sạc",
-                content: (
-                    <div>
-                        <p><b>Tên:</b> {data.name}</p>
-                        <p><b>Địa chỉ:</b> {data.address}</p>
-                        <p><b>Trụ sạc sẵn sàng:</b> {data.pointChargerAvailable}</p>
-                        <p><b>Trụ đang bảo trì:</b> {data.pointChargerMaintenance}</p>
-                        <p><b>Tổng trụ sạc:</b> {data.pointChargerTotal}</p>
-                        <p><b>Cổng hỗ trợ:</b> {data.portType?.join(", ")}</p>
-                    </div>
-                ),
-            });
-        } catch (error) {
-            message.error("Không thể tải chi tiết trạm!");
-        }
-    };
-
-    // Mở form thêm hoặc sửa
+    // Mở form thêm hoặc sửa (giữ nguyên)
     const openModal = (station = null) => {
         setIsEditMode(!!station);
         setEditingStation(station);
@@ -93,7 +70,7 @@ const ChargingStations = () => {
         setIsModalOpen(true);
     };
 
-    // Xóa trạm
+    // Xóa trạm (giữ nguyên)
     const handleDelete = async (id) => {
         modal.confirm({
             title: "Xác nhận xóa",
@@ -114,7 +91,7 @@ const ChargingStations = () => {
         });
     };
 
-    // Submit form (Thêm hoặc Cập nhật)
+    // Submit form (Thêm hoặc Cập nhật) (giữ nguyên)
     const handleSubmit = async (values) => {
         try {
             if (isEditMode) {
@@ -172,12 +149,18 @@ const ChargingStations = () => {
             />
 
             <div className="stations-list">
+                {/* ================== BẮT ĐẦU SỬA ĐỔI (QUAY LẠI BAN ĐẦU) ================== */}
                 {stations.map((s, i) => {
+                    // Sử dụng tên trường từ API .../get/2
                     const ready = s.pointChargerAvailable || 0;
                     const total = s.pointChargerTotal || 0;
-                    const maintenance = s.pointChargerMaintenance || 0;
+
+                    // LƯU Ý: Đổi tên trường "Bảo trì"
+                    const maintenance = s.pointChargerOutOfService || 0;
+
+                    // Tự tính toán "Đang sử dụng"
                     const using = total - ready - maintenance;
-                    //  Hiển thị trạng thái theo DB (ACTIVE / INACTIVE)
+
                     const status = s.status === "ACTIVE" ? "Hoạt động" : "Bảo trì";
                     const color = s.status === "ACTIVE" ? "green" : "red";
 
@@ -191,7 +174,7 @@ const ChargingStations = () => {
                                     </div>
 
                                     <div className="station-actions">
-                                        <button onClick={() => handleView(s.id)}>👁 Xem</button>
+                                        <button onClick={() => navigate(`/admin/station/${s.id}`)}>👁 Xem</button>
                                         <button onClick={() => openModal(s)}>✏️ Sửa</button>
                                         <button onClick={() => handleDelete(s.id)}>🗑 Xóa</button>
                                     </div>
@@ -205,7 +188,8 @@ const ChargingStations = () => {
                                         <span>Có sẵn</span>
                                     </div>
                                     <div className="stat orange">
-                                        {using}
+                                        {/* Hiển thị số liệu đã tính toán */}
+                                        {using < 0 ? 0 : using}
                                         <span>Đang sử dụng</span>
                                     </div>
                                     <div className="stat red">
@@ -217,6 +201,7 @@ const ChargingStations = () => {
                                         <span>Tổng cộng</span>
                                     </div>
                                 </div>
+                                {/* ================== KẾT THÚC SỬA ĐỔI ================== */}
 
                                 <p className="port-types">
                                     Cổng hỗ trợ: <b>{s.portType?.join(", ")}</b>
@@ -227,7 +212,7 @@ const ChargingStations = () => {
                 })}
             </div>
 
-            {/* Modal thêm/sửa */}
+            {/* Modal thêm/sửa (giữ nguyên) */}
             <Modal
                 title={isEditMode ? "Cập nhật trạm sạc" : "Thêm trạm sạc mới"}
                 open={isModalOpen}
@@ -287,6 +272,5 @@ const ChargingStations = () => {
             {contextHolder}
         </div>
     );
-};
-
+}
 export default ChargingStations;

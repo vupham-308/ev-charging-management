@@ -1,6 +1,15 @@
-import { Card, Button, Tag,Select  } from "antd";
+import { Card, Tag, Select, message } from "antd";
+import { useEffect } from "react";
+import { usePointsStatus } from "../../hooks/usePointsStatus";
+import { useChargerPointsContext } from "../../contexts/ChargerPointsContext";
 
-export const MaintenanceTab = ({ chargerPoints = [], isLoading }) => {
+export const MaintenanceTab = () => {
+  const { points, isLoading, fetchChargerPoints } = useChargerPointsContext();
+    const { isLoading: isUpdating, message: apiMsg, handleUpdateStatus } = usePointsStatus();
+    useEffect(() => {
+    if (apiMsg) message.info(apiMsg);
+  }, [apiMsg]);
+
   const translateStatus = (status) => {
     switch (status) {
       case "AVAILABLE":
@@ -46,48 +55,61 @@ export const MaintenanceTab = ({ chargerPoints = [], isLoading }) => {
     }
   };
 
+  // Chỉ giữ lại 2 tùy chọn cần thiết
   const statusOptions = [
     { value: "AVAILABLE", label: "Có sẵn" },
-    { value: "OCCUPIED", label: "Đang sử dụng" },
-    { value: "OUT_OF_SERVICE", label: "Ngừng hoạt động" },
+    { value: "OUT_OF_SERVICE", label: "Ngưng hoạt động" },
   ];
 
+  // Lọc bỏ trụ đang sử dụng
+    const filteredPoints = points.filter((p) => p.status !== "OCCUPIED");
+
+
+  const handleSelectChange = async (pointID, newStatus) => {
+    await handleUpdateStatus(pointID, newStatus);
+    await fetchChargerPoints();
+  };
 
   return (
     <div className="w-full bg-gray-50 min-h-screen flex justify-center py-5">
       {/* Container chính */}
       <div className="w-[80%] max-w-6xl bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-8">
         <h2 className="text-xl font-semibold text-gray-800">Quản lí trụ sạc</h2>
-        <p className="text-gray-500 mt-1 mb-6">Giám sát tình trạng và thay đổi trạng thái trụ sạc</p>
+        <p className="text-gray-500 mt-1 mb-6">
+          Giám sát tình trạng và thay đổi trạng thái trụ sạc
+        </p>
 
         {isLoading ? (
           <p className="text-gray-400">Đang tải dữ liệu...</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {chargerPoints.map((point, idx) => (
-              <Card
-                key={idx}
-                className="rounded-xl border border-gray-200 shadow-sm hover:shadow transition-all"
-                styles={{ body: { padding: "16px 20px" } }} //
-              >
-                <div className="flex justify-between items-center">
+            {filteredPoints.length === 0 ? (
+              <p className="text-gray-400 text-sm">Không có trụ khả dụng để hiển thị.</p>
+            ) : (
+              filteredPoints.map((point, idx) => (
+                <Card
+                  key={idx}
+                  className="rounded-xl border border-gray-200 shadow-sm hover:shadow transition-all"
+                  styles={{ body: { padding: "16px 20px" } }}
+                >
+                  <div className="flex justify-between items-center">
                     {/* Thông tin trụ sạc */}
                     <div>
                       <div className="flex items-center gap-3">
                         <span className="font-semibold text-gray-800 text-base">
                           {point.id || "Mã trụ không xác định"}
                         </span>
-                      <Tag
-                        style={{
-                          ...getTagStyle(point.status),
-                          fontSize: "13px",
-                          padding: "2px 10px",
-                          borderRadius: "9999px",
-                          borderWidth: "1px",
-                        }}
-                      >
-                        {translateStatus(point.status)}
-                      </Tag>
+                        <Tag
+                          style={{
+                            ...getTagStyle(point.status),
+                            fontSize: "13px",
+                            padding: "2px 10px",
+                            borderRadius: "9999px",
+                            borderWidth: "1px",
+                          }}
+                        >
+                          {translateStatus(point.status)}
+                        </Tag>
                       </div>
 
                       <p className="text-gray-500 text-sm mt-1">
@@ -96,18 +118,20 @@ export const MaintenanceTab = ({ chargerPoints = [], isLoading }) => {
                     </div>
 
                     <div className="flex flex-col items-end gap-1">
-                    <span className="text-sm text-gray-500">Trạng thái</span>
-                    <Select
-                      size="small"
-                      style={{ width: 150 }}
-                      value={point.status}
-                      options={statusOptions}
-                    />
-                  </div>
+                      <span className="text-sm text-gray-500">Trạng thái</span>
+                      <Select
+                        size="small"
+                        style={{ width: 150 }}
+                        value={point.status}
+                        options={statusOptions}
+                        disabled={isUpdating} // ngăn spam khi đang gọi API
+                        onChange={(newStatus) => handleSelectChange(point.id, newStatus)}
+                      />
+                    </div>
                   </div>
                 </Card>
               ))
-            }
+            )}
           </div>
         )}
       </div>
