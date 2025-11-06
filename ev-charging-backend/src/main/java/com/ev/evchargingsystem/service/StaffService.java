@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.response.StaffDashboardResponse;
+import com.ev.evchargingsystem.model.response.StaffStationResponse;
 import com.ev.evchargingsystem.repository.ChargingSessionRepository;
 import com.ev.evchargingsystem.repository.StaffRepository;
 import com.ev.evchargingsystem.repository.StationRepository;
@@ -15,14 +16,13 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class StaffService {
     @Autowired
     private StaffRepository staffRepository;
-    @Autowired
-    private StationRepository stationRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -33,6 +33,11 @@ public class StaffService {
     public Staff getStaffById(int id) {
         Optional<Staff> staff = staffRepository.findById(id);
         return staff.orElse(null);
+    }
+
+    public Staff getStaffByUserId(int userId) {
+        return staffRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy staff với userId: " + userId));
     }
 
     public void save(Staff staff) {
@@ -77,4 +82,9 @@ public class StaffService {
         );
 
     }
+
+    public List<StaffStationResponse> getAllStaffWithStation() {
+        return staffRepository.findAllStaffWithStation();
+    }
+
 }

@@ -102,6 +102,9 @@ public class ChargerPointService {
 
     //lấy tất cả trụ sạc đang Available của trạm sạc đó
     public List<ChargerPoint> getAllByStationAvailable(int stationId){
+        if(stationRepository.findStationsById(stationId).getStatus().equals("INACTIVE")){
+            return null;
+        }
         List<ChargerPoint> list = new ArrayList<>();
         List<ChargerPoint> avai = new ArrayList<>();
         chargerPointRepository.findChargerPointsByStationId(stationId).forEach(list::add);

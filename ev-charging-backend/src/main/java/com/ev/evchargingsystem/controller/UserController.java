@@ -1,12 +1,17 @@
 package com.ev.evchargingsystem.controller;
 
+import com.ev.evchargingsystem.entity.Staff;
+import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
+import com.ev.evchargingsystem.model.response.StaffStationResponse;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.model.response.UserStatsResponseForAdmin;
 import com.ev.evchargingsystem.repository.UserRepository;
+import com.ev.evchargingsystem.service.StaffService;
+import com.ev.evchargingsystem.service.StationService;
 import com.ev.evchargingsystem.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -33,6 +38,10 @@ public class UserController {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private StationService stationService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -83,5 +92,25 @@ public class UserController {
         return userService.adminUpdateUser(id, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "ADMIN xem danh sách staff kèm trạm được gán")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/staff-with-station")
+    public ResponseEntity<List<StaffStationResponse>> getAllStaffWithStation() {
+        List<StaffStationResponse> result = staffService.getAllStaffWithStation();
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "ADMIN gán trạm cho staff")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/{staffId}/assign-station/{stationId}")
+    public ResponseEntity<?> assignStationToStaff(@PathVariable int staffId, @PathVariable int stationId) {
+        Staff staff = staffService.getStaffByUserId(staffId);
+        Station station = stationService.getStationById(stationId);
+        staff.setStation(station);
+        staffService.save(staff);
+
+        return ResponseEntity.ok("Đã gán trạm " + station.getName() + " cho staff " + staff.getUser().getFullName());
     }
 }

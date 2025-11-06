@@ -1,6 +1,7 @@
 package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.ChargerPoint;
+import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.entity.Reservation;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.ReservationRequest;
@@ -39,12 +40,20 @@ public class ReservationService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.get();
 
+        // Kiểm tra nếu user có reservation chưa hoàn tất
+        List<Reservation> activeReservations = reservationRepository.findByUserId(user.getId());
+        for (Reservation r : activeReservations) {
+            if (!"COMPLETED".equalsIgnoreCase(r.getStatus()) && !"CANCELLED".equalsIgnoreCase(r.getStatus())) {
+                throw new RuntimeException("Bạn đang có một đặt chỗ chưa hoàn tất. Vui lòng hoàn tất trước khi đặt mới.");
+            }
+        }
+
         // 2) Lấy trụ sạc
         ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
 
         // 3) Trụ phải đang AVAILABLE mới cho đặt
         if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
-            return "This charger point is not available";
+            throw new RuntimeException("This charger point is not available");
         }
 
         // 4) Validate thời gian
@@ -53,26 +62,26 @@ public class ReservationService {
         Date current = new Date(System.currentTimeMillis());
 
         if (start == null || end == null) {
-            return "Thời gian bắt đầu và kết thúc không được để trống";
+            throw new RuntimeException( "Thời gian bắt đầu và kết thúc không được để trống");
         }
         if (current.after(start)) {
-            return "Thời gian đặt chỗ phải ở tương lai";
+            throw new RuntimeException("Thời gian đặt chỗ phải ở tương lai");
         }
         if (end.before(start)) {
-            return "Thời gian kết thúc phải sau thời gian bắt đầu";
+            throw new RuntimeException( "Thời gian kết thúc phải sau thời gian bắt đầu");
         }
         long durationMillis = end.getTime() - start.getTime();
         if (durationMillis > 30 * 60 * 1000L) { // tối đa 30m
-            return "Chỉ có thể đặt chỗ trong tối đa 30 phút";
+            throw new RuntimeException("Chỉ có thể đặt chỗ trong tối đa 30 phút");
         }
 
-        // (Optional) Không cho đặt ở quá khứ
+        // Không cho đặt ở quá khứ
         Date now = new Date();
         if (end.before(now)) {
-            return "Thời gian đặt chỗ phải ở tương lai";
+            throw new RuntimeException( "Thời gian đặt chỗ phải ở tương lai");
         }
 
-        //extra: kiểm tra trùng lặp với các reservation khác
+        //kiểm tra trùng lặp với các reservation khác
         List<Reservation> existingReservations = reservationRepository.findByChargerPointIdAndStatus(cp.getId(), "PENDING");
         for (Reservation r : existingReservations) {
             if (start.before(r.getEndDate()) && end.after(r.getStartDate())) {
@@ -94,7 +103,7 @@ public class ReservationService {
     }
 
     //tự động load, trước 10p trước giờ hẹn sẽ set trạng thái trụ về Reserved
-    @Scheduled(fixedRate = 15000)//chạy mỗi 15s
+    @Scheduled(fixedRate = 10000)//chạy mỗi 10s
     public void setStatusRever(){
         List<Reservation> reservations = reservationRepository.findByStatus("PENDING");
         Date current = new Date(System.currentTimeMillis());
@@ -115,14 +124,16 @@ public class ReservationService {
             //2)nếu phiên sạc đang sạc trước đó sạc xong SAU giờ kết
             //thúc của phiên đặt chỗ, đặt chỗ coi như bị hủy
             if(r.getEndDate().before(current)) {
-                if(!r.getChargerPoint().equals("ONGOING")){
-                r.getChargerPoint().setStatus("AVAILABLE");}
+                //if(!r.getChargerPoint().equals("ONGOING")) {
+                if (!"ONGOING".equalsIgnoreCase(r.getChargerPoint().getStatus())) {
+                    r.getChargerPoint().setStatus("AVAILABLE");}
                 r.setStatus("CANCELLED");
                 reservationRepository.save(r);
                 chargerPointRepository.save(r.getChargerPoint());
             }
         }
     }
+
 
     public List<ReservationResponse> getUserReservations(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -144,6 +155,7 @@ public class ReservationService {
             // Lấy tên trụ và trạm
             if (r.getChargerPoint() != null) {
                 dto.setChargerPointName(r.getChargerPoint().getName());
+                dto.setChargerpointId(r.getChargerPoint().getId());
                 if (r.getChargerPoint().getStation() != null) {
                     dto.setStationName(r.getChargerPoint().getStation().getName());
                     dto.setStationId(r.getChargerPoint().getStation().getId());
@@ -154,47 +166,51 @@ public class ReservationService {
         return result;
     }
 
-    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
-        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
-        List<ReservationResponse> result = new ArrayList<>();
-        for (Reservation r : reservations) {
-            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
-            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
-            if (reservationDate.equals(date)) {
-                ReservationResponse dto = new ReservationResponse();
-                dto.setId(r.getId());
-                dto.setStatus(r.getStatus());
-                dto.setStartDate(r.getStartDate());
-                dto.setEndDate(r.getEndDate());
 
-            // Lấy tên trụ và trạm
-            if (r.getChargerPoint() != null) {
-                dto.setCharcherpointId(r.getChargerPoint().getId());
-                dto.setChargerPointName(r.getChargerPoint().getName());
-                if (r.getChargerPoint().getStation() != null) {
-                    dto.setStationName(r.getChargerPoint().getStation().getName());
-                }
-            }
-            result.add(dto);
-                // Lấy tên trụ và trạm
-                if (r.getChargerPoint() != null) {
-                    dto.setChargerPointName(r.getChargerPoint().getName());
-                    if (r.getChargerPoint().getStation() != null) {
-                        dto.setStationName(r.getChargerPoint().getStation().getName());
-                        dto.setStationId(r.getChargerPoint().getStation().getId());
-                    }
-                }
-                result.add(dto);
-            }
-        }
-        return result;
-    }
+//
+//    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
+//        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
+//        List<ReservationResponse> result = new ArrayList<>();
+//        for (Reservation r : reservations) {
+//            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
+//            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
+//            if (reservationDate.equals(date)) {
+//                ReservationResponse dto = new ReservationResponse();
+//                dto.setId(r.getId());
+//                dto.setStatus(r.getStatus());
+//                dto.setStartDate(r.getStartDate());
+//                dto.setEndDate(r.getEndDate());
+//
+//            // Lấy tên trụ và trạm
+//            if (r.getChargerPoint() != null) {
+//                dto.setChargerpointId(r.getChargerPoint().getId());
+//                dto.setChargerPointName(r.getChargerPoint().getName());
+//                if (r.getChargerPoint().getStation() != null) {
+//                    dto.setStationName(r.getChargerPoint().getStation().getName());
+//                }
+//            }
+//            result.add(dto);
+//                // Lấy tên trụ và trạm
+//                if (r.getChargerPoint() != null) {
+//                    dto.setChargerPointName(r.getChargerPoint().getName());
+//                    if (r.getChargerPoint().getStation() != null) {
+//                        dto.setStationName(r.getChargerPoint().getStation().getName());
+//                    }
+//                }
+//                result.add(dto);
+//            }
+//        }
+//        return result;
+//    }
 
     public void cancelReservation(int reservationId) {
         User currentUser = getCurrentUser();
+        Reservation reservation = reservationRepository.findById(reservationId).get();
 
-        Reservation reservation = reservationRepository.findByIdAndUserId(reservationId, currentUser.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt chỗ của bạn với ID: " + reservationId));
+        if(currentUser.getRole().equals("USER")) {
+            reservation = reservationRepository.findByIdAndUserId(reservationId, currentUser.getId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt chỗ của bạn với ID: " + reservationId));
+        }
 
         if (reservation.getStatus().equalsIgnoreCase("CANCELLED") ||
                 reservation.getStatus().equalsIgnoreCase("COMPLETED")) {
@@ -202,6 +218,35 @@ public class ReservationService {
         }
 
         reservation.setStatus("CANCELLED");
+        ChargerPoint p = reservation.getChargerPoint();
+        if(p.getStatus().equals("RESERVED")) {
+            p.setStatus("AVAILABLE");
+            chargerPointRepository.save(p);
+        }
         reservationRepository.save(reservation);
+    }
+
+    public List<ReservationResponse> getAllReservations() {
+        List<ReservationResponse> result = new ArrayList<>();
+        List<Reservation> reservations = reservationRepository.findAllByStatus("PENDING");
+        for(Reservation r: reservations){
+            ReservationResponse dto = new ReservationResponse();
+            dto.setId(r.getId());
+            dto.setStatus(r.getStatus());
+            dto.setStartDate(r.getStartDate());
+            dto.setEndDate(r.getEndDate());
+
+            // Lấy tên trụ và trạm
+            if (r.getChargerPoint() != null) {
+                dto.setChargerPointName(r.getChargerPoint().getName());
+                dto.setChargerpointId(r.getChargerPoint().getId());
+                if (r.getChargerPoint().getStation() != null) {
+                    dto.setStationName(r.getChargerPoint().getStation().getName());
+                    dto.setStationId(r.getChargerPoint().getStation().getId());
+                }
+            }
+            result.add(dto);
+        }
+        return result;
     }
 }

@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Check(constraints = "status IN ('PENDING', 'IN_PROGRESS', 'SOLVED')")
+@Check(constraints = "status IN ('PENDING', 'SOLVED')")
 @Table(name="problem_reports")
 @Data
 @AllArgsConstructor
