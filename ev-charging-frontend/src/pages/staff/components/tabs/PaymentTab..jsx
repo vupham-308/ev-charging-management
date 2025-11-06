@@ -80,7 +80,7 @@
                           >
                             {processingId === session.id
                               ? "Đang xử lý..."
-                              : "Xử lý thanh toán"}
+                              : "Xác nhận thanh toán"}
                           </Button>
                         )}
                     </div>

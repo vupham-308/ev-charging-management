@@ -9,9 +9,13 @@ const Users = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
-    const [showModal, setShowModal] = useState(false);
 
-    // 🔴 Modal xác nhận xóa
+    // Modal thêm/sửa
+    const [showModal, setShowModal] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editUser, setEditUser] = useState(null);
+
+    // Modal xác nhận xóa
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
 
@@ -44,7 +48,7 @@ const Users = () => {
         fetchStats();
     }, []);
 
-    // 🔍 Tìm kiếm người dùng
+    // 🔍 Tìm kiếm
     const handleSearch = async (keyword) => {
         setSearch(keyword);
         if (!keyword.trim()) {
@@ -61,21 +65,17 @@ const Users = () => {
         }
     };
 
-    // 🗑 Nhấn nút Xóa
+    // 🗑 Nhấn nút xóa
     const handleDeleteClick = (id) => {
-        console.log("🟠 Nhấn nút xóa ID:", id);
         setSelectedUserId(id);
         setShowConfirm(true);
     };
 
     // ✅ Thực hiện xóa người dùng
     const confirmDelete = async () => {
-        console.log("🟢 Xác nhận xóa người dùng ID:", selectedUserId);
         setLoading(true);
         try {
             const res = await api.delete(`admin/users/${selectedUserId}`);
-            console.log("📡 Kết quả API:", res);
-
             if (res.status === 200 || res.status === 204) {
                 message.success("Xóa người dùng thành công!");
                 await fetchUsers();
@@ -85,13 +85,20 @@ const Users = () => {
             }
         } catch (error) {
             console.error("❌ Lỗi khi xóa người dùng:", error.response || error);
-const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng!";
+            const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng!";
             message.error(errMsg);
         } finally {
             setShowConfirm(false);
             setSelectedUserId(null);
             setLoading(false);
         }
+    };
+
+    // ✏️ Nhấn nút Sửa
+    const handleEditClick = (user) => {
+        setEditUser(user);
+        setIsEdit(true);
+        setShowModal(true);
     };
 
     if (loading) {
@@ -107,7 +114,14 @@ const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa ng�
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h1>Quản Lý Người Dùng</h1>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
+                <button
+                    className="btn-primary"
+                    onClick={() => {
+                        setIsEdit(false);
+                        setEditUser(null);
+                        setShowModal(true);
+                    }}
+                >
                     <i className="fa-solid fa-user-plus"></i> Thêm người dùng
                 </button>
             </div>
@@ -153,13 +167,10 @@ const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa ng�
                             </div>
 
                             <div className="user-actions">
-                                <button className="btn-icon edit">
-<i className="fa-solid fa-pen"></i> Sửa
+                                <button className="btn-icon edit" onClick={() => handleEditClick(u)}>
+                                    <i className="fa-solid fa-pen"></i> Sửa
                                 </button>
-                                <button
-                                    className="btn-icon delete"
-                                    onClick={() => handleDeleteClick(u.id)}
-                                >
+                                <button className="btn-icon delete" onClick={() => handleDeleteClick(u.id)}>
                                     <i className="fa-solid fa-trash"></i> Xóa
                                 </button>
                             </div>
@@ -168,78 +179,119 @@ const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa ng�
                 )}
             </div>
 
-          {/* Popup thêm người dùng */}
+            {/* Modal thêm/sửa người dùng */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal">
                         <div className="modal-header">
                             <h4>
-                                <i className="fa-solid fa-user-plus"></i> Tạo tài khoản mới
+                                <i className="fa-solid fa-user-plus"></i>{" "}
+                                {isEdit ? "Chỉnh sửa người dùng" : "Tạo tài khoản mới"}
                             </h4>
                             <button className="close-btn" onClick={() => setShowModal(false)}>
                                 <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <p className="modal-desc">Tạo tài khoản cho nhân viên hoặc tài xế mới</p>
+                        <p className="modal-desc">
+                            {isEdit
+                                ? "Cập nhật thông tin người dùng"
+                                : "Tạo tài khoản cho nhân viên hoặc tài xế mới"}
+                        </p>
 
                         <form
                             className="modal-form"
                             onSubmit={async (e) => {
                                 e.preventDefault();
                                 const form = e.target;
-                                const newUser = {
+                                const userData = {
                                     fullName: form.fullName.value.trim(),
                                     email: form.email.value.trim(),
                                     phone: form.phone.value.trim(),
                                     role: form.role.value,
-                                    password: form.password.value,
+                                    password: form.password?.value,
                                     active: true,
-                                    enabled: true,
                                 };
 
-                                if (!newUser.fullName || !newUser.email || !newUser.role || !newUser.password) {
+                                if (!userData.fullName || !userData.email || !userData.role) {
                                     message.warning("Vui lòng nhập đầy đủ thông tin bắt buộc!");
                                     return;
                                 }
 
                                 try {
                                     setLoading(true);
-                                    const res = await api.post("admin/users/create-user", newUser);
+                                    let res;
+
+                                    if (isEdit && editUser) {
+                                        // chỉ gửi field cho phép
+                                        const updateData = {
+                                            fullName: userData.fullName,
+                                            email: userData.email,
+                                            phone: userData.phone,
+                                            role: userData.role,
+                                            active: true,
+                                        };
+
+                                        // gọi API update
+                                        res = await api.put(`admin/users/admin-update-user/${editUser.id}`, updateData);
+                                    } else {
+                                        // tạo mới
+                                        res = await api.post("admin/users/create-user", userData);
+                                    }
+
                                     if (res.status === 200 || res.status === 201) {
-                                        message.success("Tạo người dùng thành công!");
+                                        message.success(isEdit ? "Cập nhật người dùng thành công!" : "Tạo người dùng thành công!");
                                         form.reset();
                                         setShowModal(false);
+                                        setEditUser(null);
+                                        setIsEdit(false);
                                         await fetchUsers();
                                         await fetchStats();
                                     } else {
-                                        message.error("Không thể tạo người dùng!");
+                                        message.error("Thao tác thất bại!");
                                     }
                                 } catch (error) {
-                                    console.error("❌ Lỗi khi tạo người dùng:", error);
-                                    const errMsg = error.response?.data?.message || "Lỗi khi tạo người dùng!";
+                                    console.error("❌ Lỗi khi tạo/cập nhật người dùng:", error);
+                                    const errMsg =
+                                        error.response?.data?.message ||
+                                        "Lỗi khi tạo/cập nhật người dùng!";
                                     message.error(errMsg);
                                 } finally {
                                     setLoading(false);
-}
+                                }
                             }}
                         >
                             <label>
                                 Họ và tên <span>*</span>
                             </label>
-                            <input type="text" name="fullName" placeholder="Nguyễn Văn A" />
+                            <input
+                                type="text"
+                                name="fullName"
+                                defaultValue={editUser?.fullName || ""}
+                                placeholder="Nguyễn Văn A"
+                            />
 
                             <label>
                                 Email <span>*</span>
                             </label>
-                            <input type="email" name="email" placeholder="nguyenvana@email.com" />
+                            <input
+                                type="email"
+                                name="email"
+                                defaultValue={editUser?.email || ""}
+                                placeholder="nguyenvana@email.com"
+                            />
 
                             <label>Số điện thoại</label>
-                            <input type="tel" name="phone" placeholder="+84-123-456789" />
+                            <input
+                                type="tel"
+                                name="phone"
+                                defaultValue={editUser?.phone || ""}
+                                placeholder="+84-123-456789"
+                            />
 
                             <label>
                                 Vai trò <span>*</span>
                             </label>
-                            <select name="role" defaultValue="">
+                            <select name="role" defaultValue={editUser?.role || ""}>
                                 <option value="" disabled>
                                     Chọn vai trò
                                 </option>
@@ -247,21 +299,20 @@ const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa ng�
                                 <option value="STAFF">Quản lý</option>
                             </select>
 
-                            <label>
-                                Mật khẩu <span>*</span>
-                            </label>
-                            <div className="password-field">
-                                <input type="password" name="password" placeholder="Nhập mật khẩu" />
-                            </div>
-
-                            <p className="note">
-                                <strong>Lưu ý:</strong> Mật khẩu sẽ được hiển thị sau khi tạo tài khoản thành công.
-                                Hãy ghi lại và chuyển cho người dùng.
-                            </p>
+                            {!isEdit && (
+                                <>
+                                    <label>
+                                        Mật khẩu <span>*</span>
+                                    </label>
+                                    <div className="password-field">
+                                        <input type="password" name="password" placeholder="Nhập mật khẩu" />
+                                    </div>
+                                </>
+                            )}
 
                             <div className="modal-actions">
                                 <button type="submit" className="btn primary">
-                                    Tạo tài khoản
+                                    {isEdit ? "Cập nhật" : "Tạo tài khoản"}
                                 </button>
                                 <button
                                     type="button"
@@ -278,7 +329,7 @@ const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa ng�
 
             {/* 🔥 Modal xác nhận xóa */}
             <Modal
-                visible={showConfirm}
+                open={showConfirm} // đổi từ visible → open
                 title="Xác nhận xóa người dùng"
                 onOk={confirmDelete}
                 onCancel={() => setShowConfirm(false)}

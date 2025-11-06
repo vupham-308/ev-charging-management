@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Spin, message, Tag, Select } from "antd";
+import { Card, Button, Spin, message, Tag, Select, Modal } from "antd";
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
@@ -22,17 +22,30 @@ const ManageStartCharging = () => {
   const [chargers, setChargers] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
+  // form state
   const [selectedCar, setSelectedCar] = useState(null);
   const [selectedCharger, setSelectedCharger] = useState(null);
   const [targetBattery, setTargetBattery] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [canContinue, setCanContinue] = useState(false);
 
+  // modal confirm bill
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmData, setConfirmData] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // ⬇️ Thêm state mới ở đầu component
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // Load data
   useEffect(() => {
+    let mounted = true;
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [stationRes, carRes, chargerRes, reviewRes] = await Promise.all([
           api.get(`/station/get/${stationId}`),
           api.get(`/cars`),
@@ -40,48 +53,53 @@ const ManageStartCharging = () => {
           api.get(`/review/station/${stationId}`),
         ]);
 
+        if (!mounted) return;
         setStation(stationRes.data);
-        setCars(carRes.data);
-        setChargers(chargerRes.data);
-        setReviews(reviewRes.data);
+        setCars(Array.isArray(carRes.data) ? carRes.data : []);
+        setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
+        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
 
-        if (reviewRes.data.length > 0) {
+        if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
-            reviewRes.data.reduce((sum, r) => sum + r.rating, 0) /
+            reviewRes.data.reduce((sum, r) => sum + (r.rating || 0), 0) /
             reviewRes.data.length;
           setAverageRating(avg.toFixed(1));
         }
-      } catch {
+      } catch (err) {
+        console.error("❌ Lỗi khi tải dữ liệu:", err);
         message.error("❌ Lỗi khi tải dữ liệu!");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     fetchData();
+    return () => {
+      mounted = false;
+    };
   }, [stationId]);
 
+  // enable continue
   useEffect(() => {
     setCanContinue(
-      selectedCar && selectedCharger && targetBattery && paymentMethod
+      Boolean(selectedCar && selectedCharger && targetBattery && paymentMethod)
     );
   }, [selectedCar, selectedCharger, targetBattery, paymentMethod]);
 
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
-    const current = selectedCar.initBattery;
+    const current = Number(selectedCar.initBattery || 0);
     const options = [];
-    for (let i = Math.ceil((current + 10) / 10) * 10; i <= 100; i += 10) {
-      options.push(i);
-    }
+    const start = Math.max(10, Math.ceil((current + 10) / 10) * 10);
+    for (let i = start; i <= 100; i += 10) options.push(i);
     return options;
   };
 
+  // continue -> open confirm modal
   const handleContinue = async () => {
     if (!canContinue) {
       message.warning("⚠️ Vui lòng chọn đầy đủ thông tin!");
       return;
     }
-
     try {
       const token = localStorage.getItem("token");
       const payload = {
@@ -90,21 +108,17 @@ const ManageStartCharging = () => {
         goalBattery: targetBattery,
         paymentMethod,
       };
-
       const res = await api.post("/charge", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      navigate("/driver/confirmBill", {
-        state: {
-          chargeData: res.data,
-          station,
-          selectedCar,
-          selectedCharger,
-          targetBattery,
-          paymentMethod,
-        },
+      setConfirmData({
+        chargeData: res.data,
+        station,
+        selectedCar,
+        selectedCharger,
       });
+      setShowConfirm(true);
     } catch (err) {
       console.error("❌ Lỗi khi tạo phiên sạc:", err);
       const errorMsg =
@@ -113,6 +127,22 @@ const ManageStartCharging = () => {
         "Không thể tạo phiên sạc!";
       message.error(errorMsg);
       toast.warning(errorMsg);
+    }
+  };
+
+  // confirm and start charging
+  const handleConfirm = async () => {
+    if (!confirmData?.chargeData?.id) return;
+    try {
+      setConfirmLoading(true);
+      await api.post(`/charging/${confirmData.chargeData.id}`);
+      toast.success("✅ Phiên sạc đã bắt đầu!");
+      setShowConfirm(false);
+      navigate("/driver/chargingSession");
+    } catch {
+      toast.error("❌ Không thể bắt đầu sạc! Vui lòng thử lại.");
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -143,9 +173,8 @@ const ManageStartCharging = () => {
           Chọn trạm, xe và trụ để khởi động phiên sạc
         </p>
 
-        {/* Layout 3 cột */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Cột 1: Trạm sạc */}
+          {/* Cột 1: Trạm */}
           <Card
             bordered={false}
             className="shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
@@ -158,15 +187,12 @@ const ManageStartCharging = () => {
           >
             <p className="text-lg font-medium">{name}</p>
             <p className="text-gray-500 mb-3">{address}</p>
-
             <p className="text-blue-600 font-medium mb-2">
               {pointChargerAvailable}/{pointChargerTotal} trụ trống
             </p>
-
             <Tag color="green" style={{ borderRadius: 12 }}>
               Sạc nhanh
             </Tag>
-
             <Button
               danger
               icon={<FaExclamationTriangle />}
@@ -198,6 +224,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn xe"
                 style={{ width: "100%" }}
+                value={selectedCar?.id}
                 onChange={(id) =>
                   setSelectedCar(cars.find((car) => car.id === id))
                 }
@@ -216,6 +243,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn trụ sạc"
                 style={{ width: "100%" }}
+                value={selectedCharger?.id}
                 onChange={(id) =>
                   setSelectedCharger(chargers.find((c) => c.id === id))
                 }
@@ -231,11 +259,12 @@ const ManageStartCharging = () => {
 
             {/* Mục tiêu pin */}
             <div className="mb-4">
-              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin (%)</p>
+              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin</p>
               <Select
                 placeholder="Chọn mức pin"
                 style={{ width: "100%" }}
                 disabled={!selectedCar}
+                value={targetBattery}
                 onChange={setTargetBattery}
               >
                 {getBatteryOptions().map((val) => (
@@ -255,6 +284,7 @@ const ManageStartCharging = () => {
               <Select
                 placeholder="Chọn phương thức"
                 style={{ width: "100%" }}
+                value={paymentMethod}
                 onChange={setPaymentMethod}
               >
                 <Select.Option value="BALANCE">Số dư tài khoản</Select.Option>
@@ -306,9 +336,109 @@ const ManageStartCharging = () => {
                 </p>
               </div>
             ))}
+
+            {reviews.length > 3 && (
+              <Button
+                type="link"
+                onClick={() => setShowAllReviews(true)}
+                className="p-0 text-blue-600"
+              >
+                Xem thêm đánh giá...
+              </Button>
+            )}
           </Card>
         </div>
       </div>
+
+      {/* Popup Confirm Bill */}
+      <Modal
+        title="Xác nhận thông tin sạc"
+        open={showConfirm}
+        onCancel={() => setShowConfirm(false)}
+        footer={null}
+        centered
+        width={600}
+      >
+        {confirmData ? (
+          <div className="space-y-3">
+            <p>
+              <strong>Trạm:</strong> {confirmData.station.name}
+            </p>
+            <p>
+              <strong>Trụ sạc:</strong> {confirmData.selectedCharger.name} •{" "}
+              {confirmData.selectedCharger.capacity}kW
+            </p>
+            <p>
+              <strong>Xe:</strong> {confirmData.selectedCar.brand}
+            </p>
+            <p>
+              <strong>Pin:</strong> {confirmData.chargeData.initBattery}% →{" "}
+              {confirmData.chargeData.goalBattery}%
+            </p>
+            <p>
+              <strong>Thanh toán:</strong>{" "}
+              {confirmData.chargeData.paymentMethod === "BALANCE"
+                ? "Số dư tài khoản"
+                : "Tiền mặt"}
+            </p>
+            <p>
+              <strong>Ước tính:</strong>{" "}
+              {confirmData.chargeData.fee.toLocaleString("vi-VN")}đ •{" "}
+              {confirmData.chargeData.minute} phút
+            </p>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button onClick={() => setShowConfirm(false)}>Hủy</Button>
+              <Button
+                type="primary"
+                loading={confirmLoading}
+                onClick={handleConfirm}
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-10">
+            <Spin />
+          </div>
+        )}
+      </Modal>
+
+      {/* Popup hiển thị tất cả đánh giá */}
+      <Modal
+        title={`Tất cả đánh giá của trạm ${station.name}`}
+        open={showAllReviews}
+        onCancel={() => setShowAllReviews(false)}
+        footer={null}
+        centered
+        width={700}
+      >
+        {reviews.length > 0 ? (
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="mb-4 border-b border-gray-100 pb-3 last:border-0"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-800">{r.userName}</p>
+                  <span className="text-yellow-500 text-sm">⭐ {r.rating}</span>
+                </div>
+                <p className="text-gray-600 text-sm mt-1">{r.description}</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-10">
+            Chưa có đánh giá nào cho trạm này.
+          </p>
+        )}
+      </Modal>
+
       <Outlet />
     </div>
   );
