@@ -23,15 +23,15 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
-    @NotEmpty(message = "Password cannot be empty!")
+    @NotEmpty(message = "Password không được để trống!")
     private String password;
-    @NotEmpty(message = "Fullname cannot be empty!")
+    @NotEmpty(message = "Fullname không được để trống!")
     @Column(columnDefinition = "NVARCHAR(100)")
     private String fullName;
     @Email
     @Column(unique = true)
     private String email;
-    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Phone is invalid!")
+    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Số điện thoại không hợp lệ!")
     @Column(unique = true)
     private String phone;
     @Column(length = 10)
