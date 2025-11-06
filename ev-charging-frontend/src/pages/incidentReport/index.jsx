@@ -109,6 +109,63 @@ const ManageIncidentReport = () => {
         </div>
       ) : (
         <div className="max-w-6xl mx-auto space-y-10">
+          {/* --- Hàng 2: ĐANG CHỜ / ĐANG XỬ LÝ --- */}
+          <div>
+            <h2 className="text-2xl font-semibold text-blue-600 mb-4 flex items-center gap-2">
+              <FaClock /> Sự cố đang chờ & xử lý
+            </h2>
+            {pendingReports.length === 0 ? (
+              <p className="text-gray-500 italic">Không có sự cố đang chờ.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {pendingReports.map((report) => (
+                  <Card
+                    key={report.id}
+                    className="rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 bg-white"
+                    title={
+                      <div className="flex items-center gap-2 text-gray-800">
+                        <FaMapMarkerAlt className="text-blue-600" />
+                        <span className="font-semibold">
+                          {report.station?.name || "Không xác định"}
+                        </span>
+                      </div>
+                    }
+                    extra={getStatusTag(report.status)}
+                  >
+                    <div className="text-gray-800">
+                      <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
+                        <FaExclamationTriangle className="text-orange-500" />
+                        {report.title}
+                      </h2>
+                      <p className="text-gray-600 mb-3">{report.description}</p>
+
+                      <div className="space-y-1 text-sm text-gray-700">
+                        {report.response && (
+                          <Tooltip title="Phản hồi từ bộ phận kỹ thuật">
+                            <p className="flex items-start gap-2">
+                              <FaComments className="text-indigo-500 mt-1" />
+                              <span>
+                                <b>Phản hồi:</b> {report.response}
+                              </span>
+                            </p>
+                          </Tooltip>
+                        )}
+                        <p className="flex items-center gap-2">
+                          <FaClock className="text-gray-400" />
+                          <span>
+                            <b>Báo cáo lúc:</b> {formatDate(report.createdAt)}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Divider className="border-gray-200" />
+
           {/* --- Hàng 1: ĐÃ GIẢI QUYẾT --- */}
           <div>
             <h2 className="text-2xl font-semibold text-green-600 mb-4 flex items-center gap-2">
@@ -167,63 +224,6 @@ const ManageIncidentReport = () => {
                             </span>
                           </p>
                         )}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <Divider className="border-gray-200" />
-
-          {/* --- Hàng 2: ĐANG CHỜ / ĐANG XỬ LÝ --- */}
-          <div>
-            <h2 className="text-2xl font-semibold text-blue-600 mb-4 flex items-center gap-2">
-              <FaClock /> Sự cố đang chờ & xử lý
-            </h2>
-            {pendingReports.length === 0 ? (
-              <p className="text-gray-500 italic">Không có sự cố đang chờ.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {pendingReports.map((report) => (
-                  <Card
-                    key={report.id}
-                    className="rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 bg-white"
-                    title={
-                      <div className="flex items-center gap-2 text-gray-800">
-                        <FaMapMarkerAlt className="text-blue-600" />
-                        <span className="font-semibold">
-                          {report.station?.name || "Không xác định"}
-                        </span>
-                      </div>
-                    }
-                    extra={getStatusTag(report.status)}
-                  >
-                    <div className="text-gray-800">
-                      <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
-                        <FaExclamationTriangle className="text-orange-500" />
-                        {report.title}
-                      </h2>
-                      <p className="text-gray-600 mb-3">{report.description}</p>
-
-                      <div className="space-y-1 text-sm text-gray-700">
-                        {report.response && (
-                          <Tooltip title="Phản hồi từ bộ phận kỹ thuật">
-                            <p className="flex items-start gap-2">
-                              <FaComments className="text-indigo-500 mt-1" />
-                              <span>
-                                <b>Phản hồi:</b> {report.response}
-                              </span>
-                            </p>
-                          </Tooltip>
-                        )}
-                        <p className="flex items-center gap-2">
-                          <FaClock className="text-gray-400" />
-                          <span>
-                            <b>Báo cáo lúc:</b> {formatDate(report.createdAt)}
-                          </span>
-                        </p>
                       </div>
                     </div>
                   </Card>

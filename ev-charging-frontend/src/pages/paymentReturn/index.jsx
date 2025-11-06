@@ -14,7 +14,7 @@ const PaymentReturn = () => {
     if (responseCode === "00") {
       // ✅ Hiển thị toast nạp tiền thành công
       toast.success(
-        `Nạp ${Number(amount).toLocaleString("vi-VN")} VND thành công!`
+        `Nạp thành công ${Number(amount).toLocaleString("vi-VN")} VND!`
       );
 
       // Chờ 1 chút rồi chuyển về trang transaction

@@ -1,13 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaBolt, FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import api from "../../config/axios";
 import "../admin/ChargingRates.css";
 
 const ChargingRates = () => {
-    const [rates, setRates] = useState([
-        { id: 1, power: "7kW", type: "AC", price: 120, editing: false },
-        { id: 2, power: "22kW", type: "CHAdeMO", price: 180, editing: false },
-        { id: 3, power: "50kW", type: "CCS", price: 320, editing: false },
-    ]);
+    const [rates, setRates] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Lấy dữ liệu từ server
+    useEffect(() => {
+        const fetchRates = async () => {
+            try {
+                const res = await api.get("admin/get");
+                console.log("Dữ liệu từ server:", res.data);
+
+                // map dữ liệu từ API về state
+                const ratesData = res.data.map((item, index) => ({
+                    id: index + 1,
+                    power:
+                        item.portType === "AC" ? "7kW" :
+                            item.portType === "CHAdeMO" ? "22kW" :
+                                item.portType === "CCS" ? "50kW" :
+                                    "N/A",
+                    type: item.portType,
+                    price: item.cost,
+                    editing: false,
+                }));
+
+                setRates(ratesData);
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu:", error);
+                alert("Không thể tải dữ liệu giá sạc!");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRates();
+    }, []);
 
     const handleEdit = (id) =>
         setRates(rates.map(r => r.id === id ? { ...r, editing: true } : r));
@@ -18,8 +48,27 @@ const ChargingRates = () => {
     const handleChange = (id, value) =>
         setRates(rates.map(r => r.id === id ? { ...r, price: value } : r));
 
-    const handleSave = (id) =>
-        setRates(rates.map(r => r.id === id ? { ...r, editing: false } : r));
+    const handleSave = async (id) => {
+        const rate = rates.find(r => r.id === id);
+        if (!rate) return;
+
+        try {
+            const res = await api.put(
+                `admin/edit-cost/${rate.type}?newCost=${rate.price}`
+            );
+
+            alert(`✅ Cập nhật giá ${rate.type} thành công!`);
+            console.log("Server response:", res.data);
+
+            setRates(rates.map(r => r.id === id ? { ...r, editing: false } : r));
+        } catch (error) {
+            console.error("Lỗi khi cập nhật giá:", error);
+            const msg = error.response?.data || error.message;
+            alert(`❌ Cập nhật thất bại: ${msg}`);
+        }
+    };
+
+    if (loading) return <p>Đang tải dữ liệu...</p>;
 
     return (
         <div className="charging-rates-container">

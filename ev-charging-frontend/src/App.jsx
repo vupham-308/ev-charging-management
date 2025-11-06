@@ -27,7 +27,6 @@ import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
 import ManageChargingSession from "./pages/chargingSession";
-import ManageConfirmBill from "./pages/confirmBill";
 import ManageIncidentReport from "./pages/incidentReport";
 import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
@@ -41,6 +40,7 @@ import PaymentReturn from "./pages/paymentReturn";
 // là 1 cái function
 // trả về 1 cái giao diện
 function AppContent() {
+  
   const dispatch = useDispatch();
 
   // ✅ Khôi phục account từ localStorage khi load app (chỉ chạy 1 lần)
@@ -109,14 +109,13 @@ function AppContent() {
           path: "startChargingBooking/:stationId",
           element: <ManageStartChargingBooking />,
         },
-
+        {
+          path: "startChargingBooking/:stationId/stationReport",
+          element: <ManageStationReport />,
+        },
         {
           path: "myBooking",
           element: <ManageMyBooking />,
-        },
-        {
-          path: "confirmBill",
-          element: <ManageConfirmBill />,
         },
         {
           path: "chargingSession",

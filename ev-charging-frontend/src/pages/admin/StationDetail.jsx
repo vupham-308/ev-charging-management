@@ -35,15 +35,24 @@ const StationDetail = () => {
     const token = localStorage.getItem("token");
 
     const fetchStationDetail = async () => {
-        const res = await fetch(`http://222.255.214.35:8080/api/station/admin/detail/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setStation(data);
-    };
+    const res = await fetch(`http://222.255.214.35:8080/api/station/admin/detail/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    setStation(data);
+
+    // ✅ Cập nhật stats từ API station
+    setStats(prevStats => ({
+        ...prevStats,
+        available: data.availableChargers,
+        inUse: data.occupiedChargers,
+        maintenance: data.outOfServiceChargers
+    }));
+};
+
 
     const fetchChargers = async () => {
-        const res = await fetch(`http://222.255.214.35:8080/api/chargerPoint/getAllAvailable/${id}`, {
+        const res = await fetch(`http://222.255.214.35:8080/api/chargerPoint/getAll/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -283,7 +292,7 @@ const StationDetail = () => {
                         <div style={{ display: "flex", gap: 24, marginTop: 12, color: "#555" }}>
                             <div><PhoneOutlined /> {station.phone}</div>
                             <div><MailOutlined /> {station.email}</div>
-                            <div>⚡ {chargers.length} trụ</div>
+<div>⚡ {station.totalChargers} trụ</div>
                         </div>
                     </div>
                     <div>{getStationStatus(station.status)}</div>
