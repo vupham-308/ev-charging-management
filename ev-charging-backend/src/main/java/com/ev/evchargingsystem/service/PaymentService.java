@@ -143,7 +143,7 @@ public class PaymentService {
                 Transaction t = transactionRepository.findTransactionById(id);
                 t.setStatus("FAILED");
                 transactionRepository.save(t);
-                throw new RuntimeException("Thanh toán thất bại! Mã lỗi: "+ responseCode);
+                return t;
             }
         } else {
             // Chữ ký không hợp lệ

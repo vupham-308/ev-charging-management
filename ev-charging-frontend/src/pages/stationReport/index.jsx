@@ -1,10 +1,17 @@
 import { useState } from "react";
-import { Card, Input, Button, Select, message } from "antd";
+import { Card, Input, Button, message } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
-import { WarningOutlined, SendOutlined } from "@ant-design/icons";
-import api from "../../config/axios";
 import { toast } from "react-toastify";
-
+import {
+  FaExclamationTriangle,
+  FaPaperPlane,
+  FaChargingStation,
+  FaRegEdit,
+  FaRegCommentDots,
+  FaArrowLeft,
+} from "react-icons/fa";
+import api from "../../config/axios";
+import { useEffect } from "react";
 const { TextArea } = Input;
 
 const ManageStationReport = () => {
@@ -14,6 +21,23 @@ const ManageStationReport = () => {
   const [problemTitle, setProblemTitle] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [stationName, setStationName] = useState("");
+
+  useEffect(() => {
+    const fetchStation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get(`/station/get/${stationId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStationName(res.data.name);
+      } catch (err) {
+        console.error("❌ Lỗi khi tải thông tin trạm:", err);
+        setStationName("Không xác định");
+      }
+    };
+    fetchStation();
+  }, [stationId]);
 
   const handleSubmit = async () => {
     if (!problemTitle || !description) {
@@ -33,7 +57,7 @@ const ManageStationReport = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast.success("Gửi báo cáo thành công!");
+      toast.success("🚀 Gửi báo cáo thành công!");
       navigate(-1);
     } catch (err) {
       console.error("❌ Lỗi khi gửi báo cáo:", err);
@@ -45,124 +69,82 @@ const ManageStationReport = () => {
   };
 
   return (
-    <div
-      style={{
-        padding: "40px 20px",
-        display: "flex",
-        justifyContent: "center",
-        backgroundColor: "#fafafa",
-        minHeight: "100vh",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: 600 }}>
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 600,
-              marginBottom: 6,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <WarningOutlined style={{ color: "#faad14" }} />
-            Báo cáo sự cố
-          </h1>
-          <p style={{ color: "#666", margin: 0 }}>
-            Báo cáo vấn đề gặp phải tại trạm sạc để chúng tôi xử lý kịp thời
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center py-10 px-4">
+      <Card
+        bordered={false}
+        className="w-full max-w-lg shadow-lg rounded-2xl bg-white hover:shadow-xl transition-all duration-300"
+        title={
+          <div className="flex items-center gap-2 text-xl font-semibold text-blue-700">
+            <FaExclamationTriangle className="text-yellow-500" />
+            Báo cáo sự cố trạm sạc
+          </div>
+        }
+      >
+        <p className="text-gray-600 mb-6">
+          Hãy mô tả rõ ràng sự cố bạn gặp phải tại trạm sạc để đội ngũ kỹ thuật
+          có thể hỗ trợ nhanh nhất.
+        </p>
+
+        {/* Thông tin trạm */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-2 text-gray-800 font-medium text-base">
+            <FaChargingStation className="text-green-600" />
+            Trạm sạc:
+          </div>
+          <p className="ml-6 mt-1 text-gray-700 font-semibold">{stationName}</p>
         </div>
 
-        {/* Form */}
-        <Card
-          style={{
-            borderRadius: 12,
-            boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
-            border: "1px solid #eee",
-          }}
-          bodyStyle={{ padding: "24px 28px" }}
-        >
-          {/* Trạm sạc */}
-          <div style={{ marginBottom: 18 }}>
-            <p style={{ marginBottom: 4, color: "#888", fontWeight: 500 }}>
-              Trạm sạc:
-            </p>
-            <p
-              style={{
-                fontWeight: 600,
-                color: "#000",
-                fontSize: 15,
-                margin: 0,
-              }}
-            >
-              Trung tâm thương mại Vincom
-            </p>
-          </div>
+        {/* Tiêu đề sự cố */}
+        <div className="mb-5">
+          <label className="font-medium text-gray-700 flex items-center gap-2 mb-2">
+            <FaRegEdit className="text-blue-500" />
+            Tiêu đề sự cố <span className="text-red-500">*</span>
+          </label>
+          <Input
+            placeholder="VD: Trụ sạc không khởi động được"
+            value={problemTitle}
+            onChange={(e) => setProblemTitle(e.target.value)}
+            size="large"
+            className="rounded-lg"
+          />
+        </div>
 
-          {/* Tiêu đề sự cố */}
-          <div style={{ marginBottom: 18 }}>
-            <label
-              style={{
-                display: "block",
-                fontWeight: 500,
-                marginBottom: 6,
-              }}
-            >
-              Tiêu đề sự cố <span style={{ color: "red" }}>*</span>
-            </label>
-            <Input
-              placeholder="VD: Trụ sạc không khởi động được"
-              value={problemTitle}
-              onChange={(e) => setProblemTitle(e.target.value)}
-            />
-          </div>
+        {/* Mô tả chi tiết */}
+        <div className="mb-8">
+          <label className="font-medium text-gray-700 flex items-center gap-2 mb-2">
+            <FaRegCommentDots className="text-indigo-500" />
+            Mô tả chi tiết <span className="text-red-500">*</span>
+          </label>
+          <TextArea
+            rows={5}
+            placeholder="Hãy mô tả chi tiết sự cố, thời gian, và các bước bạn đã thử..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="rounded-lg"
+          />
+        </div>
 
-          {/* Mô tả chi tiết */}
-          <div style={{ marginBottom: 28 }}>
-            <label
-              style={{
-                display: "block",
-                fontWeight: 500,
-                marginBottom: 6,
-              }}
-            >
-              Mô tả chi tiết <span style={{ color: "red" }}>*</span>
-            </label>
-            <TextArea
-              rows={5}
-              placeholder="Mô tả chi tiết về sự cố, thời gian xảy ra, và các bước bạn đã thử..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          {/* Buttons */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "12px",
-            }}
+        {/* Buttons */}
+        <div className="flex justify-end gap-3">
+          <Button
+            icon={<FaArrowLeft />}
+            onClick={() => navigate(-1)}
+            className="px-5 py-2 rounded-lg border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400"
           >
-            <Button onClick={() => navigate(-1)}>Hủy</Button>
-            <Button
-              type="primary"
-              icon={<SendOutlined />}
-              loading={loading}
-              onClick={handleSubmit}
-              style={{
-                backgroundColor: "#00021f",
-                border: "none",
-                fontWeight: 500,
-              }}
-            >
-              Gửi báo cáo
-            </Button>
-          </div>
-        </Card>
-      </div>
+            Hủy
+          </Button>
+
+          <Button
+            type="primary"
+            icon={<FaPaperPlane />}
+            loading={loading}
+            onClick={handleSubmit}
+            className="bg-blue-700 hover:bg-blue-800 px-6 py-2 rounded-lg font-medium shadow-md"
+          >
+            Gửi báo cáo
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 };

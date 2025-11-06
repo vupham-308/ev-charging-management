@@ -7,7 +7,7 @@ import {
   MailOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Card, Button, Spin, DatePicker, Modal, message } from "antd";
+import { Card, Button, Spin, DatePicker, Modal, message, Tooltip } from "antd";
 import api from "../../config/axios";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
@@ -25,43 +25,38 @@ const ManageBooking = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [reservations, setReservations] = useState([]);
 
-  const allTimes = [
-    "08:00",
-    "08:30",
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-    "12:30",
-    "13:00",
-    "13:30",
-    "14:00",
-    "14:30",
-    "15:00",
-    "15:30",
-    "16:00",
-    "16:30",
-    "17:00",
-    "17:30",
-    "18:00",
-    "18:30",
-    "19:00",
-    "19:30",
-  ];
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  const allTimes = Array.from({ length: 24 * 12 }, (_, i) => {
+    const hour = Math.floor(i / 12);
+    const minute = (i % 12) * 5;
+    return `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+  });
 
   // 🧠 Gọi API lấy trạm + trụ
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [stationRes, chargerRes] = await Promise.all([
+        const [stationRes, chargerRes, reviewRes] = await Promise.all([
           api.get(`/station/get/${stationId}`),
           api.get(`/chargerPoint/getAll/${stationId}`),
+          api.get(`/review/station/${stationId}`),
         ]);
         setStation(stationRes.data);
         setChargers(chargerRes.data);
+
+        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+
+        if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
+          const avg =
+            reviewRes.data.reduce((sum, r) => sum + (r.rating || 0), 0) /
+            reviewRes.data.length;
+          setAverageRating(Number(avg.toFixed(1))); // 🟢 làm tròn 1 số thập phân
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -75,7 +70,7 @@ const ManageBooking = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const res = await api.get("/reservations/my");
+        const res = await api.get("/reservations/lock");
         setReservations(res.data || []);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách đặt chỗ:", error);
@@ -90,6 +85,7 @@ const ManageBooking = () => {
       selectedDate &&
       selectedCharger &&
       r.stationId === Number(stationId) &&
+      r.chargerpointId === selectedCharger && // 🔹 Chỉ lấy slot của trụ đã chọn
       dayjs(r.startDate).isSame(selectedDate, "day")
     );
   });
@@ -204,19 +200,53 @@ const ManageBooking = () => {
                 <MailOutlined />
                 {station.email}
               </p>
-              <p className="flex items-center gap-1 text-yellow-500 mt-1">
+              {/* 🟢 Hiển thị đánh giá từ API */}
+              <p
+                className="flex items-center gap-1 text-yellow-500 mt-1 cursor-pointer hover:text-yellow-600"
+                onClick={() => setShowReviewModal(true)}
+              >
                 <StarFilled />
-                <span className="text-gray-800 font-medium">4.8</span>
-                <span className="text-gray-500 text-sm">(156 đánh giá)</span>
+                <span className="text-gray-800 font-medium">
+                  {averageRating || 0}
+                </span>
+                <span className="text-gray-500 text-sm">
+                  ({reviews.length} đánh giá)
+                </span>
               </p>
             </div>
           </div>
-
-          <div className="flex-1 bg-gray-100 flex items-center justify-center rounded-xl h-48 md:h-56">
-            <span className="text-gray-400">Hình ảnh trạm sạc</span>
-          </div>
         </div>
       </div>
+
+      <Modal
+        title="Tất cả đánh giá trạm"
+        open={showReviewModal}
+        onCancel={() => setShowReviewModal(false)}
+        footer={null}
+        width={600}
+      >
+        {reviews.length > 0 ? (
+          <div className="max-h-[60vh] overflow-y-auto space-y-3">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="border-b border-gray-100 pb-2 mb-2 text-gray-700"
+              >
+                <p className="font-medium text-gray-800">{r.userName}</p>
+                <p className="text-yellow-500 text-sm">
+                  {"⭐".repeat(r.rating)}
+                </p>
+                <p>{r.description}</p>
+                <p className="text-gray-400 text-xs">
+                  {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">Chưa có đánh giá nào.</p>
+        )}
+      </Modal>
 
       {/* Chọn trụ sạc + thời gian */}
       <div className="max-w-6xl mx-auto mt-8 grid md:grid-cols-2 gap-6">
@@ -312,21 +342,61 @@ const ManageBooking = () => {
               <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1 border border-gray-200 rounded-xl">
                 {allTimes.map((time) => {
                   const booked = isTimeBooked(time);
+
+                  // Hàm lấy tên trụ sạc đã bị đặt vào khung giờ time
+                  const chargersBooked = bookedSlots
+                    .filter((slot) => {
+                      const start = dayjs(slot.startDate);
+                      const end = dayjs(slot.endDate);
+                      const selectedStart = dayjs(
+                        `${selectedDate?.format("YYYY-MM-DD")} ${time}`
+                      );
+                      return (
+                        selectedStart.isAfter(start.subtract(1, "minute")) &&
+                        selectedStart.isBefore(end)
+                      );
+                    })
+                    .map((slot) => {
+                      const charger = chargers.find(
+                        (c) => c.id === slot.chargerPointId
+                      );
+                      return charger
+                        ? charger.name || `Trụ #${charger.id}`
+                        : "Trụ đã đặt vào thời gian này";
+                    });
+
+                  const tooltipTitle = booked
+                    ? ` ${chargersBooked.join(", ")}`
+                    : "";
+
+                  // 🕒 Nếu là hôm nay => chặn giờ trong quá khứ
+                  const now = dayjs();
+                  const selectedStart = dayjs(
+                    `${selectedDate?.format("YYYY-MM-DD")} ${time}`
+                  );
+                  const isPast =
+                    selectedDate &&
+                    selectedDate.isSame(now, "day") &&
+                    selectedStart.isBefore(now);
+
+                  const disabled = booked || isPast;
+
                   return (
-                    <button
-                      key={time}
-                      disabled={booked}
-                      onClick={() => !booked && setSelectedTime(time)}
-                      className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
-                        booked
-                          ? "bg-red-100 text-red-400 cursor-not-allowed"
-                          : selectedTime === time
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {time}
-                    </button>
+                    <Tooltip key={time} title={tooltipTitle} placement="top">
+                      <button
+                        disabled={disabled}
+                        onClick={() => !disabled && setSelectedTime(time)}
+                        className={`text-sm px-3 py-2 rounded-lg transition font-medium ${
+                          disabled
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : selectedTime === time
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                        }`}
+                      >
+                        {time}
+                      </button>
+                    </Tooltip>
                   );
                 })}
               </div>

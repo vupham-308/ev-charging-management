@@ -174,6 +174,18 @@ public class ChargingSessionService {
         }
     }
 
+    @Scheduled(fixedRate = 60000)//reload mỗi 1p
+    public void completeReservation(){
+        List<ChargingSession> c = chargingSessionRepository.findChargingSessionByStatus("COMPLETED");
+        for(ChargingSession x: c){
+            if(x.getReservation()!=null&&x.getReservation().getStatus().equals("PENDING")){
+                Reservation r = x.getReservation();
+                r.setStatus("COMPLETED");
+                reservationRepository.save(r);
+            }
+        }
+    }
+
     public ChargingResponse createSession(ChargingSessionRequest rq) {
         Car car = carRepository.findById(rq.getCarId()).orElse(null);
         User user = car.getUser();
@@ -197,7 +209,7 @@ public class ChargingSessionService {
         charge.setEndTime(new Date(current.getTime() + timeCharge*60*1000));
         double fee = timeCharge*point.getChargerCost().getCost();
         //check trạng thái trụ sạc
-        if(!point.getStatus().equals("AVAILABLE")){
+        if(point.getStatus().equals("OCCUPIED")||point.getStatus().equals("OUT_OF_SERVICE")){
             throw new RuntimeException("Trụ sạc không khả dụng");
         }
         //nếu create 1 trụ sạc đang ở trạng thái RESERVED, cần kiểm tra xem
@@ -207,7 +219,7 @@ public class ChargingSessionService {
             check=false;
             List<Reservation> r = reservationRepository.findByUserIdAndStatus(user.getId(),"PENDING");
             for(Reservation x: r){
-                if(x.getChargerPoint().getId()==charge.getChargerPoint().getId()){
+                if(x.getChargerPoint().getId()== rq.getPointId()){
                     check = true;
                 }
             }

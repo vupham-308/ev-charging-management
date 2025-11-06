@@ -13,6 +13,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
 
     List<Reservation> findByUserIdAndStatus(int userId, String status);
 
+    List<Reservation> findAllByStatus(String status);
+
     List<Reservation> findByStatus(String status);
 
     List<Reservation> findByChargerPointIdAndStatus(int chargerPointId, String status);
@@ -20,4 +22,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     void deleteByUser(User user);
 
     Optional<Reservation> findByIdAndUserId(Integer reservationId, Integer userId);
+
 }

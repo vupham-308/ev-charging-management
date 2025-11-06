@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.model.request.LoginRequest;
 import com.ev.evchargingsystem.model.request.RegisterRequest;
 import com.ev.evchargingsystem.model.request.ResetPasswordRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
+import com.ev.evchargingsystem.repository.UserRepository;
 import com.ev.evchargingsystem.service.AuthenticationService;
 import com.ev.evchargingsystem.service.UserService;
 import jakarta.mail.MessagingException;
@@ -20,6 +21,8 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     @Autowired
     UserService userService;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -32,13 +35,17 @@ public class AuthenticationController {
         return ResponseEntity.ok(account);
     }
 
-    @PostMapping("/send-otp")
+    @PostMapping("/forgot-password")
     public ResponseEntity sendOtp(@RequestBody String email) throws MessagingException {
+        User user = userRepository.findUserByEmail(email);
+        if(user==null){
+            return ResponseEntity.badRequest().body("Không tìm thấy tài khoản của bạn!");
+        }
         if(userService.sendOtp(email)){
             return ResponseEntity.ok(email);
         }
         else{
-            return ResponseEntity.badRequest().body("Không tìm thấy tài khoản của bạn!");
+            return ResponseEntity.badRequest().body("Lỗi gửi OTP! Vui lòng thử lại sau.");
         }
     }
 

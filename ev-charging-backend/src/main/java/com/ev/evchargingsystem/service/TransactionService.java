@@ -94,9 +94,10 @@ public class TransactionService {
             dto.setPaymentType(t.getPaymentType());
             dto.setStatus(t.getStatus());
             dto.setDate(t.getDate());
-            dto.setChargingSessionId(
-                    t.getChargingSession() != null ? t.getChargingSession().getId() : null
-            );
+            if(t.getChargingSession()!=null) {
+                dto.setChargingSessionId(t.getChargingSession().getId());
+                dto.setStationName(t.getChargingSession().getChargerPoint().getStation().getName());
+            }
             responses.add(dto);
         }
 

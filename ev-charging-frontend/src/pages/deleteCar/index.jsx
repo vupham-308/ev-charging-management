@@ -5,8 +5,13 @@ import {
   ExclamationCircleOutlined,
   ArrowLeftOutlined,
   DeleteOutlined,
+  CarOutlined,
+  BgColorsOutlined,
+  NumberOutlined,
+  ThunderboltOutlined,
 } from "@ant-design/icons";
 import api from "../../config/axios";
+import { toast } from "react-toastify";
 
 const ManageDeleteCar = () => {
   const { id } = useParams();
@@ -14,7 +19,7 @@ const ManageDeleteCar = () => {
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Lấy thông tin xe để hiển thị trước khi xóa
+  // ✅ Lấy thông tin xe để hiển thị
   useEffect(() => {
     const fetchCar = async () => {
       try {
@@ -42,11 +47,11 @@ const ManageDeleteCar = () => {
       await api.delete(`/cars/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      message.success("🗑️ Đã xóa xe thành công!");
-      navigate("/driver/myCar", { state: { updated: true } }); // ✅ Cập nhật lại danh sách xe
+      toast.success(" Đã xóa xe thành công!");
+      navigate("/driver/myCar", { state: { updated: true } });
     } catch (error) {
       console.error("❌ Lỗi khi xóa xe:", error);
-      message.error("Không thể xóa xe. Vui lòng thử lại sau!");
+      toast.error("Không thể xóa xe. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
@@ -60,7 +65,7 @@ const ManageDeleteCar = () => {
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
-          backgroundColor: "#f5f7fa",
+          background: "linear-gradient(135deg, #f1f5f9, #e2e8f0)",
         }}
       >
         <Spin size="large" />
@@ -74,87 +79,125 @@ const ManageDeleteCar = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f5f7fa",
+        background: "linear-gradient(135deg, #f8fafc, #e2e8f0)",
         minHeight: "100vh",
-        padding: "20px",
+        padding: "30px",
       }}
     >
       <Card
-        title={
-          <span
-            style={{
-              fontSize: "1.4rem",
-              fontWeight: "bold",
-              color: "#ff4d4f",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <ExclamationCircleOutlined />
-            Xác nhận xóa xe
-          </span>
-        }
         bordered={false}
         style={{
           width: "100%",
-          maxWidth: 600,
-          textAlign: "left",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-          borderRadius: "14px",
-          background: "#fff",
-          padding: "10px 20px 20px 20px",
+          maxWidth: 620,
+          boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
+          borderRadius: "16px",
+          background: "#ffffff",
+          padding: "28px 34px 38px",
         }}
+        title={
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: "1.5rem",
+              fontWeight: "700",
+              color: "#dc2626",
+              gap: "10px",
+            }}
+          >
+            <ExclamationCircleOutlined style={{ fontSize: 22 }} />
+            Xác nhận xóa xe
+          </div>
+        }
       >
-        <p style={{ fontSize: "1.1rem", color: "#333", marginBottom: "20px" }}>
-          Bạn có chắc chắn muốn xóa xe này không?
+        <p
+          style={{
+            fontSize: "1.05rem",
+            color: "#334155",
+            lineHeight: 1.6,
+            marginBottom: "22px",
+          }}
+        >
+          Bạn có chắc chắn muốn{" "}
+          <b style={{ color: "#dc2626" }}>xóa vĩnh viễn</b> xe này không?
           <br />
-          <span style={{ color: "#ff4d4f", fontWeight: 500 }}>
-            Hành động này không thể hoàn tác.
+          <span style={{ color: "#ef4444", fontWeight: 600 }}>
+            Hành động này không thể hoàn tác!
           </span>
         </p>
 
+        {/* Thông tin xe */}
         <div
           style={{
-            backgroundColor: "#fafafa",
-            padding: "15px",
-            borderRadius: "10px",
-            marginBottom: "25px",
+            background: "#f9fafb",
+            padding: "18px 20px",
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            marginBottom: "28px",
           }}
         >
           <p>
-            <b>🚘 Hãng xe:</b> {car?.brand}
+            <CarOutlined style={{ color: "#0f172a", marginRight: 8 }} />
+            <b>Hãng xe:</b> {car?.brand}
           </p>
           <p>
-            <b>🎨 Màu sắc:</b> {car?.color}
+            <BgColorsOutlined style={{ color: "#0f172a", marginRight: 8 }} />
+            <b>Màu sắc:</b> {car?.color}
           </p>
           <p>
-            <b>🚗 Biển số:</b> {car?.licensePlate}
+            <NumberOutlined style={{ color: "#0f172a", marginRight: 8 }} />
+            <b>Biển số:</b> {car?.licensePlate}
           </p>
           <p>
-            <b>🔋 Mức pin khởi tạo:</b> {car?.initBattery}%
+            <ThunderboltOutlined style={{ color: "#0f172a", marginRight: 8 }} />
+            <b>Mức pin khởi tạo:</b> {car?.initBattery}%
           </p>
         </div>
 
+        {/* Nút hành động */}
         <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
-            gap: "10px",
+            gap: "12px",
           }}
         >
           <Button
+            size="large"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate("/driver/myCar")}
+            style={{
+              borderRadius: "10px",
+              padding: "8px 20px",
+              fontWeight: 500,
+              transition: "all 0.25s",
+            }}
           >
             Hủy
           </Button>
+
           <Button
             type="primary"
             danger
             icon={<DeleteOutlined />}
-            onClick={handleConfirmDelete}
+            size="large"
             loading={loading}
+            onClick={handleConfirmDelete}
+            style={{
+              borderRadius: "10px",
+              padding: "8px 22px",
+              fontWeight: 600,
+              boxShadow: "0 4px 12px rgba(220,38,38,0.25)",
+              backgroundColor: "#dc2626",
+              borderColor: "#dc2626",
+              transition: "all 0.3s ease",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = "#b91c1c";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = "#dc2626";
+            }}
           >
             Xác nhận xóa
           </Button>

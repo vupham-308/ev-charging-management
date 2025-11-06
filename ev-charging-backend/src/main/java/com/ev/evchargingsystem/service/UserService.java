@@ -69,8 +69,11 @@ public class UserService {
 
 
     private UserInfoResponse convertToUserInfoResponse(User user) {
-        // Sử dụng modelMapper để chuyển đổi tự động
-        return modelMapper.map(user, UserInfoResponse.class);
+        Staff staff = staffRepository.findStaffByUser(user);
+        if(staff !=null){
+            return new UserInfoResponse(user.getId(),user.getFullName(),user.getPhone(),user.getEmail(),user.getRole(),staff.getStation());
+        }
+        return new UserInfoResponse(user.getId(),user.getFullName(),user.getPhone(),user.getEmail(),user.getRole(),null);
     }
 
 //    public void deleteUser(Integer id) {
@@ -79,11 +82,17 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Integer id) {
+        User currentUser = getCurrentUser(); // lấy user đang đăng nhập
+
+        if (currentUser.getId()==(id)) {
+            throw new RuntimeException("Không thể tự xóa chính mình");
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy User với id: " + id));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User này đã xóa");
+            throw new RuntimeException("User này đã bị xóa");
         }
 
         user.setActive(false);

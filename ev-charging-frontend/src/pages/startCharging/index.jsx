@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
-import { Card, Button, Spin, message, Tag, Select } from "antd";
-import { useParams, useNavigate } from "react-router-dom";
+import { Card, Button, Spin, message, Tag, Select, Modal } from "antd";
+import { useParams, useNavigate, Outlet } from "react-router-dom";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
-import { Outlet } from "react-router-dom";
+import {
+  FaChargingStation,
+  FaCarSide,
+  FaBatteryHalf,
+  FaMoneyBillWave,
+  FaStar,
+  FaExclamationTriangle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const ManageStartCharging = () => {
   const { stationId } = useParams();
@@ -14,68 +22,84 @@ const ManageStartCharging = () => {
   const [chargers, setChargers] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
+
   const [loading, setLoading] = useState(true);
 
+  // form state
   const [selectedCar, setSelectedCar] = useState(null);
   const [selectedCharger, setSelectedCharger] = useState(null);
   const [targetBattery, setTargetBattery] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [canContinue, setCanContinue] = useState(false);
 
+  // modal confirm bill
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmData, setConfirmData] = useState(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // ⬇️ Thêm state mới ở đầu component
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  // Load data
   useEffect(() => {
+    let mounted = true;
     const fetchData = async () => {
       try {
+        setLoading(true);
         const [stationRes, carRes, chargerRes, reviewRes] = await Promise.all([
           api.get(`/station/get/${stationId}`),
           api.get(`/cars`),
           api.get(`/chargerPoint/getAllAvailable/${stationId}`),
           api.get(`/review/station/${stationId}`),
-          api.get("/balance"),
         ]);
 
+        if (!mounted) return;
         setStation(stationRes.data);
-        setCars(carRes.data);
-        setChargers(chargerRes.data);
-        setReviews(reviewRes.data);
+        setCars(Array.isArray(carRes.data) ? carRes.data : []);
+        setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
+        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
 
-        if (reviewRes.data.length > 0) {
+        if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
-            reviewRes.data.reduce((sum, r) => sum + r.rating, 0) /
+            reviewRes.data.reduce((sum, r) => sum + (r.rating || 0), 0) /
             reviewRes.data.length;
           setAverageRating(avg.toFixed(1));
         }
-        // eslint-disable-next-line no-unused-vars
-      } catch (error) {
+      } catch (err) {
+        console.error("❌ Lỗi khi tải dữ liệu:", err);
         message.error("❌ Lỗi khi tải dữ liệu!");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     fetchData();
+    return () => {
+      mounted = false;
+    };
   }, [stationId]);
 
+  // enable continue
   useEffect(() => {
     setCanContinue(
-      selectedCar && selectedCharger && targetBattery && paymentMethod
+      Boolean(selectedCar && selectedCharger && targetBattery && paymentMethod)
     );
   }, [selectedCar, selectedCharger, targetBattery, paymentMethod]);
 
   const getBatteryOptions = () => {
     if (!selectedCar) return [];
-    const current = selectedCar.initBattery;
+    const current = Number(selectedCar.initBattery || 0);
     const options = [];
-    for (let i = Math.ceil((current + 10) / 10) * 10; i <= 100; i += 10) {
-      options.push(i);
-    }
+    const start = Math.max(10, Math.ceil((current + 10) / 10) * 10);
+    for (let i = start; i <= 100; i += 10) options.push(i);
     return options;
   };
 
+  // continue -> open confirm modal
   const handleContinue = async () => {
     if (!canContinue) {
       message.warning("⚠️ Vui lòng chọn đầy đủ thông tin!");
       return;
     }
-
     try {
       const token = localStorage.getItem("token");
       const payload = {
@@ -84,50 +108,54 @@ const ManageStartCharging = () => {
         goalBattery: targetBattery,
         paymentMethod,
       };
-
-      console.log("📦 Gửi tạo phiên sạc:", payload);
       const res = await api.post("/charge", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("✅ Phản hồi từ /charge:", res.data);
-
-      navigate("/driver/confirmBill", {
-        state: {
-          chargeData: res.data, // Dữ liệu từ backend
-          station,
-          selectedCar,
-          selectedCharger,
-          targetBattery,
-          paymentMethod,
-        },
+      setConfirmData({
+        chargeData: res.data,
+        station,
+        selectedCar,
+        selectedCharger,
       });
+      setShowConfirm(true);
     } catch (err) {
       console.error("❌ Lỗi khi tạo phiên sạc:", err);
-
-      // Lấy thông báo lỗi thật từ backend (nếu có)
       const errorMsg =
-        err.response?.data?.message || // Nếu backend trả về { message: "..."}
-        err.response?.data || // Nếu chỉ trả về chuỗi đơn giản
-        "Không thể tạo phiên sạc!"; // fallback nếu không có gì
-
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Không thể tạo phiên sạc!";
       message.error(errorMsg);
       toast.warning(errorMsg);
     }
   };
 
+  // confirm and start charging
+  const handleConfirm = async () => {
+    if (!confirmData?.chargeData?.id) return;
+    try {
+      setConfirmLoading(true);
+      await api.post(`/charging/${confirmData.chargeData.id}`);
+      toast.success("✅ Phiên sạc đã bắt đầu!");
+      setShowConfirm(false);
+      navigate("/driver/chargingSession");
+    } catch {
+      toast.error("❌ Không thể bắt đầu sạc! Vui lòng thử lại.");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   if (loading)
     return (
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 50 }}>
+      <div className="flex justify-center items-center min-h-[70vh]">
         <Spin tip="Đang tải dữ liệu..." size="large" />
       </div>
     );
 
   if (!station)
     return (
-      <p style={{ textAlign: "center", marginTop: 50 }}>
+      <p className="text-center mt-20 text-gray-500 text-lg">
         Không có dữ liệu trạm sạc
       </p>
     );
@@ -135,215 +163,282 @@ const ManageStartCharging = () => {
   const { name, address, pointChargerAvailable, pointChargerTotal } = station;
 
   return (
-    <div style={{ padding: "30px 60px" }}>
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 8 }}>
-        Bắt đầu sạc
-      </h1>
-      <p style={{ color: "#666", marginBottom: 24 }}>
-        Chọn trạm sạc và bắt đầu phiên sạc
-      </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-8 py-10">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-1 flex items-center gap-2">
+          <FaChargingStation className="text-blue-700" />
+          Bắt đầu sạc
+        </h1>
+        <p className="text-gray-500 mb-8">
+          Chọn trạm, xe và trụ để khởi động phiên sạc
+        </p>
 
-      {/* Layout 3 cột */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: 24,
-        }}
-      >
-        {/* --- Cột 1: Thông tin trạm --- */}
-        <Card
-          style={{
-            borderRadius: 12,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-            padding: 16,
-          }}
-        >
-          <h3 style={{ marginBottom: 8, fontWeight: 600 }}>Trạm đã chọn</h3>
-          <p style={{ fontSize: 16, fontWeight: 500 }}>{name}</p>
-          <p style={{ color: "#777", marginBottom: 8 }}>{address}</p>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <p style={{ color: "#1890ff" }}>
-              {pointChargerAvailable}/{pointChargerTotal} trụ trống
-            </p>
-          </div>
-
-          <Tag color="green" style={{ borderRadius: 12 }}>
-            Sạc nhanh
-          </Tag>
-
-          <Button
-            danger
-            type="default"
-            style={{
-              width: "100%",
-              marginTop: 16,
-              borderRadius: 8,
-              fontWeight: 500,
-            }}
-            onClick={() =>
-              navigate(`/driver/startCharging/${stationId}/stationReport`)
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Cột 1: Trạm */}
+          <Card
+            bordered={false}
+            className="shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
+            title={
+              <div className="flex items-center gap-2 text-blue-700 font-semibold">
+                <FaChargingStation />
+                Trạm sạc
+              </div>
             }
           >
-            Báo cáo sự cố
-          </Button>
-        </Card>
-
-        {/* --- Cột 2: Cài đặt sạc --- */}
-        <Card
-          style={{
-            borderRadius: 12,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-            padding: 16,
-          }}
-        >
-          <h3 style={{ marginBottom: 8, fontWeight: 600 }}>Cài đặt sạc</h3>
-          <p style={{ color: "#777", marginBottom: 16 }}>Chọn xe và trụ sạc</p>
-
-          {/* Chọn xe */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ fontWeight: 500, marginBottom: 6 }}>Xe của bạn</p>
-            <Select
-              placeholder="Chọn xe"
-              style={{ width: "100%" }}
-              onChange={(id) =>
-                setSelectedCar(cars.find((car) => car.id === id))
-              }
-            >
-              {cars.map((car) => (
-                <Select.Option key={car.id} value={car.id}>
-                  {car.brand} {car.model} ({car.initBattery}%)
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Chọn trụ sạc */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ fontWeight: 500, marginBottom: 6 }}>Trụ sạc</p>
-            <Select
-              placeholder="Chọn trụ sạc"
-              style={{ width: "100%" }}
-              onChange={(id) =>
-                setSelectedCharger(chargers.find((c) => c.id === id))
-              }
-            >
-              {chargers.map((ch) => (
-                <Select.Option key={ch.id} value={ch.id}>
-                  {ch.name} • {ch.capacity}kW • {ch.chargerCost?.portType} •{" "}
-                  {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/kWh
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Mục tiêu pin */}
-          <div style={{ marginBottom: 16 }}>
-            <p style={{ fontWeight: 500, marginBottom: 6 }}>Mục tiêu pin (%)</p>
-            <Select
-              placeholder="Chọn mức pin"
-              style={{ width: "100%" }}
-              disabled={!selectedCar}
-              onChange={setTargetBattery}
-            >
-              {getBatteryOptions().map((val) => (
-                <Select.Option key={val} value={val}>
-                  {val}%
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Phương thức thanh toán */}
-          <div style={{ marginBottom: 24 }}>
-            <p style={{ fontWeight: 500, marginBottom: 6 }}>
-              Phương thức thanh toán
+            <p className="text-lg font-medium">{name}</p>
+            <p className="text-gray-500 mb-3">{address}</p>
+            <p className="text-blue-600 font-medium mb-2">
+              {pointChargerAvailable}/{pointChargerTotal} trụ trống
             </p>
-            <Select
-              placeholder="Chọn phương thức"
-              style={{ width: "100%" }}
-              onChange={setPaymentMethod}
+            <Tag color="green" style={{ borderRadius: 12 }}>
+              Sạc nhanh
+            </Tag>
+            <Button
+              danger
+              icon={<FaExclamationTriangle />}
+              className="w-full mt-5 font-medium rounded-lg"
+              onClick={() =>
+                navigate(`/driver/startCharging/${stationId}/stationReport`)
+              }
             >
-              <Select.Option value="BALANCE">Số dư tài khoản</Select.Option>
-              <Select.Option value="CASH">Tiền mặt</Select.Option>
-            </Select>
-          </div>
+              Báo cáo sự cố
+            </Button>
+          </Card>
 
-          {/* Nút tiếp tục */}
-          <Button
-            type="primary"
-            block
-            size="large"
-            disabled={!canContinue}
-            onClick={handleContinue}
-            style={{
-              borderRadius: 8,
-              backgroundColor: canContinue ? "#1677ff" : "#ccc",
-              fontWeight: 600,
-            }}
+          {/* Cột 2: Cài đặt */}
+          <Card
+            bordered={false}
+            className="shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
+            title={
+              <div className="flex items-center gap-2 text-blue-700 font-semibold">
+                <FaBatteryHalf />
+                Cài đặt sạc
+              </div>
+            }
           >
-            Tiếp tục
-          </Button>
-        </Card>
-
-        {/* --- Cột 3: Đánh giá trạm --- */}
-        <Card
-          style={{
-            borderRadius: 12,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-            padding: 16,
-          }}
-        >
-          <h3 style={{ marginBottom: 8, fontWeight: 600 }}>
-            Đánh giá trạm sạc
-          </h3>
-          <p style={{ color: "#777", marginBottom: 12 }}>
-            Chia sẻ từ các tài xế khác
-          </p>
-
-          <div style={{ marginBottom: 12 }}>
-            <span
-              style={{
-                fontSize: 24,
-                fontWeight: 600,
-                color: "#faad14",
-                marginRight: 8,
-              }}
-            >
-              {averageRating}
-            </span>
-            <span style={{ color: "#faad14" }}>⭐</span>
-            <span style={{ color: "#777", marginLeft: 8 }}>
-              {reviews.length} đánh giá
-            </span>
-          </div>
-
-          {reviews.slice(0, 3).map((r) => (
-            <div
-              key={r.id}
-              style={{
-                borderBottom: "1px solid #eee",
-                paddingBottom: 10,
-                marginBottom: 10,
-              }}
-            >
-              <p style={{ fontWeight: 500 }}>{r.userName}</p>
-              <p style={{ color: "#555", fontSize: 14 }}>{r.description}</p>
-              <p style={{ color: "#999", fontSize: 12 }}>
-                {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+            {/* Xe */}
+            <div className="mb-4">
+              <p className="font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <FaCarSide className="text-blue-500" /> Xe của bạn
               </p>
+              <Select
+                placeholder="Chọn xe"
+                style={{ width: "100%" }}
+                value={selectedCar?.id}
+                onChange={(id) =>
+                  setSelectedCar(cars.find((car) => car.id === id))
+                }
+              >
+                {cars.map((car) => (
+                  <Select.Option key={car.id} value={car.id}>
+                    {car.brand} ({car.initBattery}%)
+                  </Select.Option>
+                ))}
+              </Select>
             </div>
-          ))}
-        </Card>
+
+            {/* Trụ sạc */}
+            <div className="mb-4">
+              <p className="font-medium text-gray-700 mb-2">Trụ sạc</p>
+              <Select
+                placeholder="Chọn trụ sạc"
+                style={{ width: "100%" }}
+                value={selectedCharger?.id}
+                onChange={(id) =>
+                  setSelectedCharger(chargers.find((c) => c.id === id))
+                }
+              >
+                {chargers.map((ch) => (
+                  <Select.Option key={ch.id} value={ch.id}>
+                    {ch.name} • {ch.capacity}kW • {ch.chargerCost?.portType} •{" "}
+                    {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/kWh
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Mục tiêu pin */}
+            <div className="mb-4">
+              <p className="font-medium text-gray-700 mb-2">Mục tiêu pin</p>
+              <Select
+                placeholder="Chọn mức pin"
+                style={{ width: "100%" }}
+                disabled={!selectedCar}
+                value={targetBattery}
+                onChange={setTargetBattery}
+              >
+                {getBatteryOptions().map((val) => (
+                  <Select.Option key={val} value={val}>
+                    {val}%
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Thanh toán */}
+            <div className="mb-6">
+              <p className="font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <FaMoneyBillWave className="text-green-600" /> Phương thức thanh
+                toán
+              </p>
+              <Select
+                placeholder="Chọn phương thức"
+                style={{ width: "100%" }}
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+              >
+                <Select.Option value="BALANCE">Số dư tài khoản</Select.Option>
+                <Select.Option value="CASH">Tiền mặt</Select.Option>
+              </Select>
+            </div>
+
+            <Button
+              type="primary"
+              icon={<FaArrowRight />}
+              size="large"
+              disabled={!canContinue}
+              onClick={handleContinue}
+              className={`w-full font-semibold rounded-lg ${
+                canContinue
+                  ? "bg-blue-700 hover:bg-blue-800"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              }`}
+            >
+              Tiếp tục
+            </Button>
+          </Card>
+
+          {/* Cột 3: Đánh giá */}
+          <Card
+            bordered={false}
+            className="shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
+            title={
+              <div className="flex items-center gap-2 text-blue-700 font-semibold">
+                <FaStar className="text-yellow-500" />
+                Đánh giá trạm
+              </div>
+            }
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-2xl font-bold text-yellow-500">
+                {averageRating}
+              </span>
+              <span className="text-yellow-500">⭐</span>
+              <span className="text-gray-500">({reviews.length} đánh giá)</span>
+            </div>
+
+            {reviews.slice(0, 3).map((r) => (
+              <div key={r.id} className="mb-3 border-b border-gray-100 pb-2">
+                <p className="font-medium text-gray-800">{r.userName}</p>
+                <p className="text-gray-600 text-sm">{r.description}</p>
+                <p className="text-gray-400 text-xs">
+                  {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+                </p>
+              </div>
+            ))}
+
+            {reviews.length > 3 && (
+              <Button
+                type="link"
+                onClick={() => setShowAllReviews(true)}
+                className="p-0 text-blue-600"
+              >
+                Xem thêm đánh giá...
+              </Button>
+            )}
+          </Card>
+        </div>
       </div>
+
+      {/* Popup Confirm Bill */}
+      <Modal
+        title="Xác nhận thông tin sạc"
+        open={showConfirm}
+        onCancel={() => setShowConfirm(false)}
+        footer={null}
+        centered
+        width={600}
+      >
+        {confirmData ? (
+          <div className="space-y-3">
+            <p>
+              <strong>Trạm:</strong> {confirmData.station.name}
+            </p>
+            <p>
+              <strong>Trụ sạc:</strong> {confirmData.selectedCharger.name} •{" "}
+              {confirmData.selectedCharger.capacity}kW
+            </p>
+            <p>
+              <strong>Xe:</strong> {confirmData.selectedCar.brand}
+            </p>
+            <p>
+              <strong>Pin:</strong> {confirmData.chargeData.initBattery}% →{" "}
+              {confirmData.chargeData.goalBattery}%
+            </p>
+            <p>
+              <strong>Thanh toán:</strong>{" "}
+              {confirmData.chargeData.paymentMethod === "BALANCE"
+                ? "Số dư tài khoản"
+                : "Tiền mặt"}
+            </p>
+            <p>
+              <strong>Ước tính:</strong>{" "}
+              {confirmData.chargeData.fee.toLocaleString("vi-VN")}đ •{" "}
+              {confirmData.chargeData.minute} phút
+            </p>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button onClick={() => setShowConfirm(false)}>Hủy</Button>
+              <Button
+                type="primary"
+                loading={confirmLoading}
+                onClick={handleConfirm}
+              >
+                Xác nhận
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-10">
+            <Spin />
+          </div>
+        )}
+      </Modal>
+
+      {/* Popup hiển thị tất cả đánh giá */}
+      <Modal
+        title={`Tất cả đánh giá của trạm ${station.name}`}
+        open={showAllReviews}
+        onCancel={() => setShowAllReviews(false)}
+        footer={null}
+        centered
+        width={700}
+      >
+        {reviews.length > 0 ? (
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            {reviews.map((r) => (
+              <div
+                key={r.id}
+                className="mb-4 border-b border-gray-100 pb-3 last:border-0"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-gray-800">{r.userName}</p>
+                  <span className="text-yellow-500 text-sm">⭐ {r.rating}</span>
+                </div>
+                <p className="text-gray-600 text-sm mt-1">{r.description}</p>
+                <p className="text-gray-400 text-xs mt-1">
+                  {new Date(r.reviewDate).toLocaleDateString("vi-VN")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 py-10">
+            Chưa có đánh giá nào cho trạm này.
+          </p>
+        )}
+      </Modal>
+
       <Outlet />
     </div>
   );

@@ -3,6 +3,7 @@ package com.ev.evchargingsystem.controller;
 import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.response.StaffDashboardResponse;
+import com.ev.evchargingsystem.model.response.StaffStationResponse;
 import com.ev.evchargingsystem.service.ChargerPointService;
 import com.ev.evchargingsystem.service.StaffService;
 import com.ev.evchargingsystem.service.StationService;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,20 +48,6 @@ public class StaffController {
         return stationService.getStationChargerStatus(staff.getStation().getId());
     }
 
-    @Operation(summary = "ADMIN gán trạm cho staff")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("/{staffId}/assign-station/{stationId}")
-    public ResponseEntity<?> assignStationToStaff(
-            @PathVariable int staffId,
-            @PathVariable int stationId
-    ) {
-        Staff staff = staffService.getStaffById(staffId);
-        Station station = stationService.getStationById(stationId);
-        staff.setStation(station);
-        staffService.save(staff);
-
-        return ResponseEntity.ok("Đã gán trạm " + station.getName() + " cho staff " + staff.getUser().getFullName());
-    }
 
     @Operation(summary = "STAFF xem thống kê trong ngày của trạm mình quản lý")
     @GetMapping("/dashboard-status")
@@ -68,4 +56,5 @@ public class StaffController {
         StaffDashboardResponse response = staffService.getTodayStats();
         return ResponseEntity.ok(response);
     }
+
 }

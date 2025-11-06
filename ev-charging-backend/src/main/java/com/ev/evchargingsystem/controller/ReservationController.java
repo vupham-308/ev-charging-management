@@ -40,11 +40,17 @@ public class ReservationController {
         return ResponseEntity.ok(reservations);
     }
 
-    @Operation(summary = "json mẫu: {\"pointId\":1,\"date\":\"2025-10-31\"}")
-    @GetMapping("/locked/{pointId}/{date}")
-    public ResponseEntity getLockedReservations(@PathVariable("pointId") int id,
-                                                @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        List<ReservationResponse> reservations = reservationService.getLockedReservations(id, date);
+//    @Operation(summary = "json mẫu: {\"pointId\":1,\"date\":\"2025-10-31\"}")
+//    @GetMapping("/locked/{pointId}/{date}")
+//    public ResponseEntity getLockedReservations(@PathVariable("pointId") int id,
+//                                                @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+//        List<ReservationResponse> reservations = reservationService.getLockedReservations(id, date);
+//        return ResponseEntity.ok(reservations);
+//    }
+
+    @GetMapping("/lock")
+    public ResponseEntity getAllReservations() {
+        List<ReservationResponse> reservations = reservationService.getAllReservations();
         return ResponseEntity.ok(reservations);
     }
 

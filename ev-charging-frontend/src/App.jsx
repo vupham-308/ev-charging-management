@@ -27,18 +27,17 @@ import ManageBooking from "./pages/booking";
 import ManageMyBooking from "./pages/myBooking";
 import ManageStartCharging from "./pages/startCharging";
 import ManageChargingSession from "./pages/chargingSession";
-import ManageConfirmBill from "./pages/confirmBill";
 import ManageIncidentReport from "./pages/incidentReport";
 import ManageStationReport from "./pages/stationReport";
 import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
 import ManageTopup from "./pages/topup";
-import ManagePaymentSuccess from "./pages/paymentSuccess";
 import { useDispatch } from "react-redux";
 import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
 import TermsPrivacyPage from "./pages/terms";
 import ForgotPassword from "./pages/login/ForgotPassword";
 import VerifyEmail from "./pages/login/VerifyEmail";
+import PaymentReturn from "./pages/paymentReturn";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -118,19 +117,23 @@ function AppContent() {
           path: "startChargingBooking/:stationId",
           element: <ManageStartChargingBooking />,
         },
-
+        {
+          path: "startChargingBooking/:stationId/stationReport",
+          element: <ManageStationReport />,
+        },
         {
           path: "myBooking",
           element: <ManageMyBooking />,
         },
         {
-          path: "confirmBill",
-          element: <ManageConfirmBill />,
-        },
-        {
           path: "chargingSession",
           element: <ManageChargingSession />,
         },
+        {
+          path: "chargingSession/stationReport/:stationId",
+          element: <ManageStationReport />,
+        },
+
         {
           path: "incidentReport",
           element: <ManageIncidentReport />,
@@ -153,23 +156,23 @@ function AppContent() {
             },
           ],
         },
+        {
+          path: "profile",
+          element: <ProfilePage />,
+        },
+        {
+          path: "transaction",
+          element: <ManageTransaction />,
+        },
+        {
+          path: "topup",
+          element: <ManageTopup />,
+        },
       ],
     },
     {
-      path: "/profile",
-      element: <ProfilePage />,
-    },
-    {
-      path: "/transaction",
-      element: <ManageTransaction />,
-    },
-    {
-      path: "topup",
-      element: <ManageTopup />,
-    },
-    {
-      path: "payment/:id",
-      element: <ManagePaymentSuccess />,
+      path: "payment-return",
+      element: <PaymentReturn />,
     },
     //  Route dành cho Admin có layout dùng Outlet
     {
