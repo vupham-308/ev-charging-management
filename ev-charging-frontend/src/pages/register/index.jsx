@@ -96,7 +96,7 @@ const RegisterPage = () => {
                   ]}
                 >
                   <Input
-                    placeholder="Full name"
+placeholder="Full name"
                     prefix={<UserOutlined />}
                     allowClear
                   />
@@ -185,7 +185,7 @@ const RegisterPage = () => {
                   hasFeedback
                 >
                   <Input.Password
-                    placeholder="Password (min 8 chars)"
+placeholder="Password (min 8 chars)"
                     prefix={<LockOutlined />}
                   />
                 </Form.Item>
