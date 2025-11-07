@@ -211,31 +211,6 @@ const LoginPage = () => {
                     Đăng ký
                   </a>
                 </div>
-
-                <Divider>Hoặc đăng nhập với</Divider>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    type="default"
-                    block
-                    icon={<FaGoogle />}
-                    onClick={() =>
-                      message.info("Google OAuth chưa được triển khai")
-                    }
-                  >
-                    Google
-                  </Button>
-                  <Button
-                    type="default"
-                    block
-                    icon={<FaGithub />}
-                    onClick={() =>
-                      message.info("GitHub OAuth chưa được triển khai")
-                    }
-                  >
-                    GitHub
-                  </Button>
-                </div>
               </Form>
             </>
           )}
