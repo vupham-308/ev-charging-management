@@ -1,32 +1,31 @@
-// src/pages/login/hooks/useForgotPassword.js
 import { useState } from "react";
-import { message } from "antd";
 import { forgotPasswordApi } from "../services/authService";
 
 export const useForgotPassword = () => {
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [email, setEmail] = useState("");
 
-  const handleForgotPassword = async (email) => {
-    if (!email) {
-      message.warning("Vui lòng nhập địa chỉ email!");
-      return;
-    }
-
+  const sendEmail = async (emailInput) => {
     setLoading(true);
     try {
-      const res = await forgotPasswordApi(email);
-      message.success(res?.message || "Đã gửi mã xác thực qua email!");
-      return true;
+      const res = await forgotPasswordApi(emailInput);
+      setEmail(emailInput);
+      setEmailSent(true); 
+      return res;
     } catch (err) {
-      console.error("❌ Forgot password error:", err);
-      message.error(
-        err?.message || "Không thể gửi mã, vui lòng kiểm tra lại email!"
-      );
-      return false;
+      console.error(err);
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  return { loading, handleForgotPassword };
+ // const reset = () => {
+  //setEmail("");
+  //setEmailSent(false);
+  //setError(null);
+//};
+
+  return { sendEmail, loading, emailSent, email };
 };
