@@ -4,11 +4,18 @@ import com.ev.evchargingsystem.entity.ChargerPoint;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.model.response.*;
 import com.ev.evchargingsystem.repository.*;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -35,8 +42,8 @@ public class StationService {
     public Station addStation(Station station) {
         return stationRepository.save(station);
     }
-
-
+    @Value("${geoapify.api.key}")
+    private String apiKey;
 
     public Station updateStation(Integer id, Station stationDetails) {
         // 1. Tìm Station trong DB, kết quả trả về là một Optional
@@ -269,5 +276,46 @@ public class StationService {
         }
 
         return responses;
+    }
+
+    public List<StationResponse> getNearestStations(double latitute, double longitude) throws IOException {
+        List<Station> stations = stationRepository.findAll();
+        List<StationResponse> rs = new ArrayList<>();
+        System.out.println(apiKey);
+
+        for(Station s: stations){
+            String url = String.format(
+                    "https://api.geoapify.com/v1/routing?waypoints=%f,%f|%f,%f&mode=drive&apiKey=%s",
+                    latitute, longitude, s.getLatitude(), s.getLongitude(), apiKey
+            );
+            System.out.println(url);
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .get()
+                    .build();
+            Response response = client.newCall(request).execute();
+            JsonObject props = JsonParser.parseString(response.body().string())
+                    .getAsJsonObject()
+                    .getAsJsonArray("features")
+                    .get(0).getAsJsonObject()
+                    .getAsJsonObject("properties");
+
+            double distance = props.get("distance").getAsDouble() / 1000.0;
+
+            rs.add(new StationResponse(s.getId(), s.getName(), s.getAddress(),
+                    getPointChargerAvailableByStation(s.getId()),
+                    getPointChargerOutOfServiceByStation(s.getId()),
+                    getPointChargerTotalByStation(s.getId()),
+                    chargerPointRepository.findPortTypesByStationID(s.getId()),
+                    s.getPhone(),
+                    s.getEmail(),
+                    s.getStatus(),
+                    s.getLatitude(),
+                    s.getLongitude(),
+                    distance));
+        }
+        return rs;
     }
 }

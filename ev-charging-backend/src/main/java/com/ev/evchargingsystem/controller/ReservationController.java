@@ -1,5 +1,6 @@
 package com.ev.evchargingsystem.controller;
 
+import com.ev.evchargingsystem.entity.Reservation;
 import com.ev.evchargingsystem.model.request.ReservationRequest;
 import com.ev.evchargingsystem.model.response.ReservationResponse;
 import com.ev.evchargingsystem.service.ReservationService;
@@ -62,6 +63,14 @@ public class ReservationController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @Operation(summary = "Lọc theo station, trạng thái PENDING, để gửi xác nhận cho người dùng")
+    @GetMapping("/getByStationID")
+    public ResponseEntity getByStationID(@RequestParam int stationId) {
+        Reservation r = reservationService.getByStationId(stationId);
+        if(r==null) return ResponseEntity.status(404).body("Không tìm thấy đặt chỗ nào");
+        return ResponseEntity.ok(r);
     }
 
 }

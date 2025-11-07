@@ -50,9 +50,19 @@ public class ChargingSessionService {
         }
         //BALANCE thì lưu vào transaction
         //CASH + PAID thì lưu vào transaction thành complete
-            Transaction t = transactionRepository.findTransactionByChargingSessionId(c.getId());
-            transactionService.setComplete(t);
+        Transaction t = transactionRepository.findTransactionByChargingSessionId(c.getId());
+        transactionService.setComplete(t);
         c.setStatus("ONGOING");
+        //nếu trụ đang ở RESERVED, thì link session này với Reservation đó
+        List<Reservation> r = reservationRepository.findByUserIdAndStatus(user.getId(), "PENDING");
+        Reservation re=null;
+        if(!r.isEmpty()) {
+            re = r.get(0);//vì mỗi người chỉ có 1 Reservation PENDING duy nhất
+        }if(re!=null&&re.getChargerPoint().getId()==c.getChargerPoint().getId()){
+            c.setReservation(re);
+            c.getReservation().setStatus("COMPLETED");
+            reservationRepository.save(c.getReservation());
+        }
         c.getChargerPoint().setStatus("OCCUPIED");
         chargerPointRepository.save(c.getChargerPoint());
         return chargingSessionRepository.save(c);
@@ -193,7 +203,13 @@ public class ChargingSessionService {
         if(car==null||point==null){
             throw new RuntimeException("Not found");
         }
+        //status WAITING_TO_PAY là nháp, để tránh trùng lặp khi tạo session
+        //check, nếu có thì chỉ thay đổi thông tin
         ChargingSession charge = new ChargingSession();
+        List<ChargingSession> draft = chargingSessionRepository.findChargingSessionByStatus("WAITING_TO_PAY");
+        if(!draft.isEmpty()){
+            charge = draft.get(0);
+        }
         //kiểm tra xem xe này có đang được sạc không, nếu xe đang có 1 phiên sạc khác thì báo lỗi
         List<ChargingSession> s = chargingSessionRepository.findChargingSessionByCar(car);
         for(ChargingSession x: s) {
@@ -212,6 +228,10 @@ public class ChargingSessionService {
         if(point.getStatus().equals("OCCUPIED")||point.getStatus().equals("OUT_OF_SERVICE")){
             throw new RuntimeException("Trụ sạc không khả dụng");
         }
+        //nếu tài xế đến trước thời gian đặt, hiện popup thông báo tài xế có 1
+        //phiên đặt trước tại trạm này, hỏi tài xế có muốn bắt đầu sạc luôn
+        //phiên đặt trước đó luôn không hay tạo 1 phien sạc khác (vì 1 tài xế có thể có nhiêu xe)
+
         //nếu create 1 trụ sạc đang ở trạng thái RESERVED, cần kiểm tra xem
         //có đúng user đang tạo session này đã đặt chỗ không
         boolean check = true;//nếu nó không phải là RESERVED thì bỏ qua code dưới
@@ -332,4 +352,5 @@ public class ChargingSessionService {
         if(s==null) throw new RuntimeException("Không tìm thấy SessionID!");
         return chargingSessionRepository.save(s);
     }
+
 }
