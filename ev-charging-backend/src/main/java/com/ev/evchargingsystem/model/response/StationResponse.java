@@ -34,4 +34,5 @@ public class StationResponse {
     private String status;
     private double latitude;
     private double longitude;
+    private double distance;
 }

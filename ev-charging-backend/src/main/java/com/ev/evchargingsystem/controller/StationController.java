@@ -1,16 +1,19 @@
 package com.ev.evchargingsystem.controller;
 
 import com.ev.evchargingsystem.entity.Station;
+import com.ev.evchargingsystem.model.request.LocationRequest;
 import com.ev.evchargingsystem.model.response.*;
 import com.ev.evchargingsystem.repository.StationRepository;
 import com.ev.evchargingsystem.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -108,5 +111,16 @@ public class StationController {
     public ResponseEntity<List<Top5StationRevenue>> getTop5StationsByRevenue() {
         List<Top5StationRevenue> list = stationService.getTop5StationsByRevenue();
         return ResponseEntity.ok(list);
+    }
+
+    //lấy khoảng cách dựa vào đường đi thực tế : routing
+    @PostMapping("/nearest")
+    public ResponseEntity getNearestStations(@RequestBody LocationRequest locationRequest){
+        try {
+            List<StationResponse> list = stationService.getNearestStations(locationRequest.getLatitude(), locationRequest.getLongitude());
+            return ResponseEntity.ok(list);
+        }catch (Exception e){
+            return  ResponseEntity.badRequest().body("Vui lòng nhập vị trí hợp lệ/ Lỗi kết nối tới dịch vụ định vị");
+        }
     }
 }
