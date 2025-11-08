@@ -127,20 +127,21 @@ const LoginPage = () => {
             </Form.Item>
 
             {/* 🔹 Nút Đăng ký */}
-            <Form.Item>
-              <Button
-                block
-                size="large"
-                onClick={() => navigate("/register")}
-                style={{
-                  backgroundColor: "#fff",
-                  borderColor: "#000",
-                  color: "#000",
-                  fontWeight: "500",
-                }}
-              >
-                Đăng ký
-              </Button>
+            <Form.Item style={{ textAlign: "center", marginTop: "8px" }}>
+              <span style={{ fontSize: "14px", color: "#555" }}>
+                Chưa có tài khoản?{" "}
+                <a
+                  onClick={() => navigate("/register")}
+                  style={{
+                    fontWeight: "600",
+                    color: "#000",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Đăng ký
+                </a>
+              </span>
             </Form.Item>
 
             <div className="text-center mt-3">
