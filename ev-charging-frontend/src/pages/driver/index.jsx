@@ -17,7 +17,8 @@ import {
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, setAccount } from "../../redux/accountSlice";
+import { logout } from "../../redux/accountSlice";
+import { FiSend, FiMessageCircle } from "react-icons/fi";
 
 import api from "../../config/axios";
 
@@ -202,6 +203,38 @@ const DriverDashboard = () => {
   const handleMouseLeave = () => {
     const timeout = setTimeout(() => setIsDropdownOpen(false), 200); // 200ms delay
     setHoverTimeout(timeout);
+  };
+
+  // --- AI CHAT WIDGET ---
+  const [showChat, setShowChat] = useState(false);
+  const [userInput, setUserInput] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAskAI = async () => {
+    if (!userInput.trim()) return;
+    setLoading(true);
+    setAiResponse(""); // Xóa câu trả lời cũ
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post(
+        "/ai/ask",
+        { question: userInput },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // API trả về 1 câu trả lời, hiển thị ra
+      setAiResponse(res.data.answer || "🤖 Không nhận được phản hồi.");
+    } catch (err) {
+      console.error("❌ Lỗi gọi AI:", err);
+      setAiResponse("⚠️ Đã xảy ra lỗi, vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+      setUserInput(""); // Xóa input
+    }
   };
 
   return (
@@ -540,6 +573,69 @@ const DriverDashboard = () => {
           <Outlet />
         </div>
       )}
+
+      {/* --- Floating AI Chat Widget --- */}
+      <div className="fixed bottom-6 right-6 z-[9999]">
+        {!showChat ? (
+          // 🔹 Nút tròn mở chat
+          <button
+            onClick={() => setShowChat(true)}
+            className="bg-black text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+            title="Hỏi AI"
+          >
+            <FiMessageCircle size={40} />
+          </button>
+        ) : (
+          // 🔹 Khung chat bật lên
+          <div className="w-100 h-[200px] bg-white text-black rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="bg-black text-white flex justify-between items-center px-4 py-2">
+              <span className="font-semibold">EV Charge AI</span>
+              <button
+                onClick={() => setShowChat(false)}
+                className="text-white text-lg hover:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Chat nội dung */}
+            <div className="p-4 flex-1 overflow-y-auto text-sm max-h-64">
+              {loading ? (
+                <p className="text-gray-500 italic">🤖 Đang suy nghĩ...</p>
+              ) : aiResponse ? (
+                <div className="bg-gray-100 p-3 rounded-lg text-base leading-relaxed">
+                  {aiResponse}
+                </div>
+              ) : (
+                <p className="text-gray-400 italic">
+                  Hỏi tôi bất cứ điều gì về sạc xe điện 🔋
+                </p>
+              )}
+            </div>
+
+            {/* Ô nhập & nút gửi */}
+            <div className="flex border-t border-gray-200 bg-white">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Nhập câu hỏi..."
+                className="flex-1 px-3 py-2 text-sm outline-none"
+                onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
+              />
+              <button
+                onClick={handleAskAI}
+                disabled={loading}
+                className="bg-black text-white px-3 py-2 flex items-center justify-center hover:bg-gray-800 transition"
+              >
+                <FiSend />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* --- Footer --- */}
       <footer
         id="lienhe"

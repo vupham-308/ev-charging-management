@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Input, Button, Tag, Spin, message, Card } from "antd";
+import { Input, Button, Tag, Spin, message, Card, Modal } from "antd";
 import {
   EnvironmentOutlined,
   FilterOutlined,
@@ -12,6 +12,7 @@ import "leaflet/dist/leaflet.css";
 import api from "../../config/axios";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
+import { toast } from "react-toastify";
 
 const ManageMap = () => {
   const [stations, setStations] = useState([]);
@@ -21,6 +22,9 @@ const ManageMap = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState(null);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentReservation, setCurrentReservation] = useState(null);
 
   // 🔹 Lấy danh sách trạm
   useEffect(() => {
@@ -43,6 +47,36 @@ const ManageMap = () => {
     fetchStations();
   }, []);
 
+  const handleStartCharging = async (station) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        message.warning("Vui lòng đăng nhập để bắt đầu sạc!");
+        return;
+      }
+
+      const res = await api.get(`/reservations/getByStationID`, {
+        params: { stationId: station.id },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      console.log("📡 Kết quả API:", res.status, res.data);
+
+      if (res.status === 200 && res.data && res.data.status === "PENDING") {
+        console.log("✅ Có đặt chỗ hợp lệ, mở Modal");
+        setCurrentReservation(res.data);
+        setIsModalVisible(true); // ✅ mở modal thật
+      } else {
+        console.log("ℹ️ Không có đặt chỗ, chuyển sang trang sạc ngay.");
+        navigate(`/driver/startCharging/${station.id}`);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi kiểm tra đặt chỗ:", error);
+      message.error("Không thể kiểm tra đặt chỗ. Vui lòng thử lại!");
+      navigate(`/driver/startCharging/${station.id}`);
+    }
+  };
+
   // 🔍 Tìm kiếm
   const handleSearch = () => {
     const keyword = searchText.toLowerCase();
@@ -56,9 +90,6 @@ const ManageMap = () => {
 
   const handleBookingClick = (station) => {
     navigate(`/driver/booking/${station.id}`);
-  };
-  const handleStartCharging = (station) => {
-    navigate(`/driver/startCharging/${station.id}`);
   };
 
   // ✅ Lấy vị trí người dùng hiện tại
@@ -361,7 +392,7 @@ const ManageMap = () => {
           boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
           height: "calc(100vh - 120px)",
           position: "relative",
-          zIndex: 0,
+          zIndex: 1,
         }}
       >
         <MapContainer
@@ -407,6 +438,58 @@ const ManageMap = () => {
           ))}
         </MapContainer>
       </div>
+
+      <Modal
+        title="🔋 Bạn có 1 phiên sạc đang được đặt trước"
+        open={isModalVisible}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setIsModalVisible(false);
+              navigate(
+                `/driver/startCharging/${currentReservation.chargerPoint.station.id}`
+              );
+            }}
+          >
+            Giữ lại và sạc
+          </Button>,
+          <Button
+            key="ok"
+            type="primary"
+            danger
+            onClick={async () => {
+              try {
+                const token = localStorage.getItem("token");
+                await api.put(
+                  `/reservations/cancel/${currentReservation.id}`,
+                  null,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+                message.success("✅ Đã hủy đặt chỗ, chuyển đến sạc ngay!");
+                toast.success("Bạn đã hủy đặt chỗ");
+                setIsModalVisible(false);
+                navigate(
+                  `/driver/startCharging/${currentReservation.chargerPoint.station.id}`
+                );
+              } catch {
+                message.error("Không thể hủy đặt chỗ. Vui lòng thử lại!");
+              }
+            }}
+          >
+            Hủy đặt chỗ & Sạc ngay
+          </Button>,
+        ]}
+        onCancel={() => setIsModalVisible(false)}
+        getContainer={false}
+      >
+        <p>
+          Bạn đã đặt chỗ ở trạm này. <br />
+          Bạn có muốn <b>hủy đặt chỗ</b> và bắt đầu sạc ngay không?
+        </p>
+      </Modal>
     </div>
   );
 };
