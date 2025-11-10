@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Card, Typography, message } from "antd";
+import { Form, Input, Button, Card, Typography, message, Alert } from "antd";
 import { ArrowLeftOutlined, LockOutlined, NumberOutlined } from "@ant-design/icons";
 import { useResetPassword } from "./hooks/useResetPassword";
 
@@ -12,23 +12,67 @@ const ResetPassword = () => {
   const email = state?.email || "";
   const { resetPassword, loading } = useResetPassword();
   const [form] = Form.useForm();
+  const [serverError, setServerError] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [lockMessage, setLockMessage] = useState(""); 
+  const [countdown, setCountdown] = useState(0);
+
+  // useEffect để xử lý đếm ngược khi hết lượt
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    } else if (countdown === 0 && attempts >= 3) {
+      navigate("/login");
+    }
+    return () => clearTimeout(timer);
+  }, [countdown, attempts, navigate]);
 
   const onFinish = async (values) => {
+    setServerError("");
+    setLockMessage("");
+
     try {
       await resetPassword({ ...values, email });
       message.success("✅ Mật khẩu của bạn đã được đặt lại thành công!");
       navigate("/login");
     } catch (error) {
-      message.error(error.message || "❌ Đặt lại mật khẩu thất bại, vui lòng thử lại!");
+      const errorMsg =
+        typeof error.response?.data === "string"
+          ? error.response.data
+          : error.response?.data?.message ||
+            error.response?.data?.error ||
+            "❌ Đặt lại mật khẩu thất bại, vui lòng kiểm tra kĩ các thông tin trước khi thử lại!";
+
+      setServerError(errorMsg);
+
+      setAttempts((prev) => {
+        const next = prev + 1;
+
+        if (next === 2) {
+          // Cảnh báo trước lượt cuối
+          setLockMessage("⚠️ Đây là lượt cuối để nhập OTP. Vui lòng kiểm tra email để chắc chắn mã OTP chính xác!");
+        } else if (next >= 3) {
+          // Hết lượt -> cảnh báo + bắt đầu đếm ngược
+          setLockMessage(
+            "⚠️ Bạn đã nhập sai OTP quá 3 lần. Trang sẽ tự động quay lại login trong 5 giây."
+          );
+          setCountdown(5); // bắt đầu đếm ngược
+        }
+
+        return next;
+      });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background */}
       <div className="absolute inset-0 bg-[url('https://cdn.motor1.com/images/mgl/Xkpmb/s1/zipcharge-go.jpg')] bg-cover bg-center">
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
       </div>
 
+      {/* Form */}
       <div className="relative z-10 w-full max-w-md mx-4">
         <Card
           style={{
@@ -43,7 +87,12 @@ const ResetPassword = () => {
             type="link"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate("/forgot-password")}
-            style={{ marginBottom: 8, paddingLeft: 0, color: "#000", fontWeight: 500 }}
+            style={{
+              marginBottom: 8,
+              paddingLeft: 0,
+              color: "#000",
+              fontWeight: 500,
+            }}
           >
             Quay lại
           </Button>
@@ -122,6 +171,24 @@ const ResetPassword = () => {
                 style={{ borderRadius: 8 }}
               />
             </Form.Item>
+
+            {serverError && (
+              <Alert
+                message={serverError}
+                type="error"
+                showIcon
+                style={{ marginBottom: 16, borderRadius: 8 }}
+              />
+            )}
+
+            {lockMessage && (
+              <Alert
+                message={countdown > 0 ? `${lockMessage} (${countdown}s)` : lockMessage}
+                type={attempts >= 3 ? "warning" : "info"}
+                showIcon
+                style={{ marginBottom: 16, borderRadius: 8 }}
+              />
+            )}
 
             <Button
               type="primary"

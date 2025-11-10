@@ -1,4 +1,3 @@
-"use client";
 import { useState, useEffect } from "react";
 import { useProfile } from "../contexts/ProfileContext";
 import {
