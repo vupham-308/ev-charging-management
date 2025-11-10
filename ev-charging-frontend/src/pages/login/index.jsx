@@ -126,6 +126,24 @@ const LoginPage = () => {
               </Button>
             </Form.Item>
 
+            {/* 🔹 Nút Đăng ký */}
+            <Form.Item style={{ textAlign: "center", marginTop: "8px" }}>
+              <span style={{ fontSize: "14px", color: "#555" }}>
+                Chưa có tài khoản?{" "}
+                <a
+                  onClick={() => navigate("/register")}
+                  style={{
+                    fontWeight: "600",
+                    color: "#000",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Đăng ký
+                </a>
+              </span>
+            </Form.Item>
+
             <div className="text-center mt-3">
               <a
                 className="text-sm text-blue-500 hover:underline cursor-pointer"

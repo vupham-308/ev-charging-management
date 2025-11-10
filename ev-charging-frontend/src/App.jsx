@@ -36,8 +36,8 @@ import { useDispatch } from "react-redux";
 import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
 import TermsPrivacyPage from "./pages/terms";
 import ForgotPassword from "./pages/login/ForgotPassword";
-import VerifyEmail from "./pages/login/VerifyEmail";
 import PaymentReturn from "./pages/paymentReturn";
+import ResetPassword from "./pages/login/ResetPassword";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -79,8 +79,8 @@ function AppContent() {
       element: <ForgotPassword />,
     },
     {
-      path: "/verify-email",
-      element: <VerifyEmail />,
+      path: "/reset-password",
+      element: <ResetPassword />,
     },
     {
       path: "/register",

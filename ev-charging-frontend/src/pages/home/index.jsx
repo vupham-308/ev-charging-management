@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FiBatteryCharging, // Sạc pin
   FiMapPin, // Bản đồ trạm
@@ -17,6 +17,7 @@ import {
 import { FaStar, FaQuoteLeft } from "react-icons/fa";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
 // --- Custom Hook for Scroll-triggered Animations ---
 const useAnimateOnScroll = () => {
@@ -48,10 +49,12 @@ const EVChargeHomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Change to true to test logged in state
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const user = {
-    fullName: "", // Using 'fullName' to match Redux example
+    fullName: "",
     avatar:
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=2080",
   };
+
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     // Simulate checking if user is logged in based on Redux or other logic
@@ -62,6 +65,16 @@ const EVChargeHomePage = () => {
       setIsLoggedIn(false);
     }
   }, [account]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     // In a real app, you would dispatch a logout action here
@@ -165,12 +178,10 @@ const EVChargeHomePage = () => {
             : "bg-black border-transparent"
         }`}
       >
-        {/* Logo */}
         <div className="text-3xl font-bold tracking-widest text-white cursor-pointer">
           EV Charge
         </div>
 
-        {/* Navigation Menu */}
         <nav className="hidden md:flex gap-8 items-center text-white font-medium">
           <Link to="map" className="hover:text-primary transition-colors">
             Bản đồ trạm
@@ -190,47 +201,56 @@ const EVChargeHomePage = () => {
         </nav>
 
         {/* --- AUTH SECTION --- */}
-        <div className="flex items-center gap-4">
-          {account ? (
-            <div
-              className="text-white relative"
-              onMouseEnter={() => setIsDropdownOpen(true)}
-              onMouseLeave={() => setIsDropdownOpen(false)}
-            >
-              <div className="flex items-center gap-3 cursor-pointer">
-                <span className="hidden sm:inline font-semibold">
-                  {account.fullName}
+        <div className="flex items-center gap-4" ref={dropdownRef}>
+          {isLoggedIn ? (
+            <div className="relative">
+              <button
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                className="flex items-center gap-3 cursor-pointer focus:outline-none"
+              >
+                <span className="hidden sm:inline font-semibold text-white">
+                  {account.fullName || "User"}
                 </span>
                 <img
                   src={user.avatar}
                   alt="User Avatar"
                   className="w-10 h-10 rounded-full border-2 border-primary object-cover"
                 />
-              </div>
+              </button>
 
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-[#111] rounded-lg shadow-lg border border-gray-700 py-2">
-                  <a
-                    href="/profile"
-                    className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-[#111] rounded-lg shadow-lg border border-gray-700 py-2 z-20"
                   >
-                    <FiUser /> Hồ sơ của tôi
-                  </a>
-                  <a
-                    href="#"
-                    className="flex items-center gap-3 px-4 py-2 text-sm hover:text-primary transition"
-                  >
-                    <FiShoppingCart /> Lịch sử đơn hàng
-                  </a>
-                  <div className="border-t border-gray-700 my-2"></div>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 transition"
-                  >
-                    <FiLogOut /> Đăng xuất
-                  </button>
-                </div>
-              )}
+                    <Link
+                      to="/profile"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-primary hover:bg-white/5 rounded-md transition"
+                    >
+                      <FiUser /> Hồ sơ của tôi
+                    </Link>
+
+                    <Link
+                      to="/orders"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:text-primary hover:bg-white/5 rounded-md transition"
+                    >
+                      <FiShoppingCart /> Lịch sử đơn hàng
+                    </Link>
+
+                    <div className="border-t border-gray-700 my-2"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:text-red-300 transition-colors duration-300 hover:bg-red-500/10 rounded-md"
+                    >
+                      <FiLogOut /> Đăng xuất
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <div className="flex items-center gap-4">
