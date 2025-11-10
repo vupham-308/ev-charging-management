@@ -10,5 +10,4 @@ public class ReviewStationRequest {
     private int stationId;
     private String description;
     private int rating;
-    private Date reviewDate;
 }
