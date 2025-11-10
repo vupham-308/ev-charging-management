@@ -51,9 +51,7 @@ public class ReviewStationService {
         review.setUser(userOpt.get());
         review.setDescription(request.getDescription());
         review.setRating(request.getRating());
-        review.setReviewDate(
-                request.getReviewDate() != null ? request.getReviewDate() : new Date()
-        );
+        review.setReviewDate(new Date(System.currentTimeMillis()));
 
         reviewRepo.save(review);
         return "Review created successfully";

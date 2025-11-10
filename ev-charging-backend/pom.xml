@@ -133,12 +133,12 @@
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
         </dependency>
-<!--open ai-->
-        <dependency>
-            <groupId>com.google.genai</groupId>
-            <artifactId>google-genai</artifactId>
-            <version>1.25.0</version>
-        </dependency>
+<!--gemini-->
+            <dependency>
+                <groupId>com.google.genai</groupId>
+                <artifactId>google-genai</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
     </dependencies>
 
