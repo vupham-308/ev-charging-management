@@ -35,12 +35,13 @@ import ManageTopup from "./pages/topup";
 import { useDispatch } from "react-redux";
 import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
 import TermsPrivacyPage from "./pages/terms";
+import ForgotPassword from "./pages/login/ForgotPassword";
+import VerifyEmail from "./pages/login/VerifyEmail";
 import PaymentReturn from "./pages/paymentReturn";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
 function AppContent() {
-  
   const dispatch = useDispatch();
 
   // ✅ Khôi phục account từ localStorage khi load app (chỉ chạy 1 lần)
@@ -74,10 +75,17 @@ function AppContent() {
       element: <LoginPage />,
     },
     {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/verify-email",
+      element: <VerifyEmail />,
+    },
+    {
       path: "/register",
       element: <RegisterPage />,
     },
-
     { path: "/staff", element: <StaffDashboard /> },
 
     {

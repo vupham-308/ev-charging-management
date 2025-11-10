@@ -107,9 +107,8 @@ public class ReservationService {
     public void setStatusRever(){
         List<Reservation> reservations = reservationRepository.findByStatus("PENDING");
         Date current = new Date(System.currentTimeMillis());
-        for(Reservation r: reservations){
-            Date time=new Date(r.getStartDate().getTime()-10*1000*60);//trước 10p
-            if(current.after(time)&&r.getEndDate().after(current)) {
+        for(Reservation r: reservations){//đúng giờ tự lock trụ
+            if(current.after(r.getStartDate())&&r.getEndDate().after(current)) {
                 //TH1: trụ trống hoàn toàn, có thể lock trụ trước 10p
                 if(r.getChargerPoint().getStatus().equals("AVAILABLE")) {//nếu available
                     //mới có thể lock trụ, nếu có người đang sạc thì không thể
@@ -248,5 +247,14 @@ public class ReservationService {
             result.add(dto);
         }
         return result;
+    }
+
+    public Reservation getByStationId(int id){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Reservation> res = reservationRepository.findPendingReservationByUserAndStation(user.getId(),id);
+        if(!res.isEmpty()){
+            return res.get(0);
+        }
+        return null;
     }
 }

@@ -1,0 +1,2126 @@
+{
+  "timestamp" : 1762417410798,
+  "cars" : [ {
+    "id" : 1,
+    "brand" : "Tesla Model 3",
+    "color" : "White",
+    "initBattery" : 90,
+    "licensePlate" : "51A-12345",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "active" : true
+  }, {
+    "id" : 2,
+    "brand" : "VinFast VF8",
+    "color" : "Blue",
+    "initBattery" : 60,
+    "licensePlate" : "59B-88888",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "active" : true
+  }, {
+    "id" : 3,
+    "brand" : "Hyundai Ioniq 5",
+    "color" : "Gray",
+    "initBattery" : 65,
+    "licensePlate" : "51H-55555",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "active" : true
+  } ],
+  "chargerCosts" : [ {
+    "portType" : "AC",
+    "cost" : 200.0
+  }, {
+    "portType" : "CCS",
+    "cost" : 1500.0
+  }, {
+    "portType" : "CHAdeMO",
+    "cost" : 1200.0
+  } ],
+  "chargerPoints" : [ {
+    "id" : 1,
+    "name" : "Trụ 1",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 2,
+    "name" : "Trụ 2",
+    "capacity" : 50,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 3,
+    "name" : "Trụ 3",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 4,
+    "name" : "Trụ 4",
+    "capacity" : 150,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 5,
+    "name" : "Trụ 1",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 6,
+    "name" : "Trụ 2",
+    "capacity" : 50,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 7,
+    "name" : "Trụ 3",
+    "capacity" : 150,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 8,
+    "name" : "Trụ 4",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 9,
+    "name" : "Trụ 1",
+    "capacity" : 50,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 10,
+    "name" : "Trụ 2",
+    "capacity" : 150,
+    "status" : "OUT_OF_SERVICE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 11,
+    "name" : "Trụ 3",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 12,
+    "name" : "Trụ 4",
+    "capacity" : 50,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 13,
+    "name" : "Trụ 5",
+    "capacity" : 150,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 14,
+    "name" : "Trụ 6",
+    "capacity" : 150,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 15,
+    "name" : "Trụ 1",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 16,
+    "name" : "Trụ 2",
+    "capacity" : 50,
+    "status" : "RESERVED",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 17,
+    "name" : "Trụ 3",
+    "capacity" : 150,
+    "status" : "OUT_OF_SERVICE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 18,
+    "name" : "Trụ 4",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 19,
+    "name" : "Trụ 5",
+    "capacity" : 50,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "CCS",
+      "cost" : 1500.0
+    }
+  }, {
+    "id" : 20,
+    "name" : "Trụ 6",
+    "capacity" : 150,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "CHAdeMO",
+      "cost" : 1200.0
+    }
+  }, {
+    "id" : 21,
+    "name" : "Trụ 7",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  }, {
+    "id" : 22,
+    "name" : "Trụ 5",
+    "capacity" : 22,
+    "status" : "AVAILABLE",
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    },
+    "chargerCost" : {
+      "portType" : "AC",
+      "cost" : 200.0
+    }
+  } ],
+  "chargingSessions" : [ {
+    "id" : 1,
+    "startTime" : 1762316160712,
+    "endTime" : 1762316520712,
+    "status" : "PAID",
+    "paymentMethod" : "CASH",
+    "goalBattery" : 100,
+    "chargerPoint" : {
+      "id" : 2,
+      "name" : "Trụ 2",
+      "capacity" : 50,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 1,
+        "name" : "Vincom Lê Văn Việt",
+        "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+        "phone" : "0982111133",
+        "email" : "vincomlevanviet10@ev-charging",
+        "status" : "ACTIVE",
+        "latitude" : 10.8448849,
+        "longitude" : 106.7785719
+      },
+      "chargerCost" : {
+        "portType" : "CCS",
+        "cost" : 1500.0
+      }
+    },
+    "reservation" : null,
+    "car" : {
+      "id" : 1,
+      "brand" : "Tesla Model 3",
+      "color" : "White",
+      "initBattery" : 90,
+      "licensePlate" : "51A-12345",
+      "user" : {
+        "id" : 3,
+        "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+        "fullName" : "Lê Văn Thanh Hiếu",
+        "email" : "hieu@gmail.com",
+        "phone" : "0989826352",
+        "role" : "USER",
+        "active" : true,
+        "enabled" : true,
+        "username" : "hieu@gmail.com",
+        "authorities" : [ {
+          "authority" : "USER"
+        } ],
+        "credentialsNonExpired" : true,
+        "accountNonExpired" : true,
+        "accountNonLocked" : true
+      },
+      "active" : true
+    }
+  }, {
+    "id" : 3,
+    "startTime" : 1762349986721,
+    "endTime" : 1762349996035,
+    "status" : "COMPLETED",
+    "paymentMethod" : "BALANCE",
+    "goalBattery" : 60,
+    "chargerPoint" : {
+      "id" : 2,
+      "name" : "Trụ 2",
+      "capacity" : 50,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 1,
+        "name" : "Vincom Lê Văn Việt",
+        "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+        "phone" : "0982111133",
+        "email" : "vincomlevanviet10@ev-charging",
+        "status" : "ACTIVE",
+        "latitude" : 10.8448849,
+        "longitude" : 106.7785719
+      },
+      "chargerCost" : {
+        "portType" : "CCS",
+        "cost" : 1500.0
+      }
+    },
+    "reservation" : null,
+    "car" : {
+      "id" : 2,
+      "brand" : "VinFast VF8",
+      "color" : "Blue",
+      "initBattery" : 60,
+      "licensePlate" : "59B-88888",
+      "user" : {
+        "id" : 3,
+        "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+        "fullName" : "Lê Văn Thanh Hiếu",
+        "email" : "hieu@gmail.com",
+        "phone" : "0989826352",
+        "role" : "USER",
+        "active" : true,
+        "enabled" : true,
+        "username" : "hieu@gmail.com",
+        "authorities" : [ {
+          "authority" : "USER"
+        } ],
+        "credentialsNonExpired" : true,
+        "accountNonExpired" : true,
+        "accountNonLocked" : true
+      },
+      "active" : true
+    }
+  }, {
+    "id" : 4,
+    "startTime" : 1762351098089,
+    "endTime" : 1762351101523,
+    "status" : "COMPLETED",
+    "paymentMethod" : "BALANCE",
+    "goalBattery" : 100,
+    "chargerPoint" : {
+      "id" : 2,
+      "name" : "Trụ 2",
+      "capacity" : 50,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 1,
+        "name" : "Vincom Lê Văn Việt",
+        "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+        "phone" : "0982111133",
+        "email" : "vincomlevanviet10@ev-charging",
+        "status" : "ACTIVE",
+        "latitude" : 10.8448849,
+        "longitude" : 106.7785719
+      },
+      "chargerCost" : {
+        "portType" : "CCS",
+        "cost" : 1500.0
+      }
+    },
+    "reservation" : null,
+    "car" : {
+      "id" : 1,
+      "brand" : "Tesla Model 3",
+      "color" : "White",
+      "initBattery" : 90,
+      "licensePlate" : "51A-12345",
+      "user" : {
+        "id" : 3,
+        "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+        "fullName" : "Lê Văn Thanh Hiếu",
+        "email" : "hieu@gmail.com",
+        "phone" : "0989826352",
+        "role" : "USER",
+        "active" : true,
+        "enabled" : true,
+        "username" : "hieu@gmail.com",
+        "authorities" : [ {
+          "authority" : "USER"
+        } ],
+        "credentialsNonExpired" : true,
+        "accountNonExpired" : true,
+        "accountNonLocked" : true
+      },
+      "active" : true
+    }
+  }, {
+    "id" : 5,
+    "startTime" : 1762351446744,
+    "endTime" : 1762351624425,
+    "status" : "COMPLETED",
+    "paymentMethod" : "BALANCE",
+    "goalBattery" : 90,
+    "chargerPoint" : {
+      "id" : 2,
+      "name" : "Trụ 2",
+      "capacity" : 50,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 1,
+        "name" : "Vincom Lê Văn Việt",
+        "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+        "phone" : "0982111133",
+        "email" : "vincomlevanviet10@ev-charging",
+        "status" : "ACTIVE",
+        "latitude" : 10.8448849,
+        "longitude" : 106.7785719
+      },
+      "chargerCost" : {
+        "portType" : "CCS",
+        "cost" : 1500.0
+      }
+    },
+    "reservation" : null,
+    "car" : {
+      "id" : 1,
+      "brand" : "Tesla Model 3",
+      "color" : "White",
+      "initBattery" : 90,
+      "licensePlate" : "51A-12345",
+      "user" : {
+        "id" : 3,
+        "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+        "fullName" : "Lê Văn Thanh Hiếu",
+        "email" : "hieu@gmail.com",
+        "phone" : "0989826352",
+        "role" : "USER",
+        "active" : true,
+        "enabled" : true,
+        "username" : "hieu@gmail.com",
+        "authorities" : [ {
+          "authority" : "USER"
+        } ],
+        "credentialsNonExpired" : true,
+        "accountNonExpired" : true,
+        "accountNonLocked" : true
+      },
+      "active" : true
+    }
+  }, {
+    "id" : 6,
+    "startTime" : 1762351474604,
+    "endTime" : 1762352524428,
+    "status" : "COMPLETED",
+    "paymentMethod" : "BALANCE",
+    "goalBattery" : 60,
+    "chargerPoint" : {
+      "id" : 15,
+      "name" : "Trụ 1",
+      "capacity" : 22,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 4,
+        "name" : "Megamarket An Phú",
+        "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+        "phone" : "0983456723",
+        "email" : "megamarket@ev-charging.com",
+        "status" : "ACTIVE",
+        "latitude" : 10.8598904,
+        "longitude" : 106.8135892
+      },
+      "chargerCost" : {
+        "portType" : "AC",
+        "cost" : 200.0
+      }
+    },
+    "reservation" : null,
+    "car" : {
+      "id" : 2,
+      "brand" : "VinFast VF8",
+      "color" : "Blue",
+      "initBattery" : 60,
+      "licensePlate" : "59B-88888",
+      "user" : {
+        "id" : 3,
+        "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+        "fullName" : "Lê Văn Thanh Hiếu",
+        "email" : "hieu@gmail.com",
+        "phone" : "0989826352",
+        "role" : "USER",
+        "active" : true,
+        "enabled" : true,
+        "username" : "hieu@gmail.com",
+        "authorities" : [ {
+          "authority" : "USER"
+        } ],
+        "credentialsNonExpired" : true,
+        "accountNonExpired" : true,
+        "accountNonLocked" : true
+      },
+      "active" : true
+    }
+  } ],
+  "problemReports" : [ {
+    "id" : 5,
+    "title" : "Ứng dụng hiển thị sai trạng thái",
+    "description" : "Trạm hiển thị \"Available\" nhưng thực tế đang bận.",
+    "status" : "SOLVED",
+    "createdAt" : 1759893120000,
+    "solvedAt" : 1759898700000,
+    "response" : "Đã đồng bộ lại dữ liệu trạng thái từ backend.",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 6,
+    "title" : "Lỗi thanh toán thẻ VISA",
+    "description" : "Người dùng không thanh toán được bằng thẻ VISA qua POS.",
+    "status" : "SOLVED",
+    "createdAt" : 1759819800000,
+    "solvedAt" : 1759836600000,
+    "response" : "Đã cập nhật firmware POS, chấp nhận thẻ VISA bình thường.",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 7,
+    "title" : "Xe bị kẹt trong bãi sau khi sạc",
+    "description" : "Cổng barrier không mở tự động sau khi hoàn tất sạc.",
+    "status" : "PENDING",
+    "createdAt" : 1760019300000,
+    "solvedAt" : null,
+    "response" : "Đã gửi yêu cầu đến đội vận hành bãi xe để xử lý.",
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 9,
+    "title" : "Máy in hoá đơn không hoạt động",
+    "description" : "Máy in tại quầy thanh toán không in được biên lai.",
+    "status" : "PENDING",
+    "createdAt" : 1759920000000,
+    "solvedAt" : null,
+    "response" : null,
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 11,
+    "title" : "ppppppppppppppppp",
+    "description" : "pppppppppp",
+    "status" : "PENDING",
+    "createdAt" : 1762351409017,
+    "solvedAt" : null,
+    "response" : null,
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  } ],
+  "reservations" : [ {
+    "id" : 1,
+    "status" : "CANCELLED",
+    "startDate" : 1762351200000,
+    "endDate" : 1762353000000,
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "chargerPoint" : {
+      "id" : 2,
+      "name" : "Trụ 2",
+      "capacity" : 50,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 1,
+        "name" : "Vincom Lê Văn Việt",
+        "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+        "phone" : "0982111133",
+        "email" : "vincomlevanviet10@ev-charging",
+        "status" : "ACTIVE",
+        "latitude" : 10.8448849,
+        "longitude" : 106.7785719
+      },
+      "chargerCost" : {
+        "portType" : "CCS",
+        "cost" : 1500.0
+      }
+    }
+  }, {
+    "id" : 3,
+    "status" : "CANCELLED",
+    "startDate" : 1762354800000,
+    "endDate" : 1762356600000,
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "chargerPoint" : {
+      "id" : 20,
+      "name" : "Trụ 6",
+      "capacity" : 150,
+      "status" : "AVAILABLE",
+      "station" : {
+        "id" : 4,
+        "name" : "Megamarket An Phú",
+        "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+        "phone" : "0983456723",
+        "email" : "megamarket@ev-charging.com",
+        "status" : "ACTIVE",
+        "latitude" : 10.8598904,
+        "longitude" : 106.8135892
+      },
+      "chargerCost" : {
+        "portType" : "CHAdeMO",
+        "cost" : 1200.0
+      }
+    }
+  } ],
+  "reviewStations" : [ {
+    "id" : 1,
+    "description" : "Trạm sạch sẽ, sạc nhanh và nhân viên hỗ trợ tốt.",
+    "rating" : 5,
+    "reviewDate" : 1760029200000,
+    "user" : {
+      "id" : 4,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Nguyễn Hữu Nhật",
+      "email" : "nhat@gmail.com",
+      "phone" : "0989826652",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "nhat@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 2,
+    "description" : "Vị trí thuận tiện, nhưng khu vực đỗ xe hơi chật vào giờ cao điểm.",
+    "rating" : 4,
+    "reviewDate" : 1760115600000,
+    "user" : {
+      "id" : 4,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Nguyễn Hữu Nhật",
+      "email" : "nhat@gmail.com",
+      "phone" : "0989826652",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "nhat@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 3,
+    "description" : "Trạm hoạt động ổn định, tốc độ sạc tốt và dễ sử dụng.",
+    "rating" : 5,
+    "reviewDate" : 1760115600000,
+    "user" : {
+      "id" : 4,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Nguyễn Hữu Nhật",
+      "email" : "nhat@gmail.com",
+      "phone" : "0989826652",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "nhat@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 4,
+    "description" : "Rất tiện lợi, sạc nhanh và có khu ăn uống gần đó.",
+    "rating" : 5,
+    "reviewDate" : 1760202000000,
+    "user" : {
+      "id" : 4,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Nguyễn Hữu Nhật",
+      "email" : "nhat@gmail.com",
+      "phone" : "0989826652",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "nhat@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    }
+  }, {
+    "id" : 5,
+    "description" : "Có nhiều trụ sạc, nhưng buổi tối hơi đông.",
+    "rating" : 4,
+    "reviewDate" : 1760202000000,
+    "user" : {
+      "id" : 7,
+      "password" : "$2a$10$eSfDdNtEp9zT3hUrUDdi..2U.kxFuBlD8TeeynH3jwcx3zLl3ELpW",
+      "fullName" : "RHYDER",
+      "email" : "rhyder@gmail.com",
+      "phone" : "0946764333",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "rhyder@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 6,
+    "description" : "Hệ thống ổn định và thân thiện.",
+    "rating" : 5,
+    "reviewDate" : 1760288400000,
+    "user" : {
+      "id" : 7,
+      "password" : "$2a$10$eSfDdNtEp9zT3hUrUDdi..2U.kxFuBlD8TeeynH3jwcx3zLl3ELpW",
+      "fullName" : "RHYDER",
+      "email" : "rhyder@gmail.com",
+      "phone" : "0946764333",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "rhyder@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 7,
+    "description" : "Sạc tốt nhưng hơi khó tìm chỗ đỗ xe.",
+    "rating" : 4,
+    "reviewDate" : 1760288400000,
+    "user" : {
+      "id" : 7,
+      "password" : "$2a$10$eSfDdNtEp9zT3hUrUDdi..2U.kxFuBlD8TeeynH3jwcx3zLl3ELpW",
+      "fullName" : "RHYDER",
+      "email" : "rhyder@gmail.com",
+      "phone" : "0946764333",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "rhyder@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 8,
+    "description" : "Rất tuyệt, khu sạc có mái che, an toàn và sạch sẽ.",
+    "rating" : 5,
+    "reviewDate" : 1760374800000,
+    "user" : {
+      "id" : 7,
+      "password" : "$2a$10$eSfDdNtEp9zT3hUrUDdi..2U.kxFuBlD8TeeynH3jwcx3zLl3ELpW",
+      "fullName" : "RHYDER",
+      "email" : "rhyder@gmail.com",
+      "phone" : "0946764333",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "rhyder@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    }
+  }, {
+    "id" : 9,
+    "description" : "Sạc ổn định, dễ thao tác và nhân viên thân thiện.",
+    "rating" : 5,
+    "reviewDate" : 1760461200000,
+    "user" : {
+      "id" : 11,
+      "password" : "$2a$10$CiNqCth2AXJUUjQBbO30YeM3MWpBa53yoR6PXH35NsukRhg46fVvW",
+      "fullName" : "nguyễn văn nghĩa",
+      "email" : "admin9@gmail.com",
+      "phone" : "0377345777",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin9@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 10,
+    "description" : "Sạc tốt, chỉ hơi chậm vào cuối tuần.",
+    "rating" : 4,
+    "reviewDate" : 1760461200000,
+    "user" : {
+      "id" : 11,
+      "password" : "$2a$10$CiNqCth2AXJUUjQBbO30YeM3MWpBa53yoR6PXH35NsukRhg46fVvW",
+      "fullName" : "nguyễn văn nghĩa",
+      "email" : "admin9@gmail.com",
+      "phone" : "0377345777",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin9@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 11,
+    "description" : "Vị trí trung tâm, dễ tiếp cận, sạc ổn định.",
+    "rating" : 4,
+    "reviewDate" : 1760547600000,
+    "user" : {
+      "id" : 11,
+      "password" : "$2a$10$CiNqCth2AXJUUjQBbO30YeM3MWpBa53yoR6PXH35NsukRhg46fVvW",
+      "fullName" : "nguyễn văn nghĩa",
+      "email" : "admin9@gmail.com",
+      "phone" : "0377345777",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin9@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 12,
+    "description" : "Hệ thống hiện đại, hỗ trợ thanh toán dễ dàng.",
+    "rating" : 5,
+    "reviewDate" : 1760547600000,
+    "user" : {
+      "id" : 11,
+      "password" : "$2a$10$CiNqCth2AXJUUjQBbO30YeM3MWpBa53yoR6PXH35NsukRhg46fVvW",
+      "fullName" : "nguyễn văn nghĩa",
+      "email" : "admin9@gmail.com",
+      "phone" : "0377345777",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin9@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    }
+  }, {
+    "id" : 13,
+    "description" : "Snhân viên hỗ trợ rất nhiệt tình.",
+    "rating" : 5,
+    "reviewDate" : 1760634000000,
+    "user" : {
+      "id" : 23,
+      "password" : "$2a$10$eMpTFymgRUYzD5vrdlZH0eJMYrm9nog3XpOE7JHeAj8urY9rhv72G",
+      "fullName" : "nguyễn văn long",
+      "email" : "admin11@gmail.com",
+      "phone" : "0377345888",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin11@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 14,
+    "description" : "Hơi xa khu trung tâm nhưng sạc rất nhanh.",
+    "rating" : 4,
+    "reviewDate" : 1760634000000,
+    "user" : {
+      "id" : 23,
+      "password" : "$2a$10$eMpTFymgRUYzD5vrdlZH0eJMYrm9nog3XpOE7JHeAj8urY9rhv72G",
+      "fullName" : "nguyễn văn long",
+      "email" : "admin11@gmail.com",
+      "phone" : "0377345888",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin11@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 15,
+    "description" : "Khu vực sạc rộng rãi, nhiều chỗ trống.",
+    "rating" : 5,
+    "reviewDate" : 1760720400000,
+    "user" : {
+      "id" : 23,
+      "password" : "$2a$10$eMpTFymgRUYzD5vrdlZH0eJMYrm9nog3XpOE7JHeAj8urY9rhv72G",
+      "fullName" : "nguyễn văn long",
+      "email" : "admin11@gmail.com",
+      "phone" : "0377345888",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin11@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 16,
+    "description" : "ổn, nhưng hơi chậm lúc cao điểm.",
+    "rating" : 4,
+    "reviewDate" : 1760720400000,
+    "user" : {
+      "id" : 23,
+      "password" : "$2a$10$eMpTFymgRUYzD5vrdlZH0eJMYrm9nog3XpOE7JHeAj8urY9rhv72G",
+      "fullName" : "nguyễn văn long",
+      "email" : "admin11@gmail.com",
+      "phone" : "0377345888",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "admin11@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    }
+  }, {
+    "id" : 17,
+    "description" : "ổn định, giao diện thân thiện, không lỗi.",
+    "rating" : 5,
+    "reviewDate" : 1760806800000,
+    "user" : {
+      "id" : 19,
+      "password" : "$2a$10$.SH2G9OE5kSJY6XlWw7kueH0dsdY/jpWJkIRlb47DU.kdtnszVfeq",
+      "fullName" : "vo thanh tan",
+      "email" : "kenkun3423@gmail.com",
+      "phone" : "0934154759",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "kenkun3423@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 1,
+      "name" : "Vincom Lê Văn Việt",
+      "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+      "phone" : "0982111133",
+      "email" : "vincomlevanviet10@ev-charging",
+      "status" : "ACTIVE",
+      "latitude" : 10.8448849,
+      "longitude" : 106.7785719
+    }
+  }, {
+    "id" : 18,
+    "description" : "khá tiện, chỉ cần cải thiện tốc độ thanh toán.",
+    "rating" : 4,
+    "reviewDate" : 1760806800000,
+    "user" : {
+      "id" : 19,
+      "password" : "$2a$10$.SH2G9OE5kSJY6XlWw7kueH0dsdY/jpWJkIRlb47DU.kdtnszVfeq",
+      "fullName" : "vo thanh tan",
+      "email" : "kenkun3423@gmail.com",
+      "phone" : "0934154759",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "kenkun3423@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 2,
+      "name" : "Gigamall Phạm Văn Đồng",
+      "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+      "phone" : "0967452381",
+      "email" : "gigamall@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8274345,
+      "longitude" : 106.7218182
+    }
+  }, {
+    "id" : 19,
+    "description" : "luôn sạch sẽ, có camera an ninh tốt.",
+    "rating" : 5,
+    "reviewDate" : 1760893200000,
+    "user" : {
+      "id" : 19,
+      "password" : "$2a$10$.SH2G9OE5kSJY6XlWw7kueH0dsdY/jpWJkIRlb47DU.kdtnszVfeq",
+      "fullName" : "vo thanh tan",
+      "email" : "kenkun3423@gmail.com",
+      "phone" : "0934154759",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "kenkun3423@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 3,
+      "name" : "Vincom Mega Mall Grand Park",
+      "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0967534211",
+      "email" : "grandpark@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8414916,
+      "longitude" : 106.8228698
+    }
+  }, {
+    "id" : 20,
+    "description" : "Sạc nhanh, không gặp sự cố, rất hài lòng.",
+    "rating" : 5,
+    "reviewDate" : 1760893200000,
+    "user" : {
+      "id" : 19,
+      "password" : "$2a$10$.SH2G9OE5kSJY6XlWw7kueH0dsdY/jpWJkIRlb47DU.kdtnszVfeq",
+      "fullName" : "vo thanh tan",
+      "email" : "kenkun3423@gmail.com",
+      "phone" : "0934154759",
+      "role" : "USER",
+      "active" : false,
+      "enabled" : false,
+      "username" : "kenkun3423@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    },
+    "station" : {
+      "id" : 4,
+      "name" : "Megamarket An Phú",
+      "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+      "phone" : "0983456723",
+      "email" : "megamarket@ev-charging.com",
+      "status" : "ACTIVE",
+      "latitude" : 10.8598904,
+      "longitude" : 106.8135892
+    }
+  } ],
+  "stations" : [ {
+    "id" : 1,
+    "name" : "Vincom Lê Văn Việt",
+    "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+    "phone" : "0982111133",
+    "email" : "vincomlevanviet10@ev-charging",
+    "status" : "ACTIVE",
+    "latitude" : 10.8448849,
+    "longitude" : 106.7785719
+  }, {
+    "id" : 2,
+    "name" : "Gigamall Phạm Văn Đồng",
+    "address" : "240 Phạm Văn Đồng, TP Thủ Đức, TP.HCM",
+    "phone" : "0967452381",
+    "email" : "gigamall@ev-charging.com",
+    "status" : "ACTIVE",
+    "latitude" : 10.8274345,
+    "longitude" : 106.7218182
+  }, {
+    "id" : 3,
+    "name" : "Vincom Mega Mall Grand Park",
+    "address" : " 301 Nguyễn Văn Tăng, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+    "phone" : "0967534211",
+    "email" : "grandpark@ev-charging.com",
+    "status" : "ACTIVE",
+    "latitude" : 10.8414916,
+    "longitude" : 106.8228698
+  }, {
+    "id" : 4,
+    "name" : "Megamarket An Phú",
+    "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+    "phone" : "0983456723",
+    "email" : "megamarket@ev-charging.com",
+    "status" : "ACTIVE",
+    "latitude" : 10.8598904,
+    "longitude" : 106.8135892
+  } ],
+  "transactions" : [ {
+    "id" : 1,
+    "date" : 1762316160831,
+    "totalAmount" : 9000.0,
+    "paymentMethod" : "CASH",
+    "paymentType" : "WITHDRAW",
+    "status" : "FAILED",
+    "chargingSession" : {
+      "id" : 1,
+      "startTime" : 1762316160712,
+      "endTime" : 1762316520712,
+      "status" : "PAID",
+      "paymentMethod" : "CASH",
+      "goalBattery" : 100,
+      "chargerPoint" : {
+        "id" : 2,
+        "name" : "Trụ 2",
+        "capacity" : 50,
+        "status" : "AVAILABLE",
+        "station" : {
+          "id" : 1,
+          "name" : "Vincom Lê Văn Việt",
+          "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+          "phone" : "0982111133",
+          "email" : "vincomlevanviet10@ev-charging",
+          "status" : "ACTIVE",
+          "latitude" : 10.8448849,
+          "longitude" : 106.7785719
+        },
+        "chargerCost" : {
+          "portType" : "CCS",
+          "cost" : 1500.0
+        }
+      },
+      "reservation" : null,
+      "car" : {
+        "id" : 1,
+        "brand" : "Tesla Model 3",
+        "color" : "White",
+        "initBattery" : 90,
+        "licensePlate" : "51A-12345",
+        "user" : {
+          "id" : 3,
+          "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+          "fullName" : "Lê Văn Thanh Hiếu",
+          "email" : "hieu@gmail.com",
+          "phone" : "0989826352",
+          "role" : "USER",
+          "active" : true,
+          "enabled" : true,
+          "username" : "hieu@gmail.com",
+          "authorities" : [ {
+            "authority" : "USER"
+          } ],
+          "credentialsNonExpired" : true,
+          "accountNonExpired" : true,
+          "accountNonLocked" : true
+        },
+        "active" : true
+      }
+    },
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  }, {
+    "id" : 25,
+    "date" : 1762349986731,
+    "totalAmount" : 0.0,
+    "paymentMethod" : "BALANCE",
+    "paymentType" : "WITHDRAW",
+    "status" : "COMPLETED",
+    "chargingSession" : {
+      "id" : 3,
+      "startTime" : 1762349986721,
+      "endTime" : 1762349996035,
+      "status" : "COMPLETED",
+      "paymentMethod" : "BALANCE",
+      "goalBattery" : 60,
+      "chargerPoint" : {
+        "id" : 2,
+        "name" : "Trụ 2",
+        "capacity" : 50,
+        "status" : "AVAILABLE",
+        "station" : {
+          "id" : 1,
+          "name" : "Vincom Lê Văn Việt",
+          "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+          "phone" : "0982111133",
+          "email" : "vincomlevanviet10@ev-charging",
+          "status" : "ACTIVE",
+          "latitude" : 10.8448849,
+          "longitude" : 106.7785719
+        },
+        "chargerCost" : {
+          "portType" : "CCS",
+          "cost" : 1500.0
+        }
+      },
+      "reservation" : null,
+      "car" : {
+        "id" : 2,
+        "brand" : "VinFast VF8",
+        "color" : "Blue",
+        "initBattery" : 60,
+        "licensePlate" : "59B-88888",
+        "user" : {
+          "id" : 3,
+          "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+          "fullName" : "Lê Văn Thanh Hiếu",
+          "email" : "hieu@gmail.com",
+          "phone" : "0989826352",
+          "role" : "USER",
+          "active" : true,
+          "enabled" : true,
+          "username" : "hieu@gmail.com",
+          "authorities" : [ {
+            "authority" : "USER"
+          } ],
+          "credentialsNonExpired" : true,
+          "accountNonExpired" : true,
+          "accountNonLocked" : true
+        },
+        "active" : true
+      }
+    },
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  }, {
+    "id" : 29,
+    "date" : 1762347238024,
+    "totalAmount" : 500000.0,
+    "paymentMethod" : "VNPAY",
+    "paymentType" : "TOPUP",
+    "status" : "COMPLETED",
+    "chargingSession" : null,
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  }, {
+    "id" : 30,
+    "date" : 1762351098101,
+    "totalAmount" : 0.0,
+    "paymentMethod" : "BALANCE",
+    "paymentType" : "WITHDRAW",
+    "status" : "COMPLETED",
+    "chargingSession" : {
+      "id" : 4,
+      "startTime" : 1762351098089,
+      "endTime" : 1762351101523,
+      "status" : "COMPLETED",
+      "paymentMethod" : "BALANCE",
+      "goalBattery" : 100,
+      "chargerPoint" : {
+        "id" : 2,
+        "name" : "Trụ 2",
+        "capacity" : 50,
+        "status" : "AVAILABLE",
+        "station" : {
+          "id" : 1,
+          "name" : "Vincom Lê Văn Việt",
+          "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+          "phone" : "0982111133",
+          "email" : "vincomlevanviet10@ev-charging",
+          "status" : "ACTIVE",
+          "latitude" : 10.8448849,
+          "longitude" : 106.7785719
+        },
+        "chargerCost" : {
+          "portType" : "CCS",
+          "cost" : 1500.0
+        }
+      },
+      "reservation" : null,
+      "car" : {
+        "id" : 1,
+        "brand" : "Tesla Model 3",
+        "color" : "White",
+        "initBattery" : 90,
+        "licensePlate" : "51A-12345",
+        "user" : {
+          "id" : 3,
+          "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+          "fullName" : "Lê Văn Thanh Hiếu",
+          "email" : "hieu@gmail.com",
+          "phone" : "0989826352",
+          "role" : "USER",
+          "active" : true,
+          "enabled" : true,
+          "username" : "hieu@gmail.com",
+          "authorities" : [ {
+            "authority" : "USER"
+          } ],
+          "credentialsNonExpired" : true,
+          "accountNonExpired" : true,
+          "accountNonLocked" : true
+        },
+        "active" : true
+      }
+    },
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  }, {
+    "id" : 31,
+    "date" : 1762351446758,
+    "totalAmount" : 4500.0,
+    "paymentMethod" : "BALANCE",
+    "paymentType" : "WITHDRAW",
+    "status" : "COMPLETED",
+    "chargingSession" : {
+      "id" : 5,
+      "startTime" : 1762351446744,
+      "endTime" : 1762351624425,
+      "status" : "COMPLETED",
+      "paymentMethod" : "BALANCE",
+      "goalBattery" : 90,
+      "chargerPoint" : {
+        "id" : 2,
+        "name" : "Trụ 2",
+        "capacity" : 50,
+        "status" : "AVAILABLE",
+        "station" : {
+          "id" : 1,
+          "name" : "Vincom Lê Văn Việt",
+          "address" : "30 Lê Văn Việt, TP Thủ Đức, TP.HCM",
+          "phone" : "0982111133",
+          "email" : "vincomlevanviet10@ev-charging",
+          "status" : "ACTIVE",
+          "latitude" : 10.8448849,
+          "longitude" : 106.7785719
+        },
+        "chargerCost" : {
+          "portType" : "CCS",
+          "cost" : 1500.0
+        }
+      },
+      "reservation" : null,
+      "car" : {
+        "id" : 1,
+        "brand" : "Tesla Model 3",
+        "color" : "White",
+        "initBattery" : 90,
+        "licensePlate" : "51A-12345",
+        "user" : {
+          "id" : 3,
+          "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+          "fullName" : "Lê Văn Thanh Hiếu",
+          "email" : "hieu@gmail.com",
+          "phone" : "0989826352",
+          "role" : "USER",
+          "active" : true,
+          "enabled" : true,
+          "username" : "hieu@gmail.com",
+          "authorities" : [ {
+            "authority" : "USER"
+          } ],
+          "credentialsNonExpired" : true,
+          "accountNonExpired" : true,
+          "accountNonLocked" : true
+        },
+        "active" : true
+      }
+    },
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  }, {
+    "id" : 32,
+    "date" : 1762351474615,
+    "totalAmount" : 3600.0,
+    "paymentMethod" : "BALANCE",
+    "paymentType" : "WITHDRAW",
+    "status" : "COMPLETED",
+    "chargingSession" : {
+      "id" : 6,
+      "startTime" : 1762351474604,
+      "endTime" : 1762352524428,
+      "status" : "COMPLETED",
+      "paymentMethod" : "BALANCE",
+      "goalBattery" : 60,
+      "chargerPoint" : {
+        "id" : 15,
+        "name" : "Trụ 1",
+        "capacity" : 22,
+        "status" : "AVAILABLE",
+        "station" : {
+          "id" : 4,
+          "name" : "Megamarket An Phú",
+          "address" : "230 Hoàng Hữu Nam, Long Thạnh Mỹ, TP Thủ Đức, TP.HCM",
+          "phone" : "0983456723",
+          "email" : "megamarket@ev-charging.com",
+          "status" : "ACTIVE",
+          "latitude" : 10.8598904,
+          "longitude" : 106.8135892
+        },
+        "chargerCost" : {
+          "portType" : "AC",
+          "cost" : 200.0
+        }
+      },
+      "reservation" : null,
+      "car" : {
+        "id" : 2,
+        "brand" : "VinFast VF8",
+        "color" : "Blue",
+        "initBattery" : 60,
+        "licensePlate" : "59B-88888",
+        "user" : {
+          "id" : 3,
+          "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+          "fullName" : "Lê Văn Thanh Hiếu",
+          "email" : "hieu@gmail.com",
+          "phone" : "0989826352",
+          "role" : "USER",
+          "active" : true,
+          "enabled" : true,
+          "username" : "hieu@gmail.com",
+          "authorities" : [ {
+            "authority" : "USER"
+          } ],
+          "credentialsNonExpired" : true,
+          "accountNonExpired" : true,
+          "accountNonLocked" : true
+        },
+        "active" : true
+      }
+    },
+    "user" : {
+      "id" : 3,
+      "password" : "$2a$10$pefGVYEmQhVf3qfS1knTB.iczUHfIMYSLHfcDTyBWxZ22SFM1dmpq",
+      "fullName" : "Lê Văn Thanh Hiếu",
+      "email" : "hieu@gmail.com",
+      "phone" : "0989826352",
+      "role" : "USER",
+      "active" : true,
+      "enabled" : true,
+      "username" : "hieu@gmail.com",
+      "authorities" : [ {
+        "authority" : "USER"
+      } ],
+      "credentialsNonExpired" : true,
+      "accountNonExpired" : true,
+      "accountNonLocked" : true
+    }
+  } ]
+}

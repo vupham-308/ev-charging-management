@@ -2,6 +2,7 @@ package com.ev.evchargingsystem.repository;
 
 import com.ev.evchargingsystem.entity.Car;
 import com.ev.evchargingsystem.entity.ChargingSession;
+import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.ChargingSessionRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,11 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
 
     List<ChargingSession> findChargingSessionByCar(Car car);
 
+    @Query("""
+        SELECT c FROM ChargingSession c
+        WHERE c.car.user=:user
+""")
+    List<ChargingSession> findChargingSessionByUser(@Param("user") User user);
     @Query("""
                 SELECT c
                 FROM ChargingSession c

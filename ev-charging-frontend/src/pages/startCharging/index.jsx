@@ -78,6 +78,67 @@ const ManageStartCharging = () => {
     };
   }, [stationId]);
 
+  /*useEffect(() => {
+    if (loading || !station) return;
+
+    const checkReservation = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.warn("⚠️ Không có token -> không gọi API");
+          return;
+        }
+
+        const res = await api.get(`/reservations/getByStationID`, {
+          params: { stationId },
+          headers: { Authorization: `Bearer ${token}` },
+          validateStatus: () => true,
+        });
+
+        console.log("📡 Kết quả API:", res.status, res.data);
+
+        if (res.status === 200 && res.data) {
+          console.log("✅ Có đặt chỗ hợp lệ, mở Modal");
+          const reservation = Array.isArray(res.data) ? res.data[0] : res.data;
+
+          Modal.confirm({
+            title: "🔋 Bạn có 1 phiên sạc đặt trước",
+            content: (
+              <p>
+                Bạn có 1 phiên sạc đặt trước ở trạm này. <br />
+                Bạn có muốn <b>hủy đặt trước này</b> và bắt đầu sạc ngay bây giờ
+                không?
+              </p>
+            ),
+            okText: "Hủy",
+            cancelText: "Giữ lại",
+            okButtonProps: {
+              style: { backgroundColor: "red", borderColor: "red" },
+            },
+            getContainer: () => document.body,
+            onOk: async () => {
+              try {
+                await api.put(`/reservations/cancel/${reservation.id}`, null, {
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+                message.success("✅ Đã hủy đặt chỗ thành công!");
+              } catch (err) {
+                console.error("❌ Lỗi khi hủy đặt chỗ:", err);
+                message.error("Không thể hủy đặt chỗ, vui lòng thử lại!");
+              }
+            },
+          });
+        } else {
+          console.log("🚫 Không có đặt chỗ hợp lệ hoặc status khác 200");
+        }
+      } catch (error) {
+        console.error("❌ Lỗi khi kiểm tra đặt chỗ:", error);
+      }
+    };
+
+    checkReservation();
+  }, [stationId, station, loading]);*/
+
   // enable continue
   useEffect(() => {
     setCanContinue(
@@ -108,6 +169,7 @@ const ManageStartCharging = () => {
         goalBattery: targetBattery,
         paymentMethod,
       };
+      console.log(payload);
       const res = await api.post("/charge", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -136,11 +198,19 @@ const ManageStartCharging = () => {
     try {
       setConfirmLoading(true);
       await api.post(`/charging/${confirmData.chargeData.id}`);
-      toast.success("✅ Phiên sạc đã bắt đầu!");
+      toast.success("Phiên sạc đã bắt đầu!");
       setShowConfirm(false);
       navigate("/driver/chargingSession");
-    } catch {
-      toast.error("❌ Không thể bắt đầu sạc! Vui lòng thử lại.");
+    } catch (err) {
+      console.error("❌ Lỗi khi bắt đầu sạc:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "❌ Không thể bắt đầu sạc! Vui lòng thử lại.";
+
+      // Hiển thị lỗi trả về từ backend
+      message.error(errorMsg);
+      toast.warning(errorMsg);
     } finally {
       setConfirmLoading(false);
     }

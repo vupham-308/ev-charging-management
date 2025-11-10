@@ -28,7 +28,7 @@ const ManageAddCar = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("🚗 Thêm xe thành công!");
+      toast.success(" Thêm xe thành công!");
       message.success("✅ Xe mới đã được thêm!");
       navigate("/driver/myCar", { state: { newCar: response.data } });
     } catch (error) {

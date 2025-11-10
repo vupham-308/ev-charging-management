@@ -139,11 +139,19 @@ const ManageStartChargingBooking = () => {
     try {
       setConfirmLoading(true);
       await api.post(`/charging/${confirmData.chargeData.id}`);
-      toast.success("✅ Phiên sạc đã bắt đầu!");
+      toast.success(" Phiên sạc đã bắt đầu!");
       setShowConfirm(false);
       navigate("/driver/chargingSession");
-    } catch {
-      toast.error("❌ Không thể bắt đầu sạc! Vui lòng thử lại.");
+    } catch (err) {
+      console.error("❌ Lỗi khi bắt đầu sạc:", err);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "❌ Không thể bắt đầu sạc! Vui lòng thử lại.";
+
+      // Hiển thị lỗi trả về từ backend
+      message.error(errorMsg);
+      toast.warning(errorMsg);
     } finally {
       setConfirmLoading(false);
     }
