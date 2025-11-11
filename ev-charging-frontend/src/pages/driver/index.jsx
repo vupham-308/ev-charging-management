@@ -21,6 +21,7 @@ import { logout } from "../../redux/accountSlice";
 import { FiSend, FiMessageCircle } from "react-icons/fi";
 
 import api from "../../config/axios";
+import { message } from "antd";
 
 // --- Custom Hook for Scroll-triggered Animations ---
 const useAnimateOnScroll = (pathname) => {
@@ -208,35 +209,34 @@ const DriverDashboard = () => {
   // --- AI CHAT WIDGET ---
   const [showChat, setShowChat] = useState(false);
   const [userInput, setUserInput] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
+  const [messages, setMessages] = useState([]); // 🧠 Lưu hội thoại
   const [loading, setLoading] = useState(false);
 
   const handleAskAI = async () => {
     if (!userInput.trim()) return;
+    const newMessage = { sender: "user", text: userInput };
+
+    // Hiển thị tin nhắn của người dùng ngay lập tức
+    setMessages([newMessage]);
+    setUserInput("");
     setLoading(true);
-    setAiResponse(""); // Xóa câu trả lời cũ
 
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.post(
-        "/ai/ask",
-        { question: userInput },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // 🧠 Gọi API AI (hoặc bạn có thể giả lập)
+      const res = await api.post("/ai/ask", { question: userInput });
+      const aiReply =
+        typeof res.data === "string"
+          ? res.data
+          : res.data?.answer || "Xin lỗi, tôi chưa hiểu câu hỏi của bạn.";
 
-      // API trả về 1 câu trả lời, hiển thị ra
-      setAiResponse(res.data.answer || "🤖 Không nhận được phản hồi.");
+      setMessages((prev) => [...prev, { sender: "ai", text: aiReply }]);
     } catch (err) {
-      console.error("❌ Lỗi gọi AI:", err);
-      setAiResponse("⚠️ Đã xảy ra lỗi, vui lòng thử lại.");
+      console.error(err);
+      message.error("Lỗi khi gửi câu hỏi!");
     } finally {
       setLoading(false);
-      setUserInput(""); // Xóa input
     }
   };
-
   return (
     <div className="bg-dark-bg text-text-color font-sans overflow-x-hidden">
       {/* CSS cho Reveal animation */}
@@ -587,10 +587,10 @@ const DriverDashboard = () => {
           </button>
         ) : (
           // 🔹 Khung chat bật lên
-          <div className="w-100 h-[200px] bg-white text-black rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+          <div className="w-[360px] h-[440px] bg-white text-black rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="bg-black text-white flex justify-between items-center px-4 py-2">
-              <span className="font-semibold">EV Charge AI</span>
+            <div className="bg-black text-white flex justify-between items-center px-4 py-3">
+              <span className="font-semibold text-lg">EV Charge AI</span>
               <button
                 onClick={() => setShowChat(false)}
                 className="text-white text-lg hover:text-gray-300"
@@ -600,34 +600,50 @@ const DriverDashboard = () => {
             </div>
 
             {/* Chat nội dung */}
-            <div className="p-4 flex-1 overflow-y-auto text-sm max-h-64">
-              {loading ? (
-                <p className="text-gray-500 italic">🤖 Đang suy nghĩ...</p>
-              ) : aiResponse ? (
-                <div className="bg-gray-100 p-3 rounded-lg text-base leading-relaxed">
-                  {aiResponse}
-                </div>
-              ) : (
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 text-base leading-relaxed space-y-3">
+              {messages.length === 0 ? (
                 <p className="text-gray-400 italic">
                   Hỏi tôi bất cứ điều gì về sạc xe điện 🔋
                 </p>
+              ) : (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      msg.sender === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[75%] px-3 py-2 rounded-xl text-sm ${
+                        msg.sender === "user"
+                          ? "bg-black text-white rounded-br-none"
+                          : "bg-gray-100 text-black rounded-bl-none"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))
+              )}
+              {loading && (
+                <p className="text-gray-500 italic">🤖 Đang suy nghĩ...</p>
               )}
             </div>
 
             {/* Ô nhập & nút gửi */}
-            <div className="flex border-t border-gray-200 bg-white">
+            <div className="flex items-center border-t border-gray-200 bg-white px-3 py-2">
               <input
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 placeholder="Nhập câu hỏi..."
-                className="flex-1 px-3 py-2 text-sm outline-none"
+                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-black"
                 onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
               />
               <button
                 onClick={handleAskAI}
                 disabled={loading}
-                className="bg-black text-white px-3 py-2 flex items-center justify-center hover:bg-gray-800 transition"
+                className="ml-2 bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition flex items-center justify-center"
               >
                 <FiSend />
               </button>
