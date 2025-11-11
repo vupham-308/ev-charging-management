@@ -1,5 +1,7 @@
 package com.ev.evchargingsystem.exception;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,6 +33,18 @@ public class GlobalExceptionHandler {
         if (!ex.getBindingResult().getFieldErrors().isEmpty()) {
             FieldError fieldError = ex.getBindingResult().getFieldErrors().get(0);
             message = fieldError.getDefaultMessage();
+        }
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+
+    // validation lỗi ở tầng entity
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<String> handleConstraintViolation(ConstraintViolationException ex) {
+        String message = "Dữ liệu không hợp lệ!";
+        if (!ex.getConstraintViolations().isEmpty()) {
+            ConstraintViolation<?> violation = ex.getConstraintViolations().iterator().next();
+            message = violation.getMessage();
         }
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

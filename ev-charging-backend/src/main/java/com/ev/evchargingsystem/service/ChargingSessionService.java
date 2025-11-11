@@ -203,6 +203,13 @@ public class ChargingSessionService {
         if(car==null||point==null){
             throw new RuntimeException("Not found");
         }
+
+        // hàm kiểm tra tương thích brand–connector
+        validateConnectorCompatibility(
+                car.getBrand(),
+                point.getChargerCost().getPortType()
+        );
+
         //status WAITING_TO_PAY là nháp, để tránh trùng lặp khi tạo session
         //check, nếu có thì chỉ thay đổi thông tin
         ChargingSession charge = new ChargingSession();
@@ -352,5 +359,21 @@ public class ChargingSessionService {
         if(s==null) throw new RuntimeException("Không tìm thấy SessionID!");
         return chargingSessionRepository.save(s);
     }
+
+    //check cổng sạc phù hợp với xe
+    private void validateConnectorCompatibility(String brand, String connectorType) {
+        if ("VinFast".equalsIgnoreCase(brand) && !"AC".equalsIgnoreCase(connectorType)) {
+            throw new RuntimeException("Xe VinFast chỉ sạc được với cổng AC");
+        }
+
+        if ("Hyundai".equalsIgnoreCase(brand) && !"CCS".equalsIgnoreCase(connectorType)) {
+            throw new RuntimeException("Xe Hyundai chỉ sạc được với cổng CCS");
+        }
+
+        if ("Nissan".equalsIgnoreCase(brand) && !"CHAdeMO".equalsIgnoreCase(connectorType)) {
+            throw new RuntimeException("Xe Nissan chỉ sạc được với cổng CHAdeMO");
+        }
+    }
+
 
 }
