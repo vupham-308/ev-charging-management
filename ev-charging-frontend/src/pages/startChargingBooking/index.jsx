@@ -157,6 +157,50 @@ const ManageStartChargingBooking = () => {
     }
   };
 
+  // State cho popup đánh giá
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewForm, setReviewForm] = useState({
+    description: "",
+    rating: null,
+  });
+  const [reviewLoading, setReviewLoading] = useState(false);
+
+  // Hàm gửi đánh giá
+  const handleSubmitReview = async () => {
+    if (!reviewForm.description || !reviewForm.rating) {
+      message.warning("Vui lòng nhập đủ nội dung và chọn số sao!");
+      return;
+    }
+
+    try {
+      setReviewLoading(true);
+      const token = localStorage.getItem("token");
+      const payload = {
+        stationId: Number(stationId),
+        description: reviewForm.description,
+        rating: reviewForm.rating,
+        reviewDate: new Date().toISOString(),
+      };
+
+      await api.post("/review/create", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Gửi đánh giá thành công!");
+      setShowReviewModal(false);
+      setReviewForm({ description: "", rating: null });
+
+      // Gọi lại API review để cập nhật danh sách
+      const reviewRes = await api.get(`/review/station/${stationId}`);
+      setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+    } catch (err) {
+      console.error("❌ Lỗi khi gửi đánh giá:", err);
+      message.error("Không thể gửi đánh giá!");
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
   // --- UI chính ---
   if (loading)
     return (
@@ -357,6 +401,13 @@ const ManageStartChargingBooking = () => {
                 Xem thêm đánh giá...
               </Button>
             )}
+            <Button
+              type="primary"
+              className="w-full mt-3 font-semibold rounded-lg bg-black hover:bg-gray-800"
+              onClick={() => setShowReviewModal(true)}
+            >
+              Viết đánh giá
+            </Button>
           </Card>
         </div>
       </div>
@@ -457,6 +508,61 @@ const ManageStartChargingBooking = () => {
             Chưa có đánh giá nào cho trạm này.
           </p>
         )}
+      </Modal>
+
+      {/* Popup tạo đánh giá */}
+      <Modal
+        title="Đánh giá trạm sạc"
+        open={showReviewModal}
+        onCancel={() => setShowReviewModal(false)}
+        footer={null}
+        centered
+        width={500}
+      >
+        <div className="space-y-4">
+          <div>
+            <p className="font-medium mb-2 text-gray-700">Số sao</p>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FaStar
+                  key={star}
+                  size={28}
+                  className={`cursor-pointer transition-all ${
+                    star <= reviewForm.rating
+                      ? "text-yellow-400"
+                      : "text-gray-300 hover:text-yellow-400"
+                  }`}
+                  onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="font-medium mb-2 text-gray-700">Nội dung đánh giá</p>
+            <textarea
+              rows={4}
+              value={reviewForm.description}
+              onChange={(e) =>
+                setReviewForm({ ...reviewForm, description: e.target.value })
+              }
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Hãy chia sẻ trải nghiệm của bạn..."
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3">
+            <Button onClick={() => setShowReviewModal(false)}>Hủy</Button>
+            <Button
+              type="primary"
+              loading={reviewLoading}
+              onClick={handleSubmitReview}
+              className="bg-black text-white hover:bg-gray-800 rounded-lg"
+            >
+              Gửi đánh giá
+            </Button>
+          </div>
+        </div>
       </Modal>
 
       <Outlet />
