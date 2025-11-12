@@ -29,7 +29,6 @@ public class CarService {
     @Autowired
     private ChargingSessionRepository chargingSessionRepository;
 
-    // Lấy thông tin người dùng đang đăng nhập
     private User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username;
@@ -52,7 +51,7 @@ public class CarService {
         return res;
     }
 
-    // Thêm xe mới cho người dùng hiện tại
+    // Thêm xe
     public Car addCar(CarCreateRequest req) {
         User currentUser = getCurrentUser();
         Car car = new Car();
@@ -77,7 +76,6 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    // Lấy xe theo ID (chỉ trả về nếu xe đó thuộc người dùng hiện tại)
     public Optional<CarResponse> getCarById(int carId) {
         User currentUser = getCurrentUser();
         return carRepository.findByIdAndUserId(carId, currentUser.getId())
@@ -89,14 +87,13 @@ public class CarService {
     public Optional<CarResponse> updateCar(int carId, CarCreateRequest req) {
         User currentUser = getCurrentUser();
 
-        // chỉ tìm xe của user hiện tại
         Optional<Car> carOpt = carRepository.findByIdAndUserId(carId, currentUser.getId());
         if (carOpt.isEmpty()) {
             return Optional.empty();
         }
 
         Car car = carOpt.get();
-        // cập nhật thông tin từ request
+
         car.setBrand(req.getBrand());
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());

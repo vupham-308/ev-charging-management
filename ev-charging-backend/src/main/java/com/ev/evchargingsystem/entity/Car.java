@@ -17,14 +17,19 @@ public class Car {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
-    @NotEmpty(message = "Brand cannot be empty!")
-    @Column(columnDefinition = "nvarchar(30)")
+
+    @Column(nullable = false, length = 20)
+    @Pattern(regexp = "^(VinFast|Hyundai|Nissan)$",
+            message = "Brand chỉ được là VinFast, Hyundai hoặc Nissan")
     private String brand;
+
     @NotEmpty(message = "Color cannot be empty!")
     @Column(columnDefinition = "nvarchar(30)")
     private String color;
+
     @NotNull
     private int initBattery;
+
     @Column(unique = true)
     @NotNull(message = "licensePlate cannot be empty!")
     @Pattern(regexp = "^\\d{2}[A-Z]-\\d{4,5}$", message = "Invalid license plate format. Example: 51F-12345")

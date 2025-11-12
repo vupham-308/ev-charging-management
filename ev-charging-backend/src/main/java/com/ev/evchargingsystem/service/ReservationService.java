@@ -30,13 +30,13 @@ public class ReservationService {
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName(); // Spring Security lưu username/email tại đây
+        String email = auth.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng hiện tại"));
     }
 
     public String createReservation(String email, ReservationRequest request) {
-        // 1) Lấy user theo email từ token
+
         Optional<User> optionalUser = userRepository.findByEmail(email);
         User user = optionalUser.get();
 
@@ -48,15 +48,15 @@ public class ReservationService {
             }
         }
 
-        // 2) Lấy trụ sạc
+        //Lấy trụ sạc
         ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
 
-        // 3) Trụ phải đang AVAILABLE mới cho đặt
+        //Trụ phải đang AVAILABLE mới cho đặt
         if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
             throw new RuntimeException("This charger point is not available");
         }
 
-        // 4) Validate thời gian
+        //Validate thời gian
         Date start = request.getStartDate();
         Date end = request.getEndDate();
         Date current = new Date(System.currentTimeMillis());
@@ -89,7 +89,7 @@ public class ReservationService {
             }
         }
 
-        // 5) Tạo reservation (status = PENDING để đúng CHECK constraint)
+        //Tạo reservation
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setChargerPoint(cp);
