@@ -287,7 +287,7 @@ public class ChargingSessionService {
 
     public List<ChargingResponse> view() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<ChargingSession> list = chargingSessionRepository.findOngoingSessionsByUser(user.getId());
+        List<ChargingSession> list = chargingSessionRepository.findSessionFilterTwoStatusByUser(user.getId(),"ONGOING","COMPLETED");
         List<ChargingResponse> rsList = new ArrayList<>();
         Transaction t;
         for(ChargingSession c : list) {
