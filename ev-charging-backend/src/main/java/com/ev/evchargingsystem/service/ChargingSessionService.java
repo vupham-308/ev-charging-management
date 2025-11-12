@@ -362,18 +362,19 @@ public class ChargingSessionService {
 
     //check cổng sạc phù hợp với xe
     private void validateConnectorCompatibility(String brand, String connectorType) {
-        if ("VinFast".equalsIgnoreCase(brand) && !"AC".equalsIgnoreCase(connectorType)) {
+        String lowerBrand = brand.toLowerCase();
+
+        if (lowerBrand.contains("vinfast") && !"ac".equalsIgnoreCase(connectorType)) {
             throw new RuntimeException("Xe VinFast chỉ sạc được với cổng AC");
         }
 
-        if ("Hyundai".equalsIgnoreCase(brand) && !"CCS".equalsIgnoreCase(connectorType)) {
+        if (lowerBrand.contains("hyundai") && !"ccs".equalsIgnoreCase(connectorType)) {
             throw new RuntimeException("Xe Hyundai chỉ sạc được với cổng CCS");
         }
 
-        if ("Nissan".equalsIgnoreCase(brand) && !"CHAdeMO".equalsIgnoreCase(connectorType)) {
+        if (lowerBrand.contains("nissan") && !"chademo".equalsIgnoreCase(connectorType)) {
             throw new RuntimeException("Xe Nissan chỉ sạc được với cổng CHAdeMO");
         }
     }
-
 
 }
