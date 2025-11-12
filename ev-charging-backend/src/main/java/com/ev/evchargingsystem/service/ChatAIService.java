@@ -29,7 +29,7 @@ public class ChatAIService {
         String prompt = "Bạn là một trợ lý ảo chuyên về hệ thống trạm sạc xe điện (EV Charging). "
                 + "Dưới đây là dữ liệu thực tế của hệ thống (database snapshot):\n\n"
                 + databaseContext
-                + "\n\nDựa trên dữ liệu trên, hãy trả lời câu hỏi bằng tiếng Việt, tự nhiên và chính xác. Bạn là chatbot của hệ thống, hãy trả lời như việc bạn đang trả lời với khách hàng, dữ liệu tôi đưa bạn để bạn hỗ trợ bạn trả lời, vui lòng không nhắc đến nhé. Trả lời bằng text, xuống dòng chỉn chu nhưng không cần format đậm nhạt nhé!\n\n"
+                + "\n\nDựa trên dữ liệu trên, hãy trả lời câu hỏi bằng tiếng Việt, tự nhiên và chính xác. Bạn là chatbot của hệ thống, hãy trả lời như việc bạn đang trả lời với khách hàng, dữ liệu tôi đưa bạn để bạn hỗ trợ bạn trả lời, vui lòng không nhắc đến nhé.\n\n"
                 + "Câu hỏi: " + question;
 
 

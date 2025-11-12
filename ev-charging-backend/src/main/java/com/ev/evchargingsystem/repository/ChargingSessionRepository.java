@@ -39,6 +39,16 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
             """)
     List<ChargingSession> findOngoingSessionsByUser(@Param("userId") int userId);
 
+    @Query("""
+        SELECT c
+        from ChargingSession c
+        where c.car.user.id=:userId
+        and (c.status=:status1 or c.status=:status2)
+""")
+    List<ChargingSession> findSessionFilterTwoStatusByUser(@Param("userId") int userId,
+                                                           @Param("status1")String s1,
+                                                           @Param("status2") String s2);
+
     void deleteByCar(Car car);
 
     // Tổng khách hàng

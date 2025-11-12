@@ -59,9 +59,9 @@ public class ChargerPointService {
             return 22;
         }
         else if(portType.equals("CHAdeMO")){
-            return 100;
+            return 75;
         } else if (portType.equals("CCS")) {
-            return 250;
+            return 120;
         }
         return 0;
     }
