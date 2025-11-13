@@ -19,7 +19,7 @@ public class Car {
     private int id;
 
     @Column(nullable = false, length = 20)
-    @Pattern(regexp = "^(VinFast|Hyundai|Nissan)$",
+    @Pattern(regexp = "^(VinFast|Hyundai|Nissan)[a-zA-Z0-9 ]*$",
             message = "Brand chỉ được là VinFast, Hyundai hoặc Nissan")
     private String brand;
 
