@@ -68,7 +68,7 @@ public class ChargingSessionController {
     }
 
     @Operation(summary = "Driver: Dừng phiên sạc")
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('STAFF')")
     @PostMapping("/stop/{sessionId}")
     public ResponseEntity stop(@PathVariable("sessionId") int sessionId) {
         try {

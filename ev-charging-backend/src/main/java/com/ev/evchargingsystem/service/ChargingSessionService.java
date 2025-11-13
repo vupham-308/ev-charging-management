@@ -108,7 +108,7 @@ public class ChargingSessionService {
         }
     }
 
-    @Scheduled(fixedRate = 48000)//reload mỗi 48s
+    @Scheduled(fixedRate = 30000)//reload mỗi 30s
     public void updateChargingSessionCHAdeMO() throws MessagingException {
         //lấy ra tất cả danh sách đang sạc
         List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
@@ -146,7 +146,7 @@ public class ChargingSessionService {
         }
     }
 
-    @Scheduled(fixedRate = 108000)//reload mỗi 1,8p=108s
+    @Scheduled(fixedRate = 96000)//reload mỗi 1,6p=96s
     public void updateChargingSessionAC() throws MessagingException {
         //lấy ra tất cả danh sách đang sạc
         List<ChargingSession> charging = chargingSessionRepository.findChargingSessionByStatus("ONGOING");
