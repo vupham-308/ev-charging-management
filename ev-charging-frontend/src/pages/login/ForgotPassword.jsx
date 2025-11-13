@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Card, Typography, message } from "antd";
+import { Form, Input, Button, Card, Typography, message, Modal } from "antd";
 import {
   ArrowLeftOutlined,
   MailOutlined,
-  LoadingOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "./hooks/useForgotPassword";
@@ -21,7 +20,24 @@ const ForgotPassword = () => {
       await sendEmail(email);
       message.success("✅ Mã xác thực đã được gửi đến email của bạn!");
     } catch (error) {
-      message.error(error.message || "❌ Gửi mã xác thực thất bại!");
+      const errorMsg = error.response?.data || error.message;
+
+      if (
+        error.response?.status === 400 &&
+        typeof errorMsg === "string" &&
+        errorMsg.includes("Không tìm thấy tài khoản")
+      ) {
+        Modal.confirm({
+          title: "Không tìm thấy tài khoản!",
+          content: "Bạn có muốn đăng ký tài khoản mới không?",
+          okText: "Đăng ký ngay",
+          cancelText: "Hủy",
+          centered: true,
+          onOk: () => navigate("/register"),
+        });
+      } else {
+        message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
+      }
     }
   };
 
@@ -134,7 +150,7 @@ const ForgotPassword = () => {
                 borderRadius: 8,
                 fontWeight: 500,
                 transition: "all 0.3s ease",
-              }}  
+              }}
             >
               {loading ? "Đang gửi mã xác thực..." : "Gửi mã xác thực"}
             </Button>
