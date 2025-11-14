@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Card, Typography, message, Modal } from "antd";
-import {
-  ArrowLeftOutlined,
-  MailOutlined,
-} from "@ant-design/icons";
+import { Form, Input, Button, Card, Typography, message } from "antd";
+import { ArrowLeftOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "./hooks/useForgotPassword";
 
@@ -20,27 +17,16 @@ const ForgotPassword = () => {
       await sendEmail(email);
       message.success("✅ Mã xác thực đã được gửi đến email của bạn!");
     } catch (error) {
-      const errorMsg = error.response?.data || error.message;
+      console.log("📌 ERROR RAW:", error);
 
-      if (
-        error.response?.status === 400 &&
-        typeof errorMsg === "string" &&
-        errorMsg.includes("Không tìm thấy tài khoản")
-      ) {
-        Modal.confirm({
-          title: "Không tìm thấy tài khoản!",
-          content: "Bạn có muốn đăng ký tài khoản mới không?",
-          okText: "Đăng ký ngay",
-          cancelText: "Hủy",
-          centered: true,
-          onOk: () => navigate("/register"),
-        });
-      } else {
-        message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
-      }
+      const errorMsg = error.response?.data || error.message || "";
+      
+      // ❌ Nguyên bản: chỉ báo lỗi chung, không suggest đăng ký
+      message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
     }
   };
 
+  // Nếu gửi email thành công → chuyển Reset Password
   useEffect(() => {
     if (emailSent && email) {
       navigate("/reset-password", { state: { email } });
@@ -123,10 +109,6 @@ const ForgotPassword = () => {
               rules={[
                 { required: true, message: "Vui lòng nhập email!" },
                 { type: "email", message: "Định dạng email không hợp lệ!" },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Email không hợp lệ!",
-                },
               ]}
             >
               <Input
