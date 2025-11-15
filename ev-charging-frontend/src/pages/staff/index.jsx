@@ -1,10 +1,10 @@
 import { Header } from "./components/Header";
 import { TabNavigation } from "./components/TabNavigation.";
 import { IssuesTab } from "./components/tabs/IssuesTab";
-import { MonitoringTab } from "./components/tabs/MonitoringTab.";
-import { PaymentTab } from "./components/tabs/PaymentTab.";
-import { ReportsTab } from "./components/tabs/ReportsTab.";
-import { MaintenanceTab } from "./components/tabs/MaintenanceTab.";
+import { MonitoringTab } from "./components/tabs/MonitoringTab";
+import { PaymentTab } from "./components/tabs/PaymentTab";
+import { ReportsTab } from "./components/tabs/ReportsTab";
+import { MaintenanceTab } from "./components/tabs/MaintenanceTab";
 import { useAuth } from "./hooks/useAuth";
 import { useTabs } from "./hooks/useTabs";
 import { TAB_KEYS } from "./constants/tabs";

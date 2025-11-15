@@ -13,7 +13,7 @@ export const forgotPasswordApi = async (email) => {
     return response.data;
   } catch (error) {
     console.error("❌ Lỗi khi gọi API forgot password:", error);
-    throw error.response?.data || error;
+    throw error;
   }
 };
 

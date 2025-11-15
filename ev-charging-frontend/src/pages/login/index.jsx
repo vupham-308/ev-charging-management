@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, Divider, message } from "antd";
+import { Form, Input, Button, Card, message } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import { FaGoogle, FaGithub } from "react-icons/fa";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -35,8 +34,8 @@ const LoginPage = () => {
       else navigate("/");
     } catch (e) {
       console.error(e);
-      message.error("Login failed. Please try again.");
-      toast.warning("Login failed!!!");
+      message.error("Đăng nhập thất bại. Vui lòng thử lại.");
+      toast.warning("Đăng nhập thất bại!");
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +102,7 @@ const LoginPage = () => {
               name="password"
               rules={[
                 { required: true, message: "Mật khẩu là bắt buộc" },
-                { min: 8, message: "Mật khẩu ít nhất 8 ký tự" },
+                { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
               ]}
               hasFeedback
             >
@@ -126,24 +125,6 @@ const LoginPage = () => {
               </Button>
             </Form.Item>
 
-            {/* 🔹 Nút Đăng ký */}
-            <Form.Item style={{ textAlign: "center", marginTop: "8px" }}>
-              <span style={{ fontSize: "14px", color: "#555" }}>
-                Chưa có tài khoản?{" "}
-                <a
-                  onClick={() => navigate("/register")}
-                  style={{
-                    fontWeight: "600",
-                    color: "#000",
-                    textDecoration: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Đăng ký
-                </a>
-              </span>
-            </Form.Item>
-
             <div className="text-center mt-3">
               <a
                 className="text-sm text-blue-500 hover:underline cursor-pointer"
@@ -153,6 +134,7 @@ const LoginPage = () => {
               </a>
             </div>
 
+            {/* 🔹 Chỉ giữ 1 dòng “Chưa có tài khoản? Đăng ký” */}
             <div className="text-center mt-4">
               <span className="text-gray-600">Chưa có tài khoản? </span>
               <a
