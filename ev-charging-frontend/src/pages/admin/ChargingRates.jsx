@@ -18,9 +18,9 @@ const ChargingRates = () => {
                 const ratesData = res.data.map((item, index) => ({
                     id: index + 1,
                     power:
-                        item.portType === "AC" ? "7kW" :
-                            item.portType === "CHAdeMO" ? "22kW" :
-                                item.portType === "CCS" ? "50kW" :
+                         item.portType === "AC" ? "22kW" :
+                            item.portType === "CHAdeMO" ? "100kW" :
+                                item.portType === "CCS" ? "250kW" :
                                     "N/A",
                     type: item.portType,
                     price: item.cost,
