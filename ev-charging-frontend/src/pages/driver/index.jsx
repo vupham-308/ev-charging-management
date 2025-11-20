@@ -3,16 +3,11 @@ import {
   FiBatteryCharging,
   FiMapPin,
   FiCreditCard,
-  FiZap,
-  FiRefreshCw,
-  FiSettings,
   FiEdit3,
   FiUser,
   FiLogOut,
   FiShoppingCart,
   FiPhoneCall,
-  FiChevronLeft,
-  FiChevronRight,
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
@@ -556,7 +551,7 @@ const DriverDashboard = () => {
       )}
 
       {/* --- Floating AI Chat Widget --- */}
-      <div className="fixed bottom-6 right-6 z-,[object Object],">
+      <div className="fixed bottom-6 right-6 z-[9999]">
         {!showChat ? (
           <button
             onClick={() => setShowChat(true)}

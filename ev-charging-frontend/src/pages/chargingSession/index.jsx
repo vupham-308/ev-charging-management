@@ -76,7 +76,7 @@ const ManageChargingSession = () => {
         style={{
           textAlign: "center",
           marginTop: 100,
-          color: "#000000ff",
+          color: "#ffffffff",
           fontSize: 22,
         }}
       >

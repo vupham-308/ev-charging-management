@@ -3,13 +3,7 @@ import {
   FiUser,
   FiMail,
   FiPhone,
-  FiStar,
   FiLock,
-  FiArrowLeft,
-  FiPhoneCall,
-  FiEdit3,
-  FiSettings,
-  FiCreditCard,
   FiSave,
   FiXCircle,
 } from "react-icons/fi";
@@ -123,7 +117,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-bg text-text-color font-sans">
+    <div className="min-h-screen bg-white text-black font-sans">
       <h1 className="text-3xl font-bold text-center text-black tracking-wide mt-16 mb-10">
         Hồ sơ cá nhân
       </h1>
@@ -257,7 +251,7 @@ const ProfilePage = () => {
               </button>
               <button
                 onClick={handleCancelPasswordChange}
-                className="flex items-center justify-center gap-2 px-8 py-3 border-2 border-gray-600 rounded-full text-gray-300 hover:bg-gray-700 transition-all"
+                className="flex items-center justify-center gap-2 px-8 py-3 border-2 border-gray-600 rounded-full text-black-300 hover:bg-gray-700 transition-all"
               >
                 <FiXCircle /> Hủy bỏ
               </button>
