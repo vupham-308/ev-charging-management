@@ -21,11 +21,6 @@ export const useForgotPassword = () => {
     }
   };
 
- // const reset = () => {
-  //setEmail("");
-  //setEmailSent(false);
-  //setError(null);
-//};
 
   return { sendEmail, loading, emailSent, email };
 };

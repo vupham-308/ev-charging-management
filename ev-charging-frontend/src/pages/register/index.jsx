@@ -34,12 +34,12 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       const response = await api.post("account/register", values);
-      toast.success("Successfully created new account!");
+      toast.success("✅ Đăng ký tài khoản thành công!");
       navigate("/login");
       console.log(response);
     } catch {
-      message.error("Registration failed. Please try again.");
-      toast.warning("Registration failed. Please try again.");
+      message.error("❌ Đăng ký thất bại, vui lòng thử lại!");
+      toast.warning("Đăng ký thất bại, vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -59,8 +59,8 @@ const RegisterPage = () => {
           bodyStyle={{ padding: 24 }}
         >
           <div className="text-center mb-4">
-            <h2 className="text-2xl font-bold">Create your account</h2>
-            <p className="text-gray-500">It only takes a minute.</p>
+            <h2 className="text-2xl font-bold">Tạo tài khoản mới</h2>
+            <p className="text-gray-500">Chỉ mất một phút để hoàn tất.</p>
           </div>
 
           <Form
@@ -71,63 +71,63 @@ const RegisterPage = () => {
               gender: "MALE",
               agree: false,
             }}
-            requiredMark={false} // không dùng dấu sao mặc định
+            requiredMark={false}
           >
             <Row gutter={16}>
-              {/* Full Name */}
+              {/* Họ và tên */}
               <Col span={24}>
                 <Form.Item
                   label={
                     <>
-                      Full name <span style={{ color: "red" }}>*</span>
+                      Họ và tên <span style={{ color: "red" }}>*</span>
                     </>
                   }
                   name="fullName"
                   rules={[
-                    { required: true, message: "Full name is required" },
+                    { required: true, message: "Vui lòng nhập họ và tên!" },
                     {
                       validator: (_, v) =>
                         v && v.trim()
                           ? Promise.resolve()
                           : Promise.reject(
-                              new Error("Full name cannot be empty")
+                              new Error("Họ và tên không được để trống!")
                             ),
                     },
                   ]}
                 >
                   <Input
-placeholder="Full name"
+                    placeholder="Nhập họ và tên"
                     prefix={<UserOutlined />}
                     allowClear
                   />
                 </Form.Item>
               </Col>
 
-              {/* Phone */}
+              {/* Số điện thoại */}
               <Col xs={24} md={12}>
                 <Form.Item
                   label={
                     <>
-                      Phone <span style={{ color: "red" }}>*</span>
+                      Số điện thoại <span style={{ color: "red" }}>*</span>
                     </>
                   }
                   name="phone"
                   rules={[
-                    { required: true, message: "Phone is required" },
+                    { required: true, message: "Vui lòng nhập số điện thoại!" },
                     {
                       validator: (_, v) =>
                         !v || validatePhone(v)
                           ? Promise.resolve()
                           : Promise.reject(
                               new Error(
-                                "Phone must start with 0 and be 10–11 digits"
+                                "Số điện thoại phải bắt đầu bằng 0 và gồm 10–11 chữ số!"
                               )
                             ),
                     },
                   ]}
                 >
                   <Input
-                    placeholder="Phone (e.g. 09xxxxxxxx)"
+                    placeholder="Ví dụ: 09xxxxxxxx"
                     prefix={<PhoneOutlined />}
                     inputMode="numeric"
                     maxLength={11}
@@ -137,7 +137,7 @@ placeholder="Full name"
               </Col>
 
               {/* Email */}
-              <Col span={24}>
+              <Col xs={24} md={12}>
                 <Form.Item
                   label={
                     <>
@@ -146,19 +146,19 @@ placeholder="Full name"
                   }
                   name="email"
                   rules={[
-                    { required: true, message: "Email is required" },
+                    { required: true, message: "Vui lòng nhập địa chỉ email!" },
                     {
                       validator: (_, v) =>
                         !v || validateEmail(v)
                           ? Promise.resolve()
                           : Promise.reject(
-                              new Error("Please enter a valid email")
+                              new Error("Vui lòng nhập email hợp lệ!")
                             ),
                     },
                   ]}
                 >
                   <Input
-                    placeholder="Email address"
+                    placeholder="Nhập địa chỉ email"
                     type="email"
                     prefix={<MailOutlined />}
                     allowClear
@@ -166,65 +166,71 @@ placeholder="Full name"
                 </Form.Item>
               </Col>
 
-              {/* Password */}
+              {/* Mật khẩu */}
               <Col xs={24} md={12}>
                 <Form.Item
                   label={
                     <>
-                      Password <span style={{ color: "red" }}>*</span>
+                      Mật khẩu <span style={{ color: "red" }}>*</span>
                     </>
                   }
                   name="password"
                   rules={[
-                    { required: true, message: "Password is required" },
+                    { required: true, message: "Vui lòng nhập mật khẩu!" },
                     {
                       min: 8,
-                      message: "Password must be at least 8 characters",
+                      message: "Mật khẩu phải có ít nhất 8 ký tự!",
+                    },
+                    {
+                      pattern:
+                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
+                      message:
+                        "Mật khẩu phải gồm chữ hoa, chữ thường, số và ký tự đặc biệt!",
                     },
                   ]}
                   hasFeedback
                 >
                   <Input.Password
-placeholder="Password (min 8 chars)"
+                    placeholder="Nhập mật khẩu (ít nhất 8 ký tự, gồm A-z, 0-9, ký tự đặc biệt)"
                     prefix={<LockOutlined />}
                   />
                 </Form.Item>
               </Col>
 
-              {/* Confirm Password */}
+              {/* Xác nhận mật khẩu */}
               <Col xs={24} md={12}>
                 <Form.Item
                   label={
                     <>
-                      Confirm password <span style={{ color: "red" }}>*</span>
+                      Xác nhận mật khẩu <span style={{ color: "red" }}>*</span>
                     </>
                   }
                   name="confirmPassword"
                   dependencies={["password"]}
                   hasFeedback
                   rules={[
-                    { required: true, message: "Please confirm your password" },
+                    { required: true, message: "Vui lòng xác nhận mật khẩu!" },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
                         if (!value || getFieldValue("password") === value) {
                           return Promise.resolve();
                         }
                         return Promise.reject(
-                          new Error("Passwords do not match")
+                          new Error("Mật khẩu xác nhận không khớp!")
                         );
                       },
                     }),
                   ]}
                 >
                   <Input.Password
-                    placeholder="Confirm password"
+                    placeholder="Nhập lại mật khẩu"
                     prefix={<LockOutlined />}
                   />
                 </Form.Item>
               </Col>
             </Row>
 
-            {/* Terms */}
+            {/* Điều khoản */}
             <Form.Item
               name="agree"
               valuePropName="checked"
@@ -233,12 +239,14 @@ placeholder="Password (min 8 chars)"
                   validator: (_, v) =>
                     v
                       ? Promise.resolve()
-                      : Promise.reject(new Error("You must accept the Terms")),
+                      : Promise.reject(
+                          new Error("Vui lòng đồng ý với Điều khoản & Chính sách!")
+                        ),
                 },
               ]}
             >
               <Checkbox>
-                I agree to the{" "}
+                Tôi đồng ý với{" "}
                 <a
                   onClick={(e) => {
                     e.preventDefault();
@@ -246,7 +254,7 @@ placeholder="Password (min 8 chars)"
                   }}
                   className="text-blue-600 hover:underline"
                 >
-                  Terms &amp; Privacy
+                  Điều khoản & Chính sách bảo mật
                 </a>{" "}
                 <span style={{ color: "red" }}>*</span>
               </Checkbox>
@@ -259,15 +267,21 @@ placeholder="Password (min 8 chars)"
                 loading={isLoading}
                 block
                 size="large"
+                style={{
+                  backgroundColor: "#000",
+                  borderColor: "#000",
+                  borderRadius: 8,
+                  fontWeight: 500,
+                }}
               >
-                {isLoading ? "Creating account..." : "Create account"}
+                {isLoading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
               </Button>
             </Form.Item>
 
             <div className="text-center text-sm text-gray-600">
-              Already have an account?{" "}
+              Đã có tài khoản?{" "}
               <a href="/login" className="text-blue-600 hover:text-blue-500">
-                Sign in
+                Đăng nhập
               </a>
             </div>
           </Form>

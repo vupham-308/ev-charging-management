@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Card, Typography, message } from "antd";
-import {
-  ArrowLeftOutlined,
-  MailOutlined,
-  LoadingOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "./hooks/useForgotPassword";
 
@@ -21,10 +17,16 @@ const ForgotPassword = () => {
       await sendEmail(email);
       message.success("✅ Mã xác thực đã được gửi đến email của bạn!");
     } catch (error) {
-      message.error(error.message || "❌ Gửi mã xác thực thất bại!");
+      console.log("📌 ERROR RAW:", error);
+
+      const errorMsg = error.response?.data || error.message || "";
+      
+      // ❌ Nguyên bản: chỉ báo lỗi chung, không suggest đăng ký
+      message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
     }
   };
 
+  // Nếu gửi email thành công → chuyển Reset Password
   useEffect(() => {
     if (emailSent && email) {
       navigate("/reset-password", { state: { email } });
@@ -107,10 +109,6 @@ const ForgotPassword = () => {
               rules={[
                 { required: true, message: "Vui lòng nhập email!" },
                 { type: "email", message: "Định dạng email không hợp lệ!" },
-                {
-                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Email không hợp lệ!",
-                },
               ]}
             >
               <Input
@@ -134,7 +132,7 @@ const ForgotPassword = () => {
                 borderRadius: 8,
                 fontWeight: 500,
                 transition: "all 0.3s ease",
-              }}  
+              }}
             >
               {loading ? "Đang gửi mã xác thực..." : "Gửi mã xác thực"}
             </Button>

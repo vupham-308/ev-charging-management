@@ -6,6 +6,7 @@ import { message, Spin, Modal } from "antd";
 
 const Users = () => {
     const [users, setUsers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);  // Lưu danh sách gốc để search FE
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -25,6 +26,7 @@ const Users = () => {
         try {
             const res = await api.get("admin/users");
             setUsers(res.data);
+            setAllUsers(res.data);  // Lưu bản gốc để tìm kiếm
         } catch (error) {
             console.error("❌ Lỗi tải danh sách người dùng:", error);
             message.error("Không thể tải danh sách người dùng!");
@@ -48,21 +50,22 @@ const Users = () => {
         fetchStats();
     }, []);
 
-    // 🔍 Tìm kiếm
-    const handleSearch = async (keyword) => {
+    // 🔍 Tìm kiếm FE (không gọi API)
+    const handleSearch = (keyword) => {
         setSearch(keyword);
+
         if (!keyword.trim()) {
-            fetchUsers();
+            setUsers(allUsers); // reset về danh sách gốc
             return;
         }
 
-        try {
-            const res = await api.get(`admin/users/search?name=${encodeURIComponent(keyword)}`);
-            setUsers(res.data);
-        } catch (error) {
-            console.error("❌ Lỗi tìm kiếm:", error);
-            message.error("Không thể tìm kiếm người dùng!");
-        }
+        const filtered = allUsers.filter((u) =>
+            u.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+            u.email.toLowerCase().includes(keyword.toLowerCase()) ||
+            u.phone?.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        setUsers(filtered);
     };
 
     // 🗑 Nhấn nút xóa
@@ -132,7 +135,7 @@ const Users = () => {
             <input
                 type="text"
                 className="search-inputt"
-                placeholder="🔍 Tìm kiếm người dùng theo tên..."
+                placeholder="🔍 Tìm kiếm người dùng theo tên, email, SĐT..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
             />
@@ -222,7 +225,6 @@ const Users = () => {
                                     let res;
 
                                     if (isEdit && editUser) {
-                                        // chỉ gửi field cho phép
                                         const updateData = {
                                             fullName: userData.fullName,
                                             email: userData.email,
@@ -231,15 +233,21 @@ const Users = () => {
                                             active: true,
                                         };
 
-                                        // gọi API update
-                                        res = await api.put(`admin/users/admin-update-user/${editUser.id}`, updateData);
+                                        res = await api.put(
+                                            `admin/users/admin-update-user/${editUser.id}`,
+                                            updateData
+                                        );
                                     } else {
-                                        // tạo mới
                                         res = await api.post("admin/users/create-user", userData);
                                     }
 
                                     if (res.status === 200 || res.status === 201) {
-                                        message.success(isEdit ? "Cập nhật người dùng thành công!" : "Tạo người dùng thành công!");
+                                        message.success(
+                                            isEdit
+                                                ? "Cập nhật người dùng thành công!"
+                                                : "Tạo người dùng thành công!"
+                                        );
+
                                         form.reset();
                                         setShowModal(false);
                                         setEditUser(null);
@@ -277,7 +285,7 @@ const Users = () => {
                                 type="email"
                                 name="email"
                                 defaultValue={editUser?.email || ""}
-                                placeholder="nguyenvana@email.com"
+                                placeholder="email@example.com"
                             />
 
                             <label>Số điện thoại</label>
@@ -329,7 +337,7 @@ const Users = () => {
 
             {/* 🔥 Modal xác nhận xóa */}
             <Modal
-                open={showConfirm} // đổi từ visible → open
+                open={showConfirm}
                 title="Xác nhận xóa người dùng"
                 onOk={confirmDelete}
                 onCancel={() => setShowConfirm(false)}
