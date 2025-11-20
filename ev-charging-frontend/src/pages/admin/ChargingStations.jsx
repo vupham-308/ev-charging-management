@@ -41,7 +41,7 @@ const ChargingStations = () => {
     // Lấy danh sách nhân viên (giả sử API có endpoint này, hoặc bạn thay bằng đúng endpoint)
     const fetchEmployees = async () => {
         try {
-            const res = await api.get("admin/users"); // Thay bằng endpoint lấy danh sách nhân viên
+            const res = await api.get("/admin/users/getAllStaffs"); // Thay bằng endpoint lấy danh sách nhân viên
             setEmployees(res.data);
         } catch (error) {
             console.error(error);
