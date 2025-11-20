@@ -38,6 +38,7 @@ import TermsPrivacyPage from "./pages/terms";
 import ForgotPassword from "./pages/login/ForgotPassword";
 import PaymentReturn from "./pages/paymentReturn";
 import ResetPassword from "./pages/login/ResetPassword";
+import ManageTermsOfUse from "./pages/termsOfUse";
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -92,7 +93,10 @@ function AppContent() {
       path: "/terms",
       element: <TermsPrivacyPage />,
     },
-
+    {
+      path: "termsOfUse",
+      element: <ManageTermsOfUse />,
+    },
     {
       path: "/driver",
       element: <DriverDashboard />,
@@ -128,6 +132,10 @@ function AppContent() {
         {
           path: "chargingSession",
           element: <ManageChargingSession />,
+        },
+        {
+          path: "termsOfUse",
+          element: <ManageTermsOfUse />,
         },
         {
           path: "chargingSession/stationReport/:stationId",

@@ -118,6 +118,8 @@ const ManageMap = () => {
       if (!userLocation) return;
       try {
         setLoading(true);
+        console.log(userLocation.lat);
+        console.log(userLocation.lon);
         const res = await api.post("/station/nearest", {
           latitude: userLocation.lat,
           longitude: userLocation.lon,

@@ -145,6 +145,7 @@ const ManageBooking = () => {
       navigate(-1);
     } catch (error) {
       console.error("❌ Lỗi khi tạo đặt chỗ:", error.response?.data || error);
+
       if (error.response?.status === 401) {
         message.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
         navigate("/login");
@@ -458,7 +459,7 @@ const ManageBooking = () => {
             <strong>Giá:</strong>{" "}
             {chargers.find((c) => c.id === selectedCharger)?.chargerCost
               ?.cost || 0}{" "}
-            VND/kWh
+            VND/phút
           </p>
         </div>
 

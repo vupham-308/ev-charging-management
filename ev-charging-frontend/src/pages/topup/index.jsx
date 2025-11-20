@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const { Text } = Typography;
 
 const ManageTopup = () => {
-  const [amount, setAmount] = useState(5000);
+  const [amount, setAmount] = useState(20000);
   const [method, setMethod] = useState("VNPAY");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
