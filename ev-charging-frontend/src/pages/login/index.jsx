@@ -35,8 +35,8 @@ const LoginPage = () => {
       else navigate("/");
     } catch (e) {
       console.error(e);
-      message.error("Login failed. Please try again.");
-      toast.warning("Login failed!!!");
+      message.error("Đăng nhập thất bại");
+      toast.warning("Đăng nhập thất bại!!!");
     } finally {
       setIsLoading(false);
     }
@@ -124,24 +124,6 @@ const LoginPage = () => {
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
-            </Form.Item>
-
-            {/* 🔹 Nút Đăng ký */}
-            <Form.Item style={{ textAlign: "center", marginTop: "8px" }}>
-              <span style={{ fontSize: "14px", color: "#555" }}>
-                Chưa có tài khoản?{" "}
-                <a
-                  onClick={() => navigate("/register")}
-                  style={{
-                    fontWeight: "600",
-                    color: "#000",
-                    textDecoration: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Đăng ký
-                </a>
-              </span>
             </Form.Item>
 
             <div className="text-center mt-3">

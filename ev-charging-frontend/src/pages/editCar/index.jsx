@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Button, message, Input, InputNumber, Spin, Tooltip } from "antd";
+import {
+  Card,
+  Button,
+  message,
+  Input,
+  InputNumber,
+  Spin,
+  Tooltip,
+  Select,
+} from "antd";
 import {
   FiArrowLeftCircle,
   FiSave,
@@ -28,6 +37,7 @@ const ManageEditCar = () => {
   const [initBattery, setInitBattery] = useState(100);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
+  const { Option } = Select;
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -67,7 +77,7 @@ const ManageEditCar = () => {
         { brand, color, licensePlate, initBattery },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("🚗 Cập nhật xe thành công!");
+      toast.success("Cập nhật xe thành công!");
       navigate("/driver/myCar", { state: { updated: true } });
     } catch (error) {
       console.error("❌ Lỗi khi cập nhật xe:", error);
@@ -144,17 +154,45 @@ const ManageEditCar = () => {
             >
               <FiTruck /> Hãng xe
             </label>
-            <Input
+            <Select
               value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              placeholder="VD: VinFast, Tesla..."
+              onChange={(value) => setBrand(value)}
+              placeholder="Chọn hãng xe"
               size="large"
+              showSearch
+              optionFilterProp="children"
               style={{
+                width: "100%",
                 borderRadius: 10,
-                borderColor: "#cbd5e1",
-                transition: "all 0.25s",
               }}
-            />
+            >
+              {/* VinFast */}
+              <Option value="VinFast VF3">VinFast VF3</Option>
+              <Option value="VinFast VF5">VinFast VF5</Option>
+              <Option value="VinFast VF6">VinFast VF6</Option>
+              <Option value="VinFast VF7">VinFast VF7</Option>
+              <Option value="VinFast VF8">VinFast VF8</Option>
+              <Option value="VinFast VF9">VinFast VF9</Option>
+              <Option value="VinFast VF e34">VinFast VF e34</Option>
+              <Option value="VinFast EC Van">VinFast EC Van</Option>
+
+              {/* Hyundai */}
+              <Option value="Hyundai IONIQ 5">Hyundai IONIQ 5</Option>
+              <Option value="Hyundai IONIQ 6">Hyundai IONIQ 6</Option>
+              <Option value="Hyundai IONIQ 9">Hyundai IONIQ 9</Option>
+              <Option value="Hyundai KONA Electric">
+                Hyundai KONA Electric
+              </Option>
+              <Option value="Hyundai INSTER">Hyundai INSTER</Option>
+              <Option value="Hyundai NEXO">Hyundai NEXO</Option>
+              <Option value="Hyundai ST1">Hyundai ST1</Option>
+
+              {/* Nissan */}
+              <Option value="Nissan LEAF">Nissan LEAF</Option>
+              <Option value="Nissan ARIYA">Nissan ARIYA</Option>
+              <Option value="Nissan e-NV200">Nissan e-NV200</Option>
+              <Option value="Nissan Micra EV">Nissan Micra EV</Option>
+            </Select>
           </div>
 
           {/* Màu sắc */}

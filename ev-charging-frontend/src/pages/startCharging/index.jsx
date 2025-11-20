@@ -89,8 +89,8 @@ const ManageStartCharging = () => {
     if (!selectedCar) return [];
     const current = Number(selectedCar.initBattery || 0);
     const options = [];
-    const start = Math.max(10, Math.ceil((current + 10) / 10) * 10);
-    for (let i = start; i <= 100; i += 10) options.push(i);
+    const start = Math.min(100, Math.ceil(current / 10) * 10);
+    for (let i = start; i <= 100; i += 5) options.push(i);
     return options;
   };
 
@@ -304,7 +304,7 @@ const ManageStartCharging = () => {
                 {chargers.map((ch) => (
                   <Select.Option key={ch.id} value={ch.id}>
                     {ch.name} • {ch.capacity}kW • {ch.chargerCost?.portType} •{" "}
-                    {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/kWh
+                    {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/phút
                   </Select.Option>
                 ))}
               </Select>
