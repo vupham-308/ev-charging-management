@@ -29,6 +29,7 @@ const ManageAddCar = () => {
       navigate("/driver/myCar", { state: { newCar: response.data } });
     } catch (error) {
       console.error("❌ Lỗi khi thêm xe:", error);
+      toast.error(" Lỗi khi thêm xe");
       message.error("Không thể thêm xe. Vui lòng thử lại!");
     } finally {
       setLoading(false);

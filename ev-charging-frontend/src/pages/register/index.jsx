@@ -230,36 +230,6 @@ const RegisterPage = () => {
               </Col>
             </Row>
 
-            {/* Điều khoản */}
-            <Form.Item
-              name="agree"
-              valuePropName="checked"
-              rules={[
-                {
-                  validator: (_, v) =>
-                    v
-                      ? Promise.resolve()
-                      : Promise.reject(
-                          new Error("Vui lòng đồng ý với Điều khoản & Chính sách!")
-                        ),
-                },
-              ]}
-            >
-              <Checkbox>
-                Tôi đồng ý với{" "}
-                <a
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigate("/terms");
-                  }}
-                  className="text-blue-600 hover:underline"
-                >
-                  Điều khoản & Chính sách bảo mật
-                </a>{" "}
-                <span style={{ color: "red" }}>*</span>
-              </Checkbox>
-            </Form.Item>
-
             <Form.Item>
               <Button
                 type="primary"

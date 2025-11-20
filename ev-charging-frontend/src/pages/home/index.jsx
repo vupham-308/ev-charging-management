@@ -14,17 +14,13 @@ import {
   FiChevronDown,
   FiChevronUp,
 } from "react-icons/fi";
-import {
-  FaStar,
-  FaQuoteLeft,
-  FaBolt,
-  FaLeaf,
-  FaClock,
-  FaShieldAlt,
-} from "react-icons/fa";
+import { FaBolt, FaLeaf, FaClock } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AnimatePresence } from "framer-motion";
+import api from "../../config/axios";
+import { FiSend, FiMessageCircle } from "react-icons/fi";
+import { message } from "antd";
 
 // --- Custom Hook for Scroll-triggered Animations ---
 const useAnimateOnScroll = () => {
@@ -183,6 +179,33 @@ const EVChargeHomePage = () => {
 
   const toggleFAQ = (index) => {
     setOpenFAQ(openFAQ === index ? null : index);
+  };
+  // --- AI CHAT WIDGET ---
+  const [showChat, setShowChat] = useState(false);
+  const [userInput, setUserInput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleAskAI = async () => {
+    if (!userInput.trim()) return;
+    const newMessage = { sender: "user", text: userInput };
+    setMessages([...messages, newMessage]);
+    setUserInput("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/ai/ask", { question: userInput });
+      const aiReply =
+        typeof res.data === "string"
+          ? res.data
+          : res.data?.answer || "Xin lỗi, tôi chưa hiểu câu hỏi của bạn.";
+      setMessages((prev) => [...prev, { sender: "ai", text: aiReply }]);
+    } catch (err) {
+      console.error(err);
+      message.error("Lỗi khi gửi câu hỏi!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -541,6 +564,82 @@ const EVChargeHomePage = () => {
           <Outlet />
         </div>
       )}
+
+      {/* --- Floating AI Chat Widget --- */}
+      <div className="fixed bottom-6 right-6 z-[9999]">
+        {!showChat ? (
+          <button
+            onClick={() => setShowChat(true)}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+            title="Hỏi AI"
+          >
+            <FiMessageCircle size={28} />
+          </button>
+        ) : (
+          <div className="w-[360px] h-[440px] bg-gray-900 text-white rounded-2xl shadow-2xl border border-purple-500/30 flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white flex justify-between items-center px-4 py-3">
+              <span className="font-semibold text-lg">🤖 EV Charge AI</span>
+              <button
+                onClick={() => setShowChat(false)}
+                className="text-white text-lg hover:text-gray-300"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Chat content */}
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2 text-base leading-relaxed space-y-3 bg-gray-800">
+              {messages.length === 0 ? (
+                <p className="text-gray-400 italic">
+                  Xin chào! Tôi có thể giúp gì cho bạn về sạc xe điện? 🔋
+                </p>
+              ) : (
+                messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      msg.sender === "user" ? "justify-end" : "justify-start"
+                    }`}
+                  >
+                    <div
+                      className={`max-w-[75%] px-3 py-2 rounded-xl text-sm ${
+                        msg.sender === "user"
+                          ? "bg-purple-600 text-white rounded-br-none"
+                          : "bg-gray-700 text-white rounded-bl-none"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))
+              )}
+              {loading && (
+                <p className="text-gray-400 italic">🤖 Đang suy nghĩ...</p>
+              )}
+            </div>
+
+            {/* Input & send button */}
+            <div className="flex items-center border-t border-purple-500/30 bg-gray-900 px-3 py-2">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Nhập câu hỏi..."
+                className="flex-1 px-3 py-2 text-sm bg-gray-800 border border-purple-500/30 rounded-lg outline-none focus:ring-1 focus:ring-purple-500 text-white"
+                onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
+              />
+              <button
+                onClick={handleAskAI}
+                disabled={loading}
+                className="ml-2 bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition flex items-center justify-center"
+              >
+                <FiSend />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* --- Footer --- */}
       <footer

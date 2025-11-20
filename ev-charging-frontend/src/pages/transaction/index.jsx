@@ -122,7 +122,6 @@ const ManageTransaction = () => {
     <div
       style={{
         padding: 24,
-        maxWidth: 850,
         margin: "0 auto",
         background: "white",
         minHeight: "100vh",

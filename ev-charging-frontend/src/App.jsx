@@ -33,8 +33,7 @@ import ManageStartChargingBooking from "./pages/startChargingBooking";
 import ManageTransaction from "./pages/transaction";
 import ManageTopup from "./pages/topup";
 import { useDispatch } from "react-redux";
-import { setAccount } from "./redux/accountSlice"; // sửa đúng path slice của bạn
-import TermsPrivacyPage from "./pages/terms";
+import { setAccount } from "./redux/accountSlice";
 import ForgotPassword from "./pages/login/ForgotPassword";
 import PaymentReturn from "./pages/paymentReturn";
 import ResetPassword from "./pages/login/ResetPassword";
@@ -89,10 +88,6 @@ function AppContent() {
     },
     { path: "/staff", element: <StaffDashboard /> },
 
-    {
-      path: "/terms",
-      element: <TermsPrivacyPage />,
-    },
     {
       path: "termsOfUse",
       element: <ManageTermsOfUse />,
