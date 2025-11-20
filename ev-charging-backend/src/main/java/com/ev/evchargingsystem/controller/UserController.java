@@ -57,14 +57,6 @@ public class UserController {
         return ResponseEntity.ok("Xóa thành công");
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<UserResponse>> searchUsers(@RequestParam("name") String name) {
-        List<User> users = userService.searchUsersByName(name);
-        List<UserResponse> response = users.stream()
-                .map(u -> modelMapper.map(u, UserResponse.class))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
 
     @Operation(summary = "Admin xem thống kê user")
     @GetMapping("/user-stats")

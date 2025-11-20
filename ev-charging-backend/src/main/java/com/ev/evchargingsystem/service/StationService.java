@@ -57,8 +57,8 @@ public class StationService {
             existingStation.setPhone(stationDetails.getPhone());
             existingStation.setEmail(stationDetails.getEmail());
             existingStation.setStatus(stationDetails.getStatus());
-            existingStation.setLatitude(stationDetails.getLatitude());
-            existingStation.setLongitude(stationDetails.getLongitude());
+            existingStation.setLatitude(existingStation.getLatitude());
+            existingStation.setLongitude(existingStation.getLongitude());
 
             // Lưu lại và trả về Station đã cập nhật
             return stationRepository.save(existingStation);
