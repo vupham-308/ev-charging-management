@@ -18,11 +18,11 @@ public class DataInitializer {
                 User admin = new User();
                 admin.setFullName("Administrator");
                 admin.setEmail("admin@gmail.com");
-                admin.setPassword(new BCryptPasswordEncoder().encode("12345678"));
+                admin.setPassword(new BCryptPasswordEncoder().encode("Ev@12345678"));
                 admin.setPhone("0900000000");
                 admin.setRole("ADMIN");
                 userRepository.save(admin);
-                System.out.println("Tài khoản admin: admin@gmail.com / 12345678");
+                System.out.println("Tài khoản admin: admin@gmail.com / Ev@12345678");
             }
         };
     }
