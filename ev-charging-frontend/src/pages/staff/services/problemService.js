@@ -1,5 +1,17 @@
 import api from "../../../config/axios";
 
+// Tạo mới problem
+export const createProblem = async (stationId, body) => {
+  try {
+    const response = await api.post(`problem/create/${stationId}`, body);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating problem:", error);
+    throw error;
+  }
+};
+
+
 export const getProblems = async () => {
   try {
     const response = await api.get("problem/get-all-by-staff");
@@ -10,6 +22,8 @@ export const getProblems = async () => {
     throw error;
   }
 };
+
+
 
 export const updateProblemStatus = async (status, body) => {
   try {

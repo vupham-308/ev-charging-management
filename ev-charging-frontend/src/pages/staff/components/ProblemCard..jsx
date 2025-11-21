@@ -156,7 +156,7 @@ export const ProblemCard = ({ problem }) => {
 
           <p className="flex items-center gap-2">
             <span className="font-medium text-gray-700 min-w-[120px]">Báo cáo bởi:</span>
-            <Tag color="purple">{problem?.user?.fullName || "Khách hàng"}</Tag>
+            <Tag color="purple">{problem?.user?.fullName || "Nhân viên"}</Tag>
           </p>
 
           {/* --- Nếu SOLVED thì hiển thị thông tin --- */}
