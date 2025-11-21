@@ -24,13 +24,11 @@ export const useProblems = () => {
   const handleUpdateStatus = async (status, body) => {
     try {
       await updateProblemStatus(status, body);
-      await fetchProblems(); // cập nhật lại danh sách sau khi sửa
+      await fetchProblems();
     } catch (error) {
       console.error("Error updating status:", error);
     }
   };
-
-  
 
   const handleRespond = async (problemId, body) => {
     try {
@@ -51,5 +49,6 @@ export const useProblems = () => {
     fetchProblems,
     handleUpdateStatus,
     handleRespond,
+    setProblems,
   };
 };

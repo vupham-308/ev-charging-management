@@ -9,32 +9,47 @@ export const ChargerPointsProvider = ({ children }) => {
   const [points, setPoints] = useState([]);
 
   useEffect(() => {
+    console.log("ChargerPoints từ hook:", chargerPoints);
     setPoints(chargerPoints);
   }, [chargerPoints]);
 
-  // Update trạng thái trụ ngay trên UI, có rollback nếu API thất bại
+  // SỬA LẠI HÀM updatePointStatus
   const updatePointStatus = async (pointID, newStatus) => {
-    // Lưu state cũ để rollback nếu cần
+    console.log(`Updating point ${pointID} to status: ${newStatus}`);
+    
     const oldPoints = [...points];
+    
     // Cập nhật local state ngay lập tức
     setPoints((prev) =>
       prev.map((p) => (p.id === pointID ? { ...p, status: newStatus } : p))
     );
 
     try {
+      console.log("Gọi API update status...");
       await apiUpdatePointStatus(pointID, newStatus);
-      // Nếu muốn, có thể fetch lại toàn bộ từ server để chắc chắn đồng bộ
+      
+      console.log("API thành công, fetching lại data...");
+      // QUAN TRỌNG: Đảm bảo fetchChargerPoints được gọi và hoạt động
       await fetchChargerPoints();
+      
+      console.log("Fetch completed, points mới:", points);
     } catch (error) {
       console.error("Failed to update status:", error);
       // rollback state về cũ
       setPoints(oldPoints);
+      throw error; // QUAN TRỌNG: phải throw error để component bắt được
     }
   };
 
   return (
     <ChargerPointsContext.Provider
-      value={{ points, setPoints, isLoading, fetchChargerPoints, updatePointStatus }}
+      value={{ 
+        points, 
+        setPoints, 
+        isLoading, 
+        fetchChargerPoints, 
+        updatePointStatus 
+      }}
     >
       {children}
     </ChargerPointsContext.Provider>

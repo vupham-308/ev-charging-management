@@ -2,11 +2,13 @@ import {
   ThunderboltOutlined,
   ClockCircleOutlined,
   ToolOutlined,
+  PoweroffOutlined,
 } from "@ant-design/icons";
 import { FaHeartbeat } from "react-icons/fa";
 import React from "react";
 import { Button, Card, message } from "antd";
 import { useChargerPointsContext } from "../../contexts/ChargerPointsContext";
+import { useStopSession } from "../../hooks/useStopSession";
 
 const statusStyles = {
   AVAILABLE: {
@@ -25,7 +27,7 @@ const statusStyles = {
     tagColor: "gold",
     tagText: "Đang sử dụng",
     btnText: "Dừng phiên sạc",
-    btnClass: "bg-red-500 hover:bg-red-600 border-none",
+    btnClass: "border-gray-300",
   },
   OUT_OF_SERVICE: {
     tagColor: "red",
@@ -36,7 +38,9 @@ const statusStyles = {
 };
 
 export const MonitoringTab = () => {
-  const { points, updatePointStatus } = useChargerPointsContext();
+  const { points, updatePointStatus, fetchChargerPoints } =
+    useChargerPointsContext();
+  const { stopSession, loading } = useStopSession();
 
   const available = points.filter((p) => p.status === "AVAILABLE").length;
   const occupied = points.filter((p) => p.status === "OCCUPIED").length;
@@ -77,21 +81,57 @@ export const MonitoringTab = () => {
   ];
 
   const handleMarkAvailable = async (point) => {
-    const oldStatus = point.status;
-
-    // Update UI ngay lập tức
-    updatePointStatus(point.id, "AVAILABLE");
-
     try {
-      // Gọi API để lưu backend
       await updatePointStatus(point.id, "AVAILABLE");
       message.success("Trụ sạc đã được đánh dấu khả dụng");
     } catch (error) {
-      // Nếu API thất bại, rollback về trạng thái cũ
-      updatePointStatus(point.id, oldStatus);
       message.error("Cập nhật thất bại, thử lại sau");
     }
   };
+
+  const handleStopSession = async (point) => {
+    try {
+      console.log("=== BẮT ĐẦU handleStopSession ===");
+      console.log("Point data:", point);
+
+      // Kiểm tra point có tồn tại không
+      if (!point) {
+        console.error("Point is undefined!");
+        message.error("Không tìm thấy thông tin trụ sạc");
+        return;
+      }
+
+      const sessionId = point?.chargingSession?.id;
+      console.log("Session ID:", sessionId);
+
+      if (!sessionId) {
+        console.error("Không có sessionId");
+        message.error("Không tìm thấy thông tin phiên sạc");
+        return;
+      }
+
+      console.log("Bắt đầu dừng phiên sạc với ID:", sessionId);
+      
+      // Gọi API dừng phiên sạc
+      await stopSession(sessionId);
+      console.log("Stop session API thành công");
+      
+      // Cập nhật trạng thái sang AVAILABLE
+      await updatePointStatus(point.id, "AVAILABLE");
+      console.log("Update status thành công");
+      
+      message.success("Đã dừng phiên sạc thành công");
+
+    } catch (error) {
+      console.error("Lỗi trong handleStopSession:", error);
+      message.error("Dừng phiên sạc thất bại: " + error.message);
+    }
+  };
+
+  // Thêm useEffect để debug khi points thay đổi
+  React.useEffect(() => {
+    console.log("Points đã thay đổi:", points);
+  }, [points]);
 
   return (
     <div className="px-12 py-8 bg-gray-50 min-h-[70vh]">
@@ -136,7 +176,7 @@ export const MonitoringTab = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-800">
-                          {point.id}
+                          {point?.id}
                         </h3>
                         <p className="text-gray-600 text-sm">
                           {point.capacity} kW • {point.portType}
@@ -164,6 +204,14 @@ export const MonitoringTab = () => {
                       {point.status === "OUT_OF_SERVICE" && (
                         <p className="text-red-600 font-medium">Đang bảo trì</p>
                       )}
+                      {point.status === "OCCUPIED" && (
+                        <div>
+                          <p className="text-yellow-600 font-medium">
+                            Phiên sạc đang hoạt động
+                          </p>
+                        
+                        </div>
+                      )}
                     </div>
 
                     {/* Button cho OUT_OF_SERVICE */}
@@ -176,15 +224,26 @@ export const MonitoringTab = () => {
                       </Button>
                     )}
 
-                    {/* Button cho RESERVED / OCCUPIED */}
-                    {point.status !== "AVAILABLE" &&
-                      point.status !== "OUT_OF_SERVICE" && (
-                        <Button
-                          className={`w-full mt-4 font-medium ${style.btnClass}`}
-                        >
-                          {style.btnText}
-                        </Button>
-                      )}
+                    {point.status === "OCCUPIED" && (
+                      <Button
+                        className={`w-full mt-4 font-medium ${style.btnClass}`}
+                        onClick={() => handleStopSession(point)}
+                        loading={loading}
+                        danger
+                        icon={<PoweroffOutlined />}
+                      >
+                        {loading ? "Đang dừng..." : style.btnText}
+                      </Button>
+                    )}
+
+                    {/* Button cho RESERVED */}
+                    {point.status === "RESERVED" && (
+                      <Button
+                        className={`w-full mt-4 font-medium ${style.btnClass}`}
+                      >
+                        {style.btnText}
+                      </Button>
+                    )}
                   </Card>
                 );
               })}

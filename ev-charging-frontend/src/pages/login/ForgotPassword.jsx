@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Card, Typography, message } from "antd";
-import { ArrowLeftOutlined, MailOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Typography, message, Modal } from "antd";
+import { ArrowLeftOutlined, MailOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "./hooks/useForgotPassword";
 
@@ -11,6 +11,8 @@ const ForgotPassword = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [isFilled, setIsFilled] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [nonExistentEmail, setNonExistentEmail] = useState("");
 
   const onFinish = async ({ email }) => {
     try {
@@ -19,10 +21,15 @@ const ForgotPassword = () => {
     } catch (error) {
       console.log("📌 ERROR RAW:", error);
 
-      const errorMsg = error.response?.data || error.message || "";
+      const errorMsg = error.response?.data; // "Không tìm thấy tài khoản của bạn!"
       
-      // ❌ Nguyên bản: chỉ báo lỗi chung, không suggest đăng ký
-      message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
+      // ✅ CẬP NHẬT: Dựa trên response thực tế
+      if (errorMsg && errorMsg.includes("Không tìm thấy tài khoản")) {
+        setNonExistentEmail(email);
+        setShowRegisterModal(true);
+      } else {
+        message.error(errorMsg || "❌ Gửi mã xác thực thất bại!");
+      }
     }
   };
 
@@ -35,6 +42,17 @@ const ForgotPassword = () => {
 
   const handleEmailChange = (e) => {
     setIsFilled(e.target.value.trim().length > 0);
+  };
+
+  const handleRegisterRedirect = () => {
+    setShowRegisterModal(false);
+    navigate("/register", { state: { preFilledEmail: nonExistentEmail } });
+  };
+
+  const handleCloseModal = () => {
+    setShowRegisterModal(false);
+    form.setFieldValue("email", ""); // Clear email input
+    setIsFilled(false);
   };
 
   return (
@@ -139,6 +157,38 @@ const ForgotPassword = () => {
           </Form>
         </Card>
       </div>
+
+      {/* ✅ Modal suggest đăng ký - ĐÃ CẬP NHẬT THEO RESPONSE THỰC TẾ */}
+      <Modal
+        open={showRegisterModal}
+        onCancel={handleCloseModal}
+        footer={[
+          <Button key="cancel" onClick={handleCloseModal}>
+            Để sau
+          </Button>,
+          <Button
+            key="register"
+            type="primary"
+            icon={<UserAddOutlined />}
+            onClick={handleRegisterRedirect}
+            style={{ backgroundColor: "#000", borderColor: "#000" }}
+          >
+            Đăng ký ngay
+          </Button>,
+        ]}
+        centered
+      >
+        <div style={{ textAlign: "center", padding: "20px 0" }}>
+          <UserAddOutlined style={{ fontSize: 48, color: "#ff4d4f", marginBottom: 16 }} />
+          <Title level={4} style={{ marginBottom: 8 }}>
+            Tài khoản không tồn tại
+          </Title>
+          <Text>
+            Email <strong>{nonExistentEmail}</strong> chưa có tài khoản trong hệ thống.
+            Bạn có muốn đăng ký tài khoản mới không?
+          </Text>
+        </div>
+      </Modal>
     </div>
   );
 };
