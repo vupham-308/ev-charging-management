@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, message } from "antd";
+import { Form, Input, Button, Card, Alert } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import api from "../../config/axios";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux/accountSlice";
@@ -10,21 +9,25 @@ import { login } from "../../redux/accountSlice";
 const LoginPage = () => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-
   const onFinish = async (values) => {
     setIsLoading(true);
+    setServerError("");
+
     try {
       const response = await api.post("account/login", values);
       const { token, role } = response.data;
+
       localStorage.setItem("token", token);
 
       const responseUser = await api.get("/profile/get", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       localStorage.setItem("user", JSON.stringify(responseUser.data));
       dispatch(login(response.data));
 
@@ -34,8 +37,16 @@ const LoginPage = () => {
       else navigate("/");
     } catch (e) {
       console.error(e);
-      message.error("Đăng nhập thất bại. Vui lòng thử lại.");
-      toast.warning("Đăng nhập thất bại!");
+
+      const errorMsg =
+        typeof e.response?.data === "string"
+          ? e.response.data
+          : e.response?.data?.message ||
+            e.response?.data?.error ||
+            "❌ Đăng nhập thất bại, vui lòng kiểm tra lại thông tin!";
+
+      setServerError(errorMsg);
+      
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +54,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative">
-      {/* ✅ Background */}
+      {/* BACKGROUND */}
       <div className="absolute inset-0 z-0 bg-[url('https://cdn.motor1.com/images/mgl/Xkpmb/s1/zipcharge-go.jpg')] bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"></div>
       </div>
@@ -64,66 +75,77 @@ const LoginPage = () => {
               </div>
             </div>
             <h2 className="text-2xl font-bold">Trạm Sạc Xe Điện</h2>
-            <p className="text-gray-500">
-              Đăng nhập để truy cập hệ thống quản lý sạc xe
-            </p>
+            <p className="text-gray-500">Đăng nhập để truy cập hệ thống quản lý sạc xe</p>
           </div>
 
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onFinish}
-            requiredMark={false}
-          >
+          <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
+            {/* EMAIL */}
             <Form.Item
-              label="Email"
               name="email"
+              label="Email đăng nhập"
               rules={[
-                { required: true, message: "Email là bắt buộc" },
+                { required: true, message: "Vui lòng nhập email đăng nhập!" },
                 {
-                  validator(_, value) {
-                    return !value || validateEmail(value)
-                      ? Promise.resolve()
-                      : Promise.reject(new Error("Email không hợp lệ"));
-                  },
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Email không hợp lệ, vui lòng nhập đúng định dạng!",
                 },
               ]}
             >
               <Input
-                placeholder="Nhập địa chỉ email"
-                type="email"
-                prefix={<MailOutlined />}
-                allowClear
+                placeholder="Nhập email của bạn"
+                size="large"
+                prefix={<MailOutlined className="text-gray-400" />}
+                style={{ borderRadius: 8 }}
               />
             </Form.Item>
 
+            {/* PASSWORD */}
             <Form.Item
-              label="Mật khẩu"
               name="password"
+              label="Mật khẩu"
               rules={[
-                { required: true, message: "Mật khẩu là bắt buộc" },
-                { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự" },
+                { required: true, message: "Vui lòng nhập mật khẩu!" },
+                { min: 8, message: "Mật khẩu phải có ít nhất 8 ký tự!" },
+                {
+                  pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
+                  message:
+                    "Mật khẩu phải gồm chữ hoa, chữ thường, số và ký tự đặc biệt!",
+                },
               ]}
-              hasFeedback
             >
               <Input.Password
                 placeholder="Nhập mật khẩu"
-                prefix={<LockOutlined />}
+                size="large"
+                prefix={<LockOutlined className="text-gray-400" />}
+                style={{ borderRadius: 8 }}
               />
             </Form.Item>
 
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-                block
-                size="large"
-                style={{ backgroundColor: "#000", borderColor: "#000" }}
-              >
-                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
-              </Button>
-            </Form.Item>
+            {/* SERVER ERROR */}
+            {serverError && (
+              <Alert
+                message={serverError}
+                type="error"
+                showIcon
+                style={{ marginBottom: 16, borderRadius: 8 }}
+              />
+            )}
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading}
+              block
+              size="large"
+              style={{
+                backgroundColor: "#000",
+                borderColor: "#000",
+                borderRadius: 8,
+                fontWeight: 500,
+              }}
+            >
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+            </Button>
 
             <div className="text-center mt-3">
               <a
@@ -134,7 +156,6 @@ const LoginPage = () => {
               </a>
             </div>
 
-            {/* 🔹 Chỉ giữ 1 dòng “Chưa có tài khoản? Đăng ký” */}
             <div className="text-center mt-4">
               <span className="text-gray-600">Chưa có tài khoản? </span>
               <a

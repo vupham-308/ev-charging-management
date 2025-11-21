@@ -21,6 +21,7 @@ import { AnimatePresence } from "framer-motion";
 import api from "../../config/axios";
 import { FiSend, FiMessageCircle } from "react-icons/fi";
 import { message } from "antd";
+import { motion } from "framer-motion";
 
 // --- Custom Hook for Scroll-triggered Animations ---
 const useAnimateOnScroll = () => {
