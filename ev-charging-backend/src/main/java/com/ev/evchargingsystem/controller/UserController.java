@@ -105,4 +105,11 @@ public class UserController {
 
         return ResponseEntity.ok("Đã gán trạm " + station.getName() + " cho staff " + staff.getUser().getFullName());
     }
+
+    @Operation(summary = "Lấy danh sách staff hiện có")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/getAllStaffs")
+    public ResponseEntity getAllStaffs() {
+        return ResponseEntity.ok(userService.getAllStaffs());
+    }
 }

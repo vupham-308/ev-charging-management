@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -193,18 +194,6 @@ public class UserService {
         return Optional.of(modelMapper.map(user, UserResponse.class));
     }
 
-    public String generatePassword(){
-        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-        int PASSWORD_LENGTH = 10;
-            SecureRandom random = new SecureRandom();
-            StringBuilder sb = new StringBuilder(PASSWORD_LENGTH);
-            for (int i = 0; i < PASSWORD_LENGTH; i++) {
-                int index = random.nextInt(CHARACTERS.length());
-                sb.append(CHARACTERS.charAt(index));
-            }
-            return sb.toString();
-    }
-
     public boolean sendOtp(String email) throws MessagingException {
         if(otpService.sendOtp(email)){
             return true;
@@ -234,14 +223,13 @@ public class UserService {
         emailService.sendMail(user.getEmail(), title, body);
     }
 
-    public User findOrCreateUser(String email, String name) {
-        User user = userRepository.findUserByEmail(email);
-        if(user!=null){
-            return user;
+    public List<UserInfoResponse> getAllStaffs(){
+        List<UserInfoResponse> responses = new ArrayList<>();
+        List<User> u = userRepository.findAllByRole("STAFF");
+        for(User u1 : u){
+            responses.add(convertToUserInfoResponse(u1));
         }
-        else{
-            return createUser(user);
-        }
-
+        return responses;
     }
+
 }
