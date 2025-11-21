@@ -86,10 +86,9 @@ public class DataExportScheduler {
         }
     }
 
+
     public String getInfo(){
-        return "HỆ THỐNG QUẢN LÝ TRẠM SẠC XE ĐIỆN\n" +
-                "Tên phần mềm: EV Charging Station Management System\n" +
-                "ĐIỀU KHOẢN SỬ DỤNG (TERMS OF USE)\n" +
+        return "ĐIỀU KHOẢN SỬ DỤNG (TERMS OF USE)\n" +
                 "1. Giới thiệu\n" +
                 "Chào mừng bạn đến với EV Charging Station Management System\n" +
                 "Khi truy cập hoặc sử dụng trang web, bạn đồng ý tuân thủ và bị ràng buộc bởi các Điều khoản sử dụng này.\n" +
@@ -155,16 +154,14 @@ public class DataExportScheduler {
                 "Câu hỏi thường gặp: \n" +
                 "1. Về dịch vụ sạc xe điện\n" +
                 "Q1. Hệ thống hỗ trợ sạc cho xe điện hãng nào?\n" +
-                " A: Hệ thống hiện hỗ trợ sạc xe cho Vinfast.\n" +
+                " A: Hệ thống hiện hỗ trợ sạc xe cho Vinfast, Hyundai, Nissan.\n" +
                 "Q2. Hệ thống hỗ trợ những loại cổng sạc nào?\n" +
-                " A: Hệ thống hiện hỗ trợ các chuẩn sạc phổ biến gồm AC, CHAdeMO, và CCS – tương thích với xe Vinfast.\n" +
+                " A: Hệ thống hiện hỗ trợ các chuẩn sạc phổ biến gồm AC cho xe Vinfast, CHAdeMo cho xe Nissan, CCS cho xe Hyundai.\n" +
                 "Q3. Có thể sạc xe ở trạm khác hãng không?\n" +
-                " A: Có, miễn là xe của bạn hỗ trợ một trong các cổng trên. Tuy nhiên, chúng tôi không chịu trách nhiệm nếu xảy ra sự cố phát sinh, hoặc xe của bạn không phù hợp với cổng sạc.\n" +
+                " A: Không, hiện tại chúng tôi chỉ hỗ trợ sạc xe cho Vinfast, Hyundai, Nissan.\n" +
                 "Q4. Mất bao lâu để sạc đầy pin từ 1%?\n" +
                 " A:\n" +
                 "Sạc AC (22kW): khoảng 3-4h\n" +
-                "\n" +
-                "\n" +
                 "Sạc CHAdeMo(75kW): 60-90 phút\n" +
                 "Sạc CCS (120kW): khoảng 40 phút\n" +
                 " Ứng dụng sẽ hiển thị thời gian dự kiến trước khi bạn bắt đầu.\n" +

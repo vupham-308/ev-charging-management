@@ -116,7 +116,14 @@ public class ProblemReportService {
         }
         Staff staff = staffRepository.findStaffByUser(user);
         Station s = staff.getStation();
-        return problemReportRepository.findAllByStation(s);
+        List<ProblemReport> list = problemReportRepository.findAllByStation(s);
+        List<ProblemReport> result = new ArrayList<>();
+        for(ProblemReport p : list){
+            if(p.getUser().getId() != staff.getUser().getId()){
+                result.add(p);
+            }
+        }
+        return result;
     }
 
     public ProblemReport setStatus(int id, String status) {

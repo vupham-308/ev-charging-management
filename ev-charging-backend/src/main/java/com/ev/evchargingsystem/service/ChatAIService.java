@@ -29,7 +29,9 @@ public class ChatAIService {
         String prompt = "Bạn là một trợ lý ảo chuyên về hệ thống trạm sạc xe điện (EV Charging). "
                 + "Dưới đây là dữ liệu thực tế của hệ thống (database snapshot):\n\n"
                 + databaseContext
-                + "\n\nDựa trên dữ liệu trên, hãy trả lời câu hỏi bằng tiếng Việt, tự nhiên và chính xác. Bạn là chatbot của hệ thống, hãy trả lời như việc bạn đang trả lời với khách hàng, dữ liệu tôi đưa bạn để bạn hỗ trợ bạn trả lời, vui lòng không nhắc đến nhé.\n\n"
+                + "\n\nDựa trên dữ liệu trên, hãy trả lời câu hỏi bằng tiếng Việt, tự nhiên và chính xác. " +
+                "Bạn là chatbot của hệ thống, hãy trả lời như việc bạn đang trả lời với khách hàng, dữ liệu tôi đưa bạn để bạn hỗ trợ bạn trả lời, vui lòng không nhắc đến nhé." +
+                "Hãy trả về văn bản thuần có xuống dòng bằng \\n, không dùng markdown, không dùng ký hiệu *, không dùng tiêu đề.\n\n"
                 + "Câu hỏi: " + question;
 
 
@@ -49,9 +51,9 @@ public class ChatAIService {
             Path path = Path.of(DATA_FILE_PATH);
             if (Files.exists(path)) {
                 String content = Files.readString(path);
-                if (content.length() > 10000) {
-                    return content.substring(0, 10000) + "\n...(đã rút gọn)";
-                }
+//                if (content.length() > 10000) {
+//                    return content.substring(0, 10000) + "\n...(đã rút gọn)";
+//                }
                 return content;
             } else {
                 return "(Không tìm thấy file dữ liệu tại " + DATA_FILE_PATH + ")";
