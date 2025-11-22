@@ -47,7 +47,6 @@ public class ChargerPointService {
         ChargerPoint p = new ChargerPoint();
         p.setStation(station);
         p.setName(rq.getName());
-        p.setCapacity(getCapacity(rq.getPortType()));//cost
         p.setChargerCost(cost);
         p.setStatus(rq.getStatus());
         return chargerPointRepository.save(p);
@@ -88,7 +87,6 @@ public class ChargerPointService {
         }
         ChargerCost cost = chargerCostRepository.findChargerCostByPortType(p.getPortType());
         c.setName(p.getName());
-        c.setCapacity(getCapacity(p.getPortType()));
         c.setChargerCost(cost);
         c.setStatus(p.getStatus());
         return chargerPointRepository.save(c);
@@ -140,7 +138,7 @@ public class ChargerPointService {
             StaffChargerPointResponse r = null;
             if(p.getStatus().equals("AVAILABLE")){
                 r = new StaffChargerPointResponse(p.getId(),
-                        p.getChargerCost().getPortType(), p.getCapacity(),
+                        p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus());
             }
             if(p.getStatus().equals("OCCUPIED")){
@@ -154,7 +152,7 @@ public class ChargerPointService {
                     }
                 }
                 r = new StaffChargerPointResponse(p.getId(),
-                        p.getChargerCost().getPortType(), p.getCapacity(),
+                        p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus(),cs);
             }
             if(p.getStatus().equals("RESERVED")){
@@ -168,12 +166,12 @@ public class ChargerPointService {
                     }
                 }
                 r = new StaffChargerPointResponse(p.getId(),
-                        p.getChargerCost().getPortType(), p.getCapacity(),
+                        p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus(),rv);
             }
             if(p.getStatus().equals("OUT_OF_SERVICE")){
                 r = new StaffChargerPointResponse(p.getId(),
-                        p.getChargerCost().getPortType(), p.getCapacity(),
+                        p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus());
             }
             list.add(r);

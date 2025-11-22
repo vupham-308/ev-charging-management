@@ -17,9 +17,19 @@ import java.util.List;
 @NoArgsConstructor
 public class ChargerCost {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     @NotEmpty
     @Column(name="port_type")
     private String portType;
-    @NotNull
+    @NotNull//kW
+    private int power;
+    @NotNull//cost ? kWh
     private double cost;
+
+    public ChargerCost(String portType, int capacity, double cost) {
+        this.portType = portType;
+        this.power = capacity;
+        this.cost = cost;
+    }
 }

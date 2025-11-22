@@ -15,7 +15,7 @@ import java.util.*;
 @Service
 public class ChatAIService {
 
-    @Value("${gemini.api.key}")
+    @Value("AIzaSyC5S20Eoy0dDxNGh7L_Qb-zFr8yaaVNzW8")
     private String apiKey;
 
     private static final String DATA_FILE_PATH = "data/database-export.json";
