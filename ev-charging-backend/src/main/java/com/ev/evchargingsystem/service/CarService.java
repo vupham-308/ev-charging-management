@@ -58,8 +58,8 @@ public class CarService {
     // Thêm xe
     public Car addCar(CarCreateRequest req) {
         //check biển số trong database
-        Car car = new Car();
-        car = carRepository.findByLicensePlate(req.getLicensePlate());
+        Car car = carRepository.findByLicensePlate(req.getLicensePlate());
+        if(car==null) car= new Car();
         User currentUser = getCurrentUser();
         List<CarBranch> list = carBranchRepository.findAll();
         for(CarBranch branch : list) {
