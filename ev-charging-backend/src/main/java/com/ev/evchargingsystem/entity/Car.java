@@ -18,10 +18,9 @@ public class Car {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, length = 20)
-    @Pattern(regexp = "^(VinFast|Hyundai|Nissan)[a-zA-Z0-9 ]*$",
-            message = "Brand chỉ được là VinFast, Hyundai hoặc Nissan")
-    private String brand;
+    @OneToOne
+    @JoinColumn(name="branch_id",referencedColumnName = "id", nullable=false)
+    private CarBranch carBranch;
 
     @NotEmpty(message = "Color cannot be empty!")
     @Column(columnDefinition = "nvarchar(30)")
@@ -41,4 +40,5 @@ public class Car {
 
     @Column(nullable = false)
     private boolean active = true;
+
 }

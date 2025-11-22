@@ -206,7 +206,7 @@ public class ChargingSessionService {
 
         // hàm kiểm tra tương thích brand–connector
         validateConnectorCompatibility(
-                car.getBrand(),
+                car,
                 point.getChargerCost().getPortType()
         );
 
@@ -361,19 +361,10 @@ public class ChargingSessionService {
     }
 
     //check cổng sạc phù hợp với xe
-    private void validateConnectorCompatibility(String brand, String connectorType) {
-        String lowerBrand = brand.toLowerCase();
+    private void validateConnectorCompatibility(Car car, String connectorType) {
 
-        if (lowerBrand.contains("vinfast") && !"ac".equalsIgnoreCase(connectorType)) {
-            throw new RuntimeException("Xe VinFast chỉ sạc được với cổng AC");
-        }
-
-        if (lowerBrand.contains("hyundai") && !"ccs".equalsIgnoreCase(connectorType)) {
-            throw new RuntimeException("Xe Hyundai chỉ sạc được với cổng CCS");
-        }
-
-        if (lowerBrand.contains("nissan") && !"chademo".equalsIgnoreCase(connectorType)) {
-            throw new RuntimeException("Xe Nissan chỉ sạc được với cổng CHAdeMO");
+        if (car.getCarBranch().getPortType().equalsIgnoreCase(connectorType)) {
+            throw new RuntimeException("Xe chỉ sạc được với cổng "+car.getCarBranch().getPortType());
         }
     }
 

@@ -14,4 +14,6 @@ public interface CarRepository extends JpaRepository<Car, Integer> {
     List<Car> findByUserAndActiveTrue(User user);
 
     List<Car> findAllByUser(User user);
+
+    Car findByLicensePlate(String licensePlate);
 }
