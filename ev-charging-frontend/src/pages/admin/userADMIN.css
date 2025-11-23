@@ -427,3 +427,13 @@
         transform: translateY(0);
     }
 }
+input.error,
+select.error {
+    border: 1px solid red;
+}
+
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 2px;
+}
