@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+
 @RestController
 @RequestMapping("/car-branch")
 public class CarBranchController {
@@ -15,27 +17,33 @@ public class CarBranchController {
     CarBranchService carBranchService;
 
     @GetMapping("/getAll")
-    public List<CarBranch> getAll(){
-        return null;
+    public ResponseEntity<List<CarBranch>> getAll(){
+        return ResponseEntity.ok(carBranchService.getAllCarBranches());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CarBranch> getById(@PathVariable("id") int id){
+        return ResponseEntity.ok(carBranchService.getCarBranchById(id));
     }
 
     @PostMapping("/admin/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CarBranch create(@RequestBody CarBranch carBranch){
-        return null;
+    public ResponseEntity<CarBranch> create(@RequestBody CarBranch carBranch){
+        return ResponseEntity.ok(carBranchService.addNewCarBranch(carBranch));
     }
 
-    @PutMapping("/admin/edit")
+    @PutMapping("/admin/edit/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CarBranch update(@RequestBody CarBranch carBranch){
-        return null;
+    public ResponseEntity<CarBranch> update(@PathVariable("id") int id, @RequestBody CarBranch carBranch){
+        return ResponseEntity.ok(carBranchService.updateCarBranch(id, carBranch));
     }
 
     @DeleteMapping("/admin/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public CarBranch delete(@PathVariable("id")int id){
+    public ResponseEntity<Void> delete(@PathVariable("id")int id){
         //chuyển thành inactive
-        return null;
+        carBranchService.deleteCarBranch(id);
+        return ResponseEntity.ok().build();
     }
 
 }
