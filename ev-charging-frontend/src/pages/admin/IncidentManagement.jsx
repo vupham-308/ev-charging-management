@@ -18,7 +18,13 @@ const IncidentManagement = () => {
     const fetchIncidents = async () => {
         try {
             const res = await api.get("problem/admin/getAllResolve");
-            setIncidents(res.data);
+
+            // Sắp xếp theo createdAt mới nhất
+            const sorted = res.data.sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            setIncidents(sorted);
         } catch (error) {
             console.error(error);
             message.error("Không thể tải danh sách sự cố!");
@@ -26,6 +32,7 @@ const IncidentManagement = () => {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         setLoading(true);
