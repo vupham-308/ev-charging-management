@@ -30,12 +30,15 @@ const ChargingStations = () => {
         setLoading(true);
         try {
             const res = await api.get("station/getAllStations");
-            setStations(res.data);
+
+            // Sắp xếp theo ID mới nhất lên đầu
+            const sorted = res.data.sort((a, b) => b.id - a.id);
+
+            setStations(sorted);
         } finally {
             setLoading(false);
         }
     };
-
     // Lấy danh sách nhân viên
     const fetchEmployees = async () => {
         try {
