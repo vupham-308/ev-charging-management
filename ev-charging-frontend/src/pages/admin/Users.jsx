@@ -41,8 +41,12 @@ const Users = () => {
         setLoading(true);
         try {
             const res = await api.get("admin/users");
-            setUsers(res.data);
-            setAllUsers(res.data);
+
+            // Sắp xếp theo newest first (id lớn nhất lên đầu)
+            const sorted = res.data.sort((a, b) => b.id - a.id);
+
+            setUsers(sorted);
+            setAllUsers(sorted);
         } catch (error) {
             console.error("❌ Lỗi tải danh sách người dùng:", error);
             message.error("Không thể tải danh sách người dùng!");
@@ -50,6 +54,7 @@ const Users = () => {
             setLoading(false);
         }
     };
+
 
     const fetchStats = async () => {
         try {
