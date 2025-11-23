@@ -55,7 +55,6 @@ const Users = () => {
         }
     };
 
-
     const fetchStats = async () => {
         try {
             const res = await api.get("admin/users/user-stats");
@@ -96,7 +95,7 @@ const Users = () => {
         setLoading(true);
         try {
             const res = await api.delete(`admin/users/${selectedUserId}`);
-if (res.status === 200 || res.status === 204) {
+            if (res.status === 200 || res.status === 204) {
                 message.success("Xóa người dùng thành công!");
                 await fetchUsers();
                 await fetchStats();
@@ -178,20 +177,36 @@ if (res.status === 200 || res.status === 204) {
         setFormValues((prev) => ({ ...prev, [name]: cleanValue }));
         validateField(name, cleanValue);
     };
-// Validate all fields before submit
+
+    // Validate all fields synchronously before submit
     const validateAll = () => {
-        Object.keys(formValues).forEach((key) =>
-            validateField(key, formValues[key])
-        );
-        return !Object.values(formErrors).some((e) => e);
+        const errors = {};
+
+        if (!formValues.fullName.trim()) errors.fullName = "Họ tên không được để trống";
+        else if (!nameRegex.test(formValues.fullName)) errors.fullName = "Họ tên chỉ bao gồm chữ và khoảng trắng (3-50 ký tự)";
+
+        if (!formValues.email.trim()) errors.email = "Email không được để trống";
+        else if (!emailRegex.test(formValues.email)) errors.email = "Email không hợp lệ";
+
+        if (formValues.phone && !phoneRegex.test(formValues.phone)) errors.phone = "SĐT phải gồm 10 số và bắt đầu bằng 0";
+
+        if (!formValues.role) errors.role = "Vui lòng chọn vai trò";
+
+        if (!isEdit) {
+            if (!formValues.password) errors.password = "Mật khẩu không được để trống";
+            else if (!passwordRegex.test(formValues.password)) errors.password = "Mật khẩu tối thiểu 6 ký tự, phải có ít nhất 1 chữ và 1 số";
+        }
+
+        setFormErrors(errors);
+
+        return Object.keys(errors).length === 0;
     };
 
     // Handle submit
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Validate all fields
-        validateAll();
-        if (Object.values(formErrors).some((e) => e)) {
+
+        if (!validateAll()) {
             message.warning("Vui lòng sửa các lỗi trước khi gửi");
             return;
         }
@@ -264,7 +279,7 @@ if (res.status === 200 || res.status === 204) {
 
     return (
         <div className="users-admin-page">
-{/* Header */}
+            {/* Header */}
             <div
                 style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
             >
@@ -327,7 +342,7 @@ if (res.status === 200 || res.status === 204) {
                                 <button className="btn-icon edit" onClick={() => handleEditClick(u)}>
                                     <i className="fa-solid fa-pen"></i> Sửa
                                 </button>
-<button className="btn-icon delete" onClick={() => handleDeleteClick(u.id)}>
+                                <button className="btn-icon delete" onClick={() => handleDeleteClick(u.id)}>
                                     <i className="fa-solid fa-trash"></i> Xóa
                                 </button>
                             </div>
@@ -388,7 +403,7 @@ if (res.status === 200 || res.status === 204) {
                                 Vai trò <span>*</span>
                             </label>
                             <select
-name="role"
+                                name="role"
                                 value={formValues.role}
                                 onChange={handleChange}
                                 className={formErrors.role ? "error" : ""}

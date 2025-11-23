@@ -14,12 +14,10 @@ const ChargingStations = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingStation, setEditingStation] = useState(null);
-
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
     const [form] = Form.useForm();
     const [assignForm] = Form.useForm();
-
     const [modal, contextHolder] = Modal.useModal();
     const [messageApi, messageContextHolder] = message.useMessage();
 
@@ -30,15 +28,13 @@ const ChargingStations = () => {
         setLoading(true);
         try {
             const res = await api.get("station/getAllStations");
-
-            // Sắp xếp theo ID mới nhất lên đầu
             const sorted = res.data.sort((a, b) => b.id - a.id);
-
             setStations(sorted);
         } finally {
             setLoading(false);
         }
     };
+
     // Lấy danh sách nhân viên
     const fetchEmployees = async () => {
         try {
@@ -55,22 +51,16 @@ const ChargingStations = () => {
         fetchEmployees();
     }, []);
 
-    // Tìm kiếm trạm
-    const handleSearch = async (value) => {
+    // Search trên frontend
+    const handleSearch = (value) => {
         setSearch(value);
-        if (!value.trim()) {
-            fetchStations();
-            return;
-        }
-
-        try {
-            const res = await api.get(`station/search?keyword=${encodeURIComponent(value)}`);
-            setStations(res.data);
-        } catch (error) {
-            console.error(error);
-            messageApi.error("Không thể tìm kiếm trạm!");
-        }
     };
+
+    const filteredStations = stations.filter(
+        (s) =>
+            s.name.toLowerCase().includes(search.toLowerCase()) ||
+            s.address.toLowerCase().includes(search.toLowerCase())
+    );
 
     // Mở form thêm hoặc sửa
     const openModal = (station = null) => {
@@ -98,7 +88,7 @@ const ChargingStations = () => {
             title: "Xác nhận xóa",
             content: "Bạn có chắc muốn xóa trạm này không?",
             okText: "Xóa",
-cancelText: "Hủy",
+            cancelText: "Hủy",
             okButtonProps: { danger: true },
             async onOk() {
                 try {
@@ -117,19 +107,15 @@ cancelText: "Hủy",
     const handleSubmit = async (values) => {
         try {
             if (isEditMode) {
-                await api.put(
-                    `station/admin/update/${editingStation.id}`,
-                    {
-                        name: values.name,
-                        address: values.address,
-                        phone: values.phone,
-                        email: values.email,
-                        status: values.status,
-                        latitude: Number(values.latitude),
-                        longitude: Number(values.longitude),
-                    }
-                );
-
+                await api.put(`station/admin/update/${editingStation.id}`, {
+                    name: values.name,
+                    address: values.address,
+                    phone: values.phone,
+                    email: values.email,
+                    status: values.status,
+                    latitude: Number(values.latitude),
+                    longitude: Number(values.longitude),
+                });
                 messageApi.success("Cập nhật trạm sạc thành công!");
             } else {
                 const res = await api.post("station/admin/create", {
@@ -143,9 +129,8 @@ cancelText: "Hủy",
                     longitude: Number(values.longitude),
                 });
 
-                // Lấy station vừa tạo (từ BE trả về hoặc từ form nếu BE không trả ID)
                 const newStation = {
-                    ...(res.data || {}), // nếu backend return {id,...}
+                    ...(res.data || {}),
                     name: values.name,
                     address: values.address,
                     phone: values.phone,
@@ -155,15 +140,12 @@ cancelText: "Hủy",
                     longitude: Number(values.longitude),
                 };
 
-                // Nếu BE không trả ID → dùng Date.now để tạo ID tạm
                 if (!newStation.id) newStation.id = Date.now();
-
-                // ĐẨY LÊN ĐẦU LIST
-                setStations(prev => [newStation, ...prev]);
-
+                setStations((prev) => [newStation, ...prev]);
                 messageApi.success("Thêm trạm sạc mới thành công!");
-                setIsModalOpen(false);
             }
+
+            setIsModalOpen(false);
         } catch (error) {
             console.error("Lỗi khi lưu trạm:", error.response?.data || error);
             messageApi.error("Lưu dữ liệu thất bại!");
@@ -176,11 +158,10 @@ cancelText: "Hủy",
         setIsAssignModalOpen(true);
     };
 
-    // Submit gắn nhân viên
-const handleAssignSubmit = async (values) => {
+    // Submit gán nhân viên
+    const handleAssignSubmit = async (values) => {
         try {
             await api.put(`/admin/users/${values.employeeId}/assign-station/${values.stationId}`);
-
             messageApi.success("Gắn nhân viên thành công!");
             setIsAssignModalOpen(false);
         } catch (error) {
@@ -223,12 +204,11 @@ const handleAssignSubmit = async (values) => {
             />
 
             <div className="stations-list">
-                {stations.map((s, i) => {
+                {filteredStations.map((s, i) => {
                     const ready = s.pointChargerAvailable || 0;
                     const total = s.pointChargerTotal || 0;
                     const maintenance = s.pointChargerOutOfService || 0;
                     const using = total - ready - maintenance;
-
                     const status = s.status === "ACTIVE" ? "Hoạt động" : "Bảo trì";
                     const color = s.status === "ACTIVE" ? "green" : "red";
 
@@ -240,12 +220,11 @@ const handleAssignSubmit = async (values) => {
                                         <h4>{s.name}</h4>
                                         <span className={`status-text ${color}`}>{status}</span>
                                     </div>
-
                                     <div className="station-actions">
                                         <button onClick={() => navigate(`/admin/station/${s.id}`)}>
                                             👁 Xem
                                         </button>
-<button onClick={() => openModal(s)}>✏️ Sửa</button>
+                                        <button onClick={() => openModal(s)}>✏️ Sửa</button>
                                     </div>
                                 </div>
 
@@ -313,7 +292,11 @@ const handleAssignSubmit = async (values) => {
                         label="Số điện thoại"
                         rules={[
                             { required: true, message: "Vui lòng nhập số điện thoại" },
-{ pattern: /^[0-9]+$/, message: "Số điện thoại chỉ được nhập số" },
+                            {
+                                pattern: /^\d{10}$/,
+                                message: "Số điện thoại phải đúng 10 chữ số",
+                            }
+
                         ]}
                     >
                         <Input placeholder="Nhập số điện thoại..." />
@@ -330,22 +313,18 @@ const handleAssignSubmit = async (values) => {
                         <Input placeholder="Nhập email..." />
                     </Form.Item>
 
-                    {/* Latitude */}
                     <Form.Item
                         name="latitude"
                         label="Vĩ độ (Latitude)"
                         rules={[
-                            { required: true, message: "Vĩ độ không được để trống" },
                             {
                                 validator(_, value) {
                                     if (value === "" || value === undefined || value === null)
                                         return Promise.reject("Vĩ độ không được để trống");
-
                                     const num = Number(value);
                                     if (isNaN(num)) return Promise.reject("Vĩ độ phải là số");
                                     if (num < -90 || num > 90)
                                         return Promise.reject("Vĩ độ phải từ -90 đến 90");
-
                                     return Promise.resolve();
                                 },
                             },
@@ -356,26 +335,23 @@ const handleAssignSubmit = async (values) => {
                             step="0.000001"
                             min={-90}
                             max={90}
-                            placeholder="Nhập vĩ độ (VD: 10.123456)"
+                            placeholder="VD: 10.123456"
                         />
                     </Form.Item>
 
-                    {/* Longitude */}
                     <Form.Item
                         name="longitude"
                         label="Kinh độ (Longitude)"
                         rules={[
-                            { required: true, message: "Kinh độ không được để trống" },
                             {
                                 validator(_, value) {
                                     if (value === "" || value === undefined || value === null)
                                         return Promise.reject("Kinh độ không được để trống");
-
                                     const num = Number(value);
                                     if (isNaN(num)) return Promise.reject("Kinh độ phải là số");
                                     if (num < -180 || num > 180)
                                         return Promise.reject("Kinh độ phải từ -180 đến 180");
-return Promise.resolve();
+                                    return Promise.resolve();
                                 },
                             },
                         ]}
@@ -385,9 +361,10 @@ return Promise.resolve();
                             step="0.000001"
                             min={-180}
                             max={180}
-                            placeholder="Nhập kinh độ (VD: 106.123456)"
+                            placeholder="VD: 106.123456"
                         />
                     </Form.Item>
+
 
                     <Form.Item
                         name="status"
@@ -445,7 +422,7 @@ return Promise.resolve();
                         <Select
                             placeholder="Tìm kiếm trạm sạc..."
                             showSearch
-optionFilterProp="children"
+                            optionFilterProp="children"
                             filterOption={(input, option) =>
                                 option.children.toLowerCase().includes(input.toLowerCase())
                             }
