@@ -22,7 +22,7 @@ public class Car {
     @JoinColumn(name="branch_id",referencedColumnName = "id", nullable=false)
     private CarBranch carBranch;
 
-    @NotEmpty(message = "Color cannot be empty!")
+    @NotEmpty(message = "Màu xe không được để trống!")
     @Column(columnDefinition = "nvarchar(30)")
     private String color;
 
@@ -30,7 +30,7 @@ public class Car {
     private int initBattery;
 
     @Column(unique = true)
-    @NotNull(message = "licensePlate cannot be empty!")
+    @NotNull(message = "Biển số xe không được để trống!")
     @Pattern(regexp = "^\\d{2}[A-Z]-\\d{4,5}$", message = "Invalid license plate format. Example: 51F-12345")
     private String licensePlate;
 
