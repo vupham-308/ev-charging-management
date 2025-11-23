@@ -4,8 +4,6 @@ import api from "../../config/axios";
 import { Spin, message, Modal, Form, Input, Button, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 
-// Khi create/edit thành công:
-
 const { Option } = Select;
 
 const ChargingStations = () => {
@@ -16,12 +14,10 @@ const ChargingStations = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingStation, setEditingStation] = useState(null);
-
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
     const [form] = Form.useForm();
     const [assignForm] = Form.useForm();
-
     const [modal, contextHolder] = Modal.useModal();
     const [messageApi, messageContextHolder] = message.useMessage();
 
@@ -32,16 +28,17 @@ const ChargingStations = () => {
         setLoading(true);
         try {
             const res = await api.get("station/getAllStations");
-            setStations(res.data);
+            const sorted = res.data.sort((a, b) => b.id - a.id);
+            setStations(sorted);
         } finally {
             setLoading(false);
         }
     };
 
-    // Lấy danh sách nhân viên (giả sử API có endpoint này, hoặc bạn thay bằng đúng endpoint)
+    // Lấy danh sách nhân viên
     const fetchEmployees = async () => {
         try {
-            const res = await api.get("/admin/users/getAllStaffs"); // Thay bằng endpoint lấy danh sách nhân viên
+            const res = await api.get("/admin/users/getAllStaffs");
             setEmployees(res.data);
         } catch (error) {
             console.error(error);
@@ -54,24 +51,16 @@ const ChargingStations = () => {
         fetchEmployees();
     }, []);
 
-    // Tìm kiếm trạm
-    const handleSearch = async (value) => {
+    // Search trên frontend
+    const handleSearch = (value) => {
         setSearch(value);
-        if (!value.trim()) {
-            fetchStations();
-            return;
-        }
-
-        try {
-            const res = await api.get(
-                `station/search?keyword=${encodeURIComponent(value)}`
-            );
-            setStations(res.data);
-        } catch (error) {
-            console.error(error);
-            messageApi.error("Không thể tìm kiếm trạm!");
-        }
     };
+
+    const filteredStations = stations.filter(
+        (s) =>
+            s.name.toLowerCase().includes(search.toLowerCase()) ||
+            s.address.toLowerCase().includes(search.toLowerCase())
+    );
 
     // Mở form thêm hoặc sửa
     const openModal = (station = null) => {
@@ -82,6 +71,8 @@ const ChargingStations = () => {
             form.setFieldsValue({
                 ...station,
                 status: station.status || "ACTIVE",
+                latitude: station.latitude,
+                longitude: station.longitude,
             });
         } else {
             form.resetFields();
@@ -112,21 +103,19 @@ const ChargingStations = () => {
         });
     };
 
-    // Submit form (Thêm hoặc Cập nhật)
+    // Submit form (Thêm hoặc cập nhật)
     const handleSubmit = async (values) => {
         try {
             if (isEditMode) {
-                const res = await api.put(
-                    `station/admin/update/${editingStation.id}`,
-                    {
-                        name: values.name,
-                        address: values.address,
-                        phone: values.phone,
-                        email: values.email,
-                        status: values.status,
-                    }
-                );
-                console.log("✅ API update response:", res.data);
+                await api.put(`station/admin/update/${editingStation.id}`, {
+                    name: values.name,
+                    address: values.address,
+                    phone: values.phone,
+                    email: values.email,
+                    status: values.status,
+                    latitude: Number(values.latitude),
+                    longitude: Number(values.longitude),
+                });
                 messageApi.success("Cập nhật trạm sạc thành công!");
             } else {
                 const res = await api.post("station/admin/create", {
@@ -136,33 +125,43 @@ const ChargingStations = () => {
                     phone: values.phone,
                     email: values.email,
                     status: values.status,
+                    latitude: Number(values.latitude),
+                    longitude: Number(values.longitude),
                 });
-                console.log("✅ API create response:", res.data);
+
+                const newStation = {
+                    ...(res.data || {}),
+                    name: values.name,
+                    address: values.address,
+                    phone: values.phone,
+                    email: values.email,
+                    status: values.status,
+                    latitude: Number(values.latitude),
+                    longitude: Number(values.longitude),
+                };
+
+                if (!newStation.id) newStation.id = Date.now();
+                setStations((prev) => [newStation, ...prev]);
                 messageApi.success("Thêm trạm sạc mới thành công!");
             }
 
             setIsModalOpen(false);
-            fetchStations();
         } catch (error) {
             console.error("Lỗi khi lưu trạm:", error.response?.data || error);
             messageApi.error("Lưu dữ liệu thất bại!");
         }
     };
 
-    // Mở modal gắn nhân viên
+    // Mở modal gán nhân viên
     const openAssignModal = () => {
         assignForm.resetFields();
         setIsAssignModalOpen(true);
     };
 
-    // Submit form gắn nhân viên
+    // Submit gán nhân viên
     const handleAssignSubmit = async (values) => {
         try {
-            const userId = values.employeeId;
-            const stationId = values.stationId;
-
-            await api.put(`/admin/users/${userId}/assign-station/${stationId}`);
-
+            await api.put(`/admin/users/${values.employeeId}/assign-station/${values.stationId}`);
             messageApi.success("Gắn nhân viên thành công!");
             setIsAssignModalOpen(false);
         } catch (error) {
@@ -181,7 +180,6 @@ const ChargingStations = () => {
 
     return (
         <div className="stations-page">
-            {/* Context holder cho message */}
             {messageContextHolder}
             {contextHolder}
 
@@ -197,7 +195,6 @@ const ChargingStations = () => {
                 </div>
             </div>
 
-
             <input
                 className="search-inputt"
                 type="text"
@@ -207,12 +204,11 @@ const ChargingStations = () => {
             />
 
             <div className="stations-list">
-                {stations.map((s, i) => {
+                {filteredStations.map((s, i) => {
                     const ready = s.pointChargerAvailable || 0;
                     const total = s.pointChargerTotal || 0;
                     const maintenance = s.pointChargerOutOfService || 0;
                     const using = total - ready - maintenance;
-
                     const status = s.status === "ACTIVE" ? "Hoạt động" : "Bảo trì";
                     const color = s.status === "ACTIVE" ? "green" : "red";
 
@@ -224,13 +220,11 @@ const ChargingStations = () => {
                                         <h4>{s.name}</h4>
                                         <span className={`status-text ${color}`}>{status}</span>
                                     </div>
-
                                     <div className="station-actions">
                                         <button onClick={() => navigate(`/admin/station/${s.id}`)}>
                                             👁 Xem
                                         </button>
                                         <button onClick={() => openModal(s)}>✏️ Sửa</button>
-                                        {/* <button onClick={() => handleDelete(s.id)}>🗑 Xóa</button> */}
                                     </div>
                                 </div>
 
@@ -264,7 +258,7 @@ const ChargingStations = () => {
                 })}
             </div>
 
-            {/* Modal thêm/sửa */}
+            {/* Modal Thêm/Sửa */}
             <Modal
                 title={isEditMode ? "Cập nhật trạm sạc" : "Thêm trạm sạc mới"}
                 open={isModalOpen}
@@ -299,9 +293,10 @@ const ChargingStations = () => {
                         rules={[
                             { required: true, message: "Vui lòng nhập số điện thoại" },
                             {
-                                pattern: /^[0-9]+$/,
-                                message: "Số điện thoại chỉ được nhập số",
-                            },
+                                pattern: /^\d{10}$/,
+                                message: "Số điện thoại phải đúng 10 chữ số",
+                            }
+
                         ]}
                     >
                         <Input placeholder="Nhập số điện thoại..." />
@@ -312,14 +307,64 @@ const ChargingStations = () => {
                         label="Email"
                         rules={[
                             { required: true, message: "Vui lòng nhập email" },
-                            {
-                                type: "email",
-                                message: "Email không hợp lệ",
-                            },
+                            { type: "email", message: "Email không hợp lệ" },
                         ]}
                     >
                         <Input placeholder="Nhập email..." />
                     </Form.Item>
+
+                    <Form.Item
+                        name="latitude"
+                        label="Vĩ độ (Latitude)"
+                        rules={[
+                            {
+                                validator(_, value) {
+                                    if (value === "" || value === undefined || value === null)
+                                        return Promise.reject("Vĩ độ không được để trống");
+                                    const num = Number(value);
+                                    if (isNaN(num)) return Promise.reject("Vĩ độ phải là số");
+                                    if (num < -90 || num > 90)
+                                        return Promise.reject("Vĩ độ phải từ -90 đến 90");
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                    >
+                        <Input
+                            type="number"
+                            step="0.000001"
+                            min={-90}
+                            max={90}
+                            placeholder="VD: 10.123456"
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="longitude"
+                        label="Kinh độ (Longitude)"
+                        rules={[
+                            {
+                                validator(_, value) {
+                                    if (value === "" || value === undefined || value === null)
+                                        return Promise.reject("Kinh độ không được để trống");
+                                    const num = Number(value);
+                                    if (isNaN(num)) return Promise.reject("Kinh độ phải là số");
+                                    if (num < -180 || num > 180)
+                                        return Promise.reject("Kinh độ phải từ -180 đến 180");
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                    >
+                        <Input
+                            type="number"
+                            step="0.000001"
+                            min={-180}
+                            max={180}
+                            placeholder="VD: 106.123456"
+                        />
+                    </Form.Item>
+
 
                     <Form.Item
                         name="status"
@@ -347,11 +392,7 @@ const ChargingStations = () => {
                 onCancel={() => setIsAssignModalOpen(false)}
                 footer={null}
             >
-                <Form
-                    form={assignForm}
-                    layout="vertical"
-                    onFinish={handleAssignSubmit}
-                >
+                <Form form={assignForm} layout="vertical" onFinish={handleAssignSubmit}>
                     <Form.Item
                         name="employeeId"
                         label="Chọn nhân viên"
@@ -362,7 +403,7 @@ const ChargingStations = () => {
                             showSearch
                             optionFilterProp="children"
                             filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                option.children.toLowerCase().includes(input.toLowerCase())
                             }
                         >
                             {employees.map((emp) => (
@@ -383,7 +424,7 @@ const ChargingStations = () => {
                             showSearch
                             optionFilterProp="children"
                             filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                option.children.toLowerCase().includes(input.toLowerCase())
                             }
                         >
                             {stations.map((station) => (

@@ -23,14 +23,14 @@ public class Station {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty (message = "Name cannot be empty!")
+    @NotEmpty (message = "Tên trạm không được để trống!")
     @Column(unique = true,columnDefinition = "Nvarchar(100)")
     private String name;
-    @NotEmpty(message = "Address cannot be empty!")
+    @NotEmpty(message = "Địa chỉ không được để trống!")
     @Column(columnDefinition = "Nvarchar(200)")
     private String address;
     @NotEmpty
-    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Phone is invalid!")
+    @Pattern(regexp = "^(0(3\\d|5\\d|7\\d|8\\d|9\\d)\\d{7})$", message = "Số điện thoại không hợp lệ!")
     @Column(unique = true)
     private String phone;
     @Email

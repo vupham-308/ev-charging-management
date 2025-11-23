@@ -6,27 +6,47 @@ import { message, Spin, Modal } from "antd";
 
 const Users = () => {
     const [users, setUsers] = useState([]);
-    const [allUsers, setAllUsers] = useState([]);  // Lưu danh sách gốc để search FE
+    const [allUsers, setAllUsers] = useState([]);
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
-    // Modal thêm/sửa
+    // Modal create/edit
     const [showModal, setShowModal] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [editUser, setEditUser] = useState(null);
 
-    // Modal xác nhận xóa
+    // Modal confirm delete
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState(null);
 
-    // 🟢 Lấy danh sách người dùng
+    // Input values & errors for realtime validation
+    const [formValues, setFormValues] = useState({
+        fullName: "",
+        email: "",
+        phone: "",
+        role: "",
+        password: "",
+    });
+    const [formErrors, setFormErrors] = useState({});
+
+    // Regex validate
+    const nameRegex = /^[A-Za-zÀ-ỹ\s]{3,50}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^0\d{9}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+    // Fetch users & stats
     const fetchUsers = async () => {
         setLoading(true);
         try {
             const res = await api.get("admin/users");
-            setUsers(res.data);
-            setAllUsers(res.data);  // Lưu bản gốc để tìm kiếm
+
+            // Sắp xếp theo newest first (id lớn nhất lên đầu)
+            const sorted = res.data.sort((a, b) => b.id - a.id);
+
+            setUsers(sorted);
+            setAllUsers(sorted);
         } catch (error) {
             console.error("❌ Lỗi tải danh sách người dùng:", error);
             message.error("Không thể tải danh sách người dùng!");
@@ -35,7 +55,6 @@ const Users = () => {
         }
     };
 
-    // 🧮 Lấy thống kê
     const fetchStats = async () => {
         try {
             const res = await api.get("admin/users/user-stats");
@@ -50,31 +69,28 @@ const Users = () => {
         fetchStats();
     }, []);
 
-    // 🔍 Tìm kiếm FE (không gọi API)
+    // Search FE
     const handleSearch = (keyword) => {
         setSearch(keyword);
-
         if (!keyword.trim()) {
-            setUsers(allUsers); // reset về danh sách gốc
+            setUsers(allUsers);
             return;
         }
-
-        const filtered = allUsers.filter((u) =>
-            u.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
-            u.email.toLowerCase().includes(keyword.toLowerCase()) ||
-            u.phone?.toLowerCase().includes(keyword.toLowerCase())
+        const filtered = allUsers.filter(
+            (u) =>
+                u.fullName.toLowerCase().includes(keyword.toLowerCase()) ||
+                u.email.toLowerCase().includes(keyword.toLowerCase()) ||
+                u.phone?.toLowerCase().includes(keyword.toLowerCase())
         );
-
         setUsers(filtered);
     };
 
-    // 🗑 Nhấn nút xóa
+    // Delete user
     const handleDeleteClick = (id) => {
         setSelectedUserId(id);
         setShowConfirm(true);
     };
 
-    // ✅ Thực hiện xóa người dùng
     const confirmDelete = async () => {
         setLoading(true);
         try {
@@ -88,7 +104,8 @@ const Users = () => {
             }
         } catch (error) {
             console.error("❌ Lỗi khi xóa người dùng:", error.response || error);
-            const errMsg = error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng!";
+            const errMsg =
+                error.response?.data?.message || "Có lỗi xảy ra khi xóa người dùng!";
             message.error(errMsg);
         } finally {
             setShowConfirm(false);
@@ -97,11 +114,159 @@ const Users = () => {
         }
     };
 
-    // ✏️ Nhấn nút Sửa
+    // Edit click
     const handleEditClick = (user) => {
         setEditUser(user);
         setIsEdit(true);
+        setFormValues({
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone || "",
+            role: user.role,
+            password: "",
+        });
+        setFormErrors({});
         setShowModal(true);
+    };
+
+    // Realtime validate single field
+    const validateField = (name, value) => {
+        let error = "";
+        switch (name) {
+            case "fullName":
+                if (!value.trim()) error = "Họ tên không được để trống";
+                else if (!nameRegex.test(value))
+                    error =
+                        "Họ tên chỉ bao gồm chữ và khoảng trắng (3-50 ký tự)";
+                break;
+            case "email":
+                if (!value.trim()) error = "Email không được để trống";
+                else if (!emailRegex.test(value)) error = "Email không hợp lệ";
+                break;
+            case "phone":
+                if (value && !phoneRegex.test(value))
+                    error = "SĐT phải gồm 10 số và bắt đầu bằng 0";
+                break;
+            case "role":
+                if (!value) error = "Vui lòng chọn vai trò";
+                break;
+            case "password":
+                if (!isEdit) {
+                    if (!value) error = "Mật khẩu không được để trống";
+                    else if (!passwordRegex.test(value))
+                        error =
+                            "Mật khẩu tối thiểu 6 ký tự, phải có ít nhất 1 chữ và 1 số";
+                }
+                break;
+            default:
+                break;
+        }
+        setFormErrors((prev) => ({ ...prev, [name]: error }));
+    };
+
+    // Handle input change
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        // Chặn ký tự không hợp lệ
+        let cleanValue = value;
+        if (name === "phone") cleanValue = value.replace(/\D/g, "").slice(0, 10);
+        if (name === "fullName") cleanValue = value.replace(/[^A-Za-zÀ-ỹ\s]/g, "");
+        if (name === "email") cleanValue = value.replace(/\s/g, "");
+
+        setFormValues((prev) => ({ ...prev, [name]: cleanValue }));
+        validateField(name, cleanValue);
+    };
+
+    // Validate all fields synchronously before submit
+    const validateAll = () => {
+        const errors = {};
+
+        if (!formValues.fullName.trim()) errors.fullName = "Họ tên không được để trống";
+        else if (!nameRegex.test(formValues.fullName)) errors.fullName = "Họ tên chỉ bao gồm chữ và khoảng trắng (3-50 ký tự)";
+
+        if (!formValues.email.trim()) errors.email = "Email không được để trống";
+        else if (!emailRegex.test(formValues.email)) errors.email = "Email không hợp lệ";
+
+        if (formValues.phone && !phoneRegex.test(formValues.phone)) errors.phone = "SĐT phải gồm 10 số và bắt đầu bằng 0";
+
+        if (!formValues.role) errors.role = "Vui lòng chọn vai trò";
+
+        if (!isEdit) {
+            if (!formValues.password) errors.password = "Mật khẩu không được để trống";
+            else if (!passwordRegex.test(formValues.password)) errors.password = "Mật khẩu tối thiểu 6 ký tự, phải có ít nhất 1 chữ và 1 số";
+        }
+
+        setFormErrors(errors);
+
+        return Object.keys(errors).length === 0;
+    };
+
+    // Handle submit
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateAll()) {
+            message.warning("Vui lòng sửa các lỗi trước khi gửi");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            if (isEdit && editUser) {
+                const updateData = {
+                    fullName: formValues.fullName,
+                    email: formValues.email,
+                    phone: formValues.phone,
+                    role: formValues.role,
+                    active: true,
+                };
+                const res = await api.put(
+                    `admin/users/admin-update-user/${editUser.id}`,
+                    updateData
+                );
+                message.success("Cập nhật người dùng thành công!");
+                setUsers((prev) =>
+                    prev.map((u) => (u.id === editUser.id ? { ...u, ...updateData } : u))
+                );
+                setAllUsers((prev) =>
+                    prev.map((u) => (u.id === editUser.id ? { ...u, ...updateData } : u))
+                );
+            } else {
+                const res = await api.post("admin/users/create-user", formValues);
+                const newUser = {
+                    id: res.data?.id || Date.now(),
+                    fullName: formValues.fullName,
+                    email: formValues.email,
+                    phone: formValues.phone,
+                    role: formValues.role,
+                    active: true,
+                };
+                message.success("Tạo người dùng thành công!");
+                setUsers((prev) => [newUser, ...prev]);
+                setAllUsers((prev) => [newUser, ...prev]);
+            }
+
+            setShowModal(false);
+            setIsEdit(false);
+            setEditUser(null);
+            setFormValues({
+                fullName: "",
+                email: "",
+                phone: "",
+                role: "",
+                password: "",
+            });
+            setFormErrors({});
+            await fetchStats();
+        } catch (error) {
+            console.error("❌ Lỗi khi tạo/cập nhật người dùng:", error);
+            const errMsg =
+                error.response?.data?.message || "Lỗi khi tạo/cập nhật người dùng!";
+            message.error(errMsg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (loading) {
@@ -115,13 +280,17 @@ const Users = () => {
     return (
         <div className="users-admin-page">
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            >
                 <h1>Quản Lý Người Dùng</h1>
                 <button
                     className="btn-primary"
                     onClick={() => {
                         setIsEdit(false);
                         setEditUser(null);
+                        setFormValues({ fullName: "", email: "", phone: "", role: "", password: "" });
+                        setFormErrors({});
                         setShowModal(true);
                     }}
                 >
@@ -131,7 +300,7 @@ const Users = () => {
 
             <br />
 
-            {/* Ô tìm kiếm */}
+            {/* Search */}
             <input
                 type="text"
                 className="search-inputt"
@@ -140,7 +309,7 @@ const Users = () => {
                 onChange={(e) => handleSearch(e.target.value)}
             />
 
-            {/* Danh sách người dùng */}
+            {/* User list */}
             <div className="users-list">
                 {users.length === 0 ? (
                     <div className="no-users">Không có người dùng nào.</div>
@@ -182,7 +351,7 @@ const Users = () => {
                 )}
             </div>
 
-            {/* Modal thêm/sửa người dùng */}
+            {/* Modal create/edit */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal">
@@ -195,88 +364,18 @@ const Users = () => {
                                 <i className="fa-solid fa-xmark"></i>
                             </button>
                         </div>
-                        <p className="modal-desc">
-                            {isEdit
-                                ? "Cập nhật thông tin người dùng"
-                                : "Tạo tài khoản cho nhân viên hoặc tài xế mới"}
-                        </p>
-
-                        <form
-                            className="modal-form"
-                            onSubmit={async (e) => {
-                                e.preventDefault();
-                                const form = e.target;
-                                const userData = {
-                                    fullName: form.fullName.value.trim(),
-                                    email: form.email.value.trim(),
-                                    phone: form.phone.value.trim(),
-                                    role: form.role.value,
-                                    password: form.password?.value,
-                                    active: true,
-                                };
-
-                                if (!userData.fullName || !userData.email || !userData.role) {
-                                    message.warning("Vui lòng nhập đầy đủ thông tin bắt buộc!");
-                                    return;
-                                }
-
-                                try {
-                                    setLoading(true);
-                                    let res;
-
-                                    if (isEdit && editUser) {
-                                        const updateData = {
-                                            fullName: userData.fullName,
-                                            email: userData.email,
-                                            phone: userData.phone,
-                                            role: userData.role,
-                                            active: true,
-                                        };
-
-                                        res = await api.put(
-                                            `admin/users/admin-update-user/${editUser.id}`,
-                                            updateData
-                                        );
-                                    } else {
-                                        res = await api.post("admin/users/create-user", userData);
-                                    }
-
-                                    if (res.status === 200 || res.status === 201) {
-                                        message.success(
-                                            isEdit
-                                                ? "Cập nhật người dùng thành công!"
-                                                : "Tạo người dùng thành công!"
-                                        );
-
-                                        form.reset();
-                                        setShowModal(false);
-                                        setEditUser(null);
-                                        setIsEdit(false);
-                                        await fetchUsers();
-                                        await fetchStats();
-                                    } else {
-                                        message.error("Thao tác thất bại!");
-                                    }
-                                } catch (error) {
-                                    console.error("❌ Lỗi khi tạo/cập nhật người dùng:", error);
-                                    const errMsg =
-                                        error.response?.data?.message ||
-                                        "Lỗi khi tạo/cập nhật người dùng!";
-                                    message.error(errMsg);
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }}
-                        >
+                        <form className="modal-form" onSubmit={handleSubmit}>
                             <label>
                                 Họ và tên <span>*</span>
                             </label>
                             <input
                                 type="text"
                                 name="fullName"
-                                defaultValue={editUser?.fullName || ""}
-                                placeholder="Nguyễn Văn A"
+                                value={formValues.fullName}
+                                onChange={handleChange}
+                                className={formErrors.fullName ? "error" : ""}
                             />
+                            {formErrors.fullName && <div className="error-text">{formErrors.fullName}</div>}
 
                             <label>
                                 Email <span>*</span>
@@ -284,37 +383,52 @@ const Users = () => {
                             <input
                                 type="email"
                                 name="email"
-                                defaultValue={editUser?.email || ""}
-                                placeholder="email@example.com"
+                                value={formValues.email}
+                                onChange={handleChange}
+                                className={formErrors.email ? "error" : ""}
                             />
+                            {formErrors.email && <div className="error-text">{formErrors.email}</div>}
 
                             <label>Số điện thoại</label>
                             <input
                                 type="tel"
                                 name="phone"
-                                defaultValue={editUser?.phone || ""}
-                                placeholder="+84-123-456789"
+                                value={formValues.phone}
+                                onChange={handleChange}
+                                className={formErrors.phone ? "error" : ""}
                             />
+                            {formErrors.phone && <div className="error-text">{formErrors.phone}</div>}
 
                             <label>
                                 Vai trò <span>*</span>
                             </label>
-                            <select name="role" defaultValue={editUser?.role || ""}>
-                                <option value="" disabled>
-                                    Chọn vai trò
-                                </option>
+                            <select
+                                name="role"
+                                value={formValues.role}
+                                onChange={handleChange}
+                                className={formErrors.role ? "error" : ""}
+                            >
+                                <option value="">Chọn vai trò</option>
                                 <option value="USER">Tài xế</option>
                                 <option value="STAFF">Quản lý</option>
                             </select>
+                            {formErrors.role && <div className="error-text">{formErrors.role}</div>}
 
                             {!isEdit && (
                                 <>
                                     <label>
                                         Mật khẩu <span>*</span>
                                     </label>
-                                    <div className="password-field">
-                                        <input type="password" name="password" placeholder="Nhập mật khẩu" />
-                                    </div>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formValues.password}
+                                        onChange={handleChange}
+                                        className={formErrors.password ? "error" : ""}
+                                    />
+                                    {formErrors.password && (
+                                        <div className="error-text">{formErrors.password}</div>
+                                    )}
                                 </>
                             )}
 
@@ -335,7 +449,7 @@ const Users = () => {
                 </div>
             )}
 
-            {/* 🔥 Modal xác nhận xóa */}
+            {/* Confirm delete */}
             <Modal
                 open={showConfirm}
                 title="Xác nhận xóa người dùng"
