@@ -17,7 +17,7 @@ public class ChargerPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty (message = "Name cannot be empty!")
+    @NotEmpty (message = "Tên trụ sạc không được để trống!")
     @Column(columnDefinition = "NVARCHAR(30)")
     private String name;
     @NotEmpty
