@@ -7,6 +7,6 @@ public class CarResponse {
     private Integer id;
     private String brand;
     private String color;
-    private Integer initBattery;
+    private double initBattery;
     private String licensePlate;
 }

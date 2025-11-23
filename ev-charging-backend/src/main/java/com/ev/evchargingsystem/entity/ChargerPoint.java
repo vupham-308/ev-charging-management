@@ -22,6 +22,8 @@ public class ChargerPoint {
     private String name;
     @NotEmpty
     private String status;
+    @Column(nullable = true)
+    private Double powerRealTime;//công suất thực tế của trụ khi đang sạc
 
     @ManyToOne
     @JoinColumn(name="station_id", referencedColumnName = "id", nullable=false)

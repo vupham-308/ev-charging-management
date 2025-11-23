@@ -27,7 +27,7 @@ public class Car {
     private String color;
 
     @NotNull
-    private int initBattery;
+    private double initBattery;//kWh
 
     @Column(unique = true)
     @NotNull(message = "licensePlate cannot be empty!")

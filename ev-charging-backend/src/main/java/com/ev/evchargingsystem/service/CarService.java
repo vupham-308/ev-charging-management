@@ -70,8 +70,8 @@ public class CarService {
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());
 
-        // Random pin từ 1 đến 100
-        int randomBattery = new Random().nextInt(100) + 1;
+        // Random pin
+        double randomBattery = Math.round(new Random().nextDouble(car.getCarBranch().getBatteryCapacity()) * 1000.0) / 1000.0;
         car.setInitBattery(randomBattery);
 
         car.setUser(currentUser);
