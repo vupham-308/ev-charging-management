@@ -50,7 +50,7 @@ public class CarService {
         res.setId(car.getId());
         res.setBrand(car.getCarBranch().getBrand());
         res.setColor(car.getColor());
-        res.setInitBattery(car.getInitBattery());
+        res.setInitBattery(convertBatteryToPercent(car));
         res.setLicensePlate(car.getLicensePlate());
         return res;
     }
@@ -66,6 +66,9 @@ public class CarService {
             if (req.getBrand().equalsIgnoreCase(branch.getBrand())){
                 car.setCarBranch(branch);
             }
+        }
+        if(car.getCarBranch()==null){
+            throw new RuntimeException("Loại xe không hợp lệ!");
         }
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());
@@ -137,6 +140,10 @@ public class CarService {
 
         car.setActive(false);
         carRepository.save(car);
+
+    }
+    public int convertBatteryToPercent(Car car){
+        return (int) Math.round(car.getInitBattery()/car.getCarBranch().getBatteryCapacity()*100);
 
     }
 }

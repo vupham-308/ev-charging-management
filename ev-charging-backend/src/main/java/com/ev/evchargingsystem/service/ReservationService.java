@@ -102,14 +102,13 @@ public class ReservationService {
         return "Reservation successful";
     }
 
-    //tự động load, trước 10p trước giờ hẹn sẽ set trạng thái trụ về Reserved
     @Scheduled(fixedRate = 10000)//chạy mỗi 10s
     public void setStatusRever(){
         List<Reservation> reservations = reservationRepository.findByStatus("PENDING");
         Date current = new Date(System.currentTimeMillis());
         for(Reservation r: reservations){//đúng giờ tự lock trụ
             if(current.after(r.getStartDate())&&r.getEndDate().after(current)) {
-                //TH1: trụ trống hoàn toàn, có thể lock trụ trước 10p
+                //TH1: trụ trống hoàn toàn, có thể lock trụ
                 if(r.getChargerPoint().getStatus().equals("AVAILABLE")) {//nếu available
                     //mới có thể lock trụ, nếu có người đang sạc thì không thể
                     r.getChargerPoint().setStatus("RESERVED");
@@ -165,42 +164,6 @@ public class ReservationService {
         return result;
     }
 
-
-//
-//    public List<ReservationResponse> getLockedReservations(int pointId, LocalDate date) {
-//        List<Reservation> reservations = reservationRepository.findByChargerPointIdAndStatus(pointId,"PENDING");
-//        List<ReservationResponse> result = new ArrayList<>();
-//        for (Reservation r : reservations) {
-//            // Kiểm tra ngày của reservation có trùng với ngày yêu cầu không
-//            LocalDate reservationDate = new java.sql.Date(r.getStartDate().getTime()).toLocalDate();
-//            if (reservationDate.equals(date)) {
-//                ReservationResponse dto = new ReservationResponse();
-//                dto.setId(r.getId());
-//                dto.setStatus(r.getStatus());
-//                dto.setStartDate(r.getStartDate());
-//                dto.setEndDate(r.getEndDate());
-//
-//            // Lấy tên trụ và trạm
-//            if (r.getChargerPoint() != null) {
-//                dto.setChargerpointId(r.getChargerPoint().getId());
-//                dto.setChargerPointName(r.getChargerPoint().getName());
-//                if (r.getChargerPoint().getStation() != null) {
-//                    dto.setStationName(r.getChargerPoint().getStation().getName());
-//                }
-//            }
-//            result.add(dto);
-//                // Lấy tên trụ và trạm
-//                if (r.getChargerPoint() != null) {
-//                    dto.setChargerPointName(r.getChargerPoint().getName());
-//                    if (r.getChargerPoint().getStation() != null) {
-//                        dto.setStationName(r.getChargerPoint().getStation().getName());
-//                    }
-//                }
-//                result.add(dto);
-//            }
-//        }
-//        return result;
-//    }
 
     public void cancelReservation(int reservationId) {
         User currentUser = getCurrentUser();
