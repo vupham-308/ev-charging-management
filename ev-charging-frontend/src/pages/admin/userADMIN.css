@@ -437,3 +437,15 @@ select.error {
     font-size: 12px;
     margin-top: 2px;
 }
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper i {
+    position: absolute;
+    right: 10px;
+    color: #555;
+}
