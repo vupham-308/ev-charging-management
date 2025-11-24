@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.aspectj.bridge.IMessage;
 import org.hibernate.annotations.Check;
 
 @Entity
@@ -21,13 +22,14 @@ public class CarBranch {
         private int id;
 
         @Column(nullable = false, length = 20)
+        @NotNull(message = "Không được để trống tên hãng xe")
         private String brand;
 
-        @NotNull
+        @NotNull(message = "Không được để trống dung lượng pin")
         private double batteryCapacity;//kwh
 
     @Column(name="port_type")
-    @NotEmpty
+    @NotEmpty(message = "Không được để trống loại cổng sạc")
     private String portType;
 
     @Column(nullable = false)

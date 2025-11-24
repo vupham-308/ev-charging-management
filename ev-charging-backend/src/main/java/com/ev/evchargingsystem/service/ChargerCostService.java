@@ -14,22 +14,35 @@ public class ChargerCostService {
     @Autowired
     ChargerCostRepository chargerCostRepository;
 
-    //ADMIN: chức năng chỉnh sửa giá dựa vào loại cổng sạc
-    public boolean editCost(double newCost, int chargerCostId){
-        ChargerCost c = chargerCostRepository.findById(chargerCostId).orElse(null);
-        if(c==null) throw new RuntimeException("Không tìm thấy thông tin");
-        c.setCost(newCost);
-        chargerCostRepository.save(c);
-        return true;
-    }
-
-    public List<ChargerCost> get() {
+    public List<ChargerCost> getAll() {
         return chargerCostRepository.findAll();
     }
 
+    public ChargerCost getById(int id) {
+        return chargerCostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy, vui lòng kiểm tra lại id"));
+    }
 
-    public ChargerCost create(ChargerCostRequest chargerCost) {
-        return chargerCostRepository.save(new ChargerCost
-                (chargerCost.getPortType(),chargerCost.getCapacity(),chargerCost.getCost()));
+    public ChargerCost create(ChargerCostRequest request) {
+        ChargerCost chargerCost = new ChargerCost();
+        chargerCost.setPortType(request.getPortType());
+        chargerCost.setPower(request.getCapacity());
+        chargerCost.setCost(request.getCost());
+        return chargerCostRepository.save(chargerCost);
+    }
+
+    public ChargerCost update(int id, ChargerCostRequest request) {
+        ChargerCost existing = getById(id);
+        existing.setPortType(request.getPortType());
+        existing.setPower(request.getCapacity());
+        existing.setCost(request.getCost());
+        return chargerCostRepository.save(existing);
+    }
+
+    public void delete(int id) {
+        if (!chargerCostRepository.existsById(id)) {
+            throw new RuntimeException("Không tìm thấy giá sạc với id: " + id);
+        }
+        chargerCostRepository.deleteById(id);
     }
 }
