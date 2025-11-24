@@ -38,6 +38,9 @@ import ForgotPassword from "./pages/login/ForgotPassword";
 import PaymentReturn from "./pages/paymentReturn";
 import ResetPassword from "./pages/login/ResetPassword";
 import ManageTermsOfUse from "./pages/termsOfUse";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthPageWrapper from "./components/AuthPageWrapper"; // THÊM IMPORT NÀY
+
 // 1. Component
 // là 1 cái function
 // trả về 1 cái giao diện
@@ -72,29 +75,55 @@ function AppContent() {
     },
     {
       path: "/login",
-      element: <LoginPage />,
+      element: (
+        <AuthPageWrapper> {/* BỌC AUTH PAGE WRAPPER */}
+          <LoginPage />
+        </AuthPageWrapper>
+      ),
     },
     {
       path: "/forgot-password",
-      element: <ForgotPassword />,
+      element: (
+        <AuthPageWrapper> {/* BỌC AUTH PAGE WRAPPER */}
+          <ForgotPassword />
+        </AuthPageWrapper>
+      ),
     },
     {
       path: "/reset-password",
-      element: <ResetPassword />,
+      element: (
+        <AuthPageWrapper> {/* BỌC AUTH PAGE WRAPPER */}
+          <ResetPassword />
+        </AuthPageWrapper>
+      ),
     },
     {
       path: "/register",
-      element: <RegisterPage />,
+      element: (
+        <AuthPageWrapper> {/* BỌC AUTH PAGE WRAPPER */}
+          <RegisterPage />
+        </AuthPageWrapper>
+      ),
     },
-    { path: "/staff", element: <StaffDashboard /> },
-
+    {
+      path: "/staff",
+      element: (
+        <ProtectedRoute requiredRole="STAFF">
+          <StaffDashboard />
+        </ProtectedRoute>
+      ),
+    },
     {
       path: "termsOfUse",
       element: <ManageTermsOfUse />,
     },
     {
       path: "/driver",
-      element: <DriverDashboard />,
+      element: (
+        <ProtectedRoute requiredRole="USER">
+          <DriverDashboard />
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: "map",
@@ -136,7 +165,6 @@ function AppContent() {
           path: "chargingSession/stationReport/:stationId",
           element: <ManageStationReport />,
         },
-
         {
           path: "incidentReport",
           element: <ManageIncidentReport />,
@@ -177,13 +205,17 @@ function AppContent() {
       path: "payment-return",
       element: <PaymentReturn />,
     },
-    //  Route dành cho Admin có layout dùng Outlet
+    // Route dành cho Admin có layout dùng Outlet
     {
       path: "/admin",
-      element: <AdminDashboard />,
+      element: (
+        <ProtectedRoute requiredRole="ADMIN">
+          <AdminDashboard />
+        </ProtectedRoute>
+      ),
       children: [
         {
-          index: true, // khi vào /admin sẽ mặc định hiện DashboardAdmin
+          index: true, 
           element: <DashboardAdmin />,
         },
         {

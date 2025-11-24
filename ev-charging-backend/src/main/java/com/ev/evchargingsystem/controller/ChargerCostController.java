@@ -7,45 +7,42 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/charger-cost")
 public class ChargerCostController {
 
     @Autowired
     ChargerCostService chargerCostService;
 
-    //ADMIN: chức năng sửa giá sạc phụ thuộc vào cổng sạc
-    @Operation(
-            summary = "ADMIN: thay đổi giá trạm sạc phụ thuộc vào cổng sạc"
-    )
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("edit-cost/{chargerCostId}")
-    public ResponseEntity editChargerPointCost(float newCost, @PathVariable("chargerCostId") int chargerCostId) {
-        try {
-            if (chargerCostService.editCost(newCost, chargerCostId)) {
-                return ResponseEntity.ok("Đã thay đổi giá!");
-            }
-            return ResponseEntity.badRequest().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    @GetMapping
+    public ResponseEntity<List<ChargerCost>> getAll() {
+        return ResponseEntity.ok(chargerCostService.getAll());
     }
 
-
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("get")
-    public ResponseEntity getCost() {
-        return ResponseEntity.ok(chargerCostService.get());
+    @GetMapping("/{id}")
+    public ResponseEntity<ChargerCost> getById(@PathVariable int id) {
+        return ResponseEntity.ok(chargerCostService.getById(id));
     }
 
+    @PostMapping
+    public ResponseEntity<ChargerCost> create(@RequestBody @Valid ChargerCostRequest request) {
+        return ResponseEntity.ok(chargerCostService.create(request));
+    }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create")
-    public ResponseEntity create(ChargerCostRequest chargerCost) {
-        return ResponseEntity.ok(chargerCostService.create(chargerCost));
+    @PutMapping("/{id}")
+    public ResponseEntity<ChargerCost> update(@PathVariable int id, @RequestBody @Valid ChargerCostRequest request) {
+        return ResponseEntity.ok(chargerCostService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        chargerCostService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }
 
