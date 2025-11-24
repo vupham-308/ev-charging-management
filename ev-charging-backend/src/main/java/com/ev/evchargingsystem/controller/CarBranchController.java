@@ -5,6 +5,7 @@ import com.ev.evchargingsystem.service.CarBranchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -28,13 +29,13 @@ public class CarBranchController {
 
     @PostMapping("/admin/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<CarBranch> create(@RequestBody CarBranch carBranch){
+    public ResponseEntity<CarBranch> create(@RequestBody @Valid CarBranch carBranch){
         return ResponseEntity.ok(carBranchService.addNewCarBranch(carBranch));
     }
 
     @PutMapping("/admin/edit/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<CarBranch> update(@PathVariable("id") int id, @RequestBody CarBranch carBranch){
+    public ResponseEntity<CarBranch> update(@PathVariable("id") int id, @RequestBody @Valid CarBranch carBranch){
         return ResponseEntity.ok(carBranchService.updateCarBranch(id, carBranch));
     }
 

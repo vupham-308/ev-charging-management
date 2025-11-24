@@ -28,11 +28,14 @@ public class CarBranchService {
     }
 
     public CarBranch updateCarBranch(int id, CarBranch carBranchDetails) {
-        if (carBranchRepository.existsById(id)) {
-            carBranchDetails.setId(id);
-            return carBranchRepository.save(carBranchDetails);
-        }
-        throw new RuntimeException("Không tìm thấy hãng xe với id: " + id);
+        CarBranch existingCarBranch = carBranchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hãng xe với id: " + id));
+
+        existingCarBranch.setBrand(carBranchDetails.getBrand());
+        existingCarBranch.setBatteryCapacity(carBranchDetails.getBatteryCapacity());
+        existingCarBranch.setPortType(carBranchDetails.getPortType());
+
+        return carBranchRepository.save(existingCarBranch);
     }
 
     public void deleteCarBranch(int id) {
