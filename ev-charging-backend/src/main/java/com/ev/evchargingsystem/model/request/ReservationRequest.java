@@ -10,6 +10,7 @@ import java.util.Date;
 @Setter
 public class ReservationRequest {
     private int chargerPointId;
+    private int carId;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;

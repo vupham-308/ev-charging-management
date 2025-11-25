@@ -9,6 +9,8 @@ import com.ev.evchargingsystem.model.response.ReservationResponse;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
 import com.ev.evchargingsystem.repository.ReservationRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
+import com.ev.evchargingsystem.repository.CarRepository;
+import com.ev.evchargingsystem.entity.Car;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,8 @@ public class ReservationService {
     private ChargerPointRepository chargerPointRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private CarRepository carRepository;
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -89,10 +93,19 @@ public class ReservationService {
             }
         }
 
+        //thông tin xe và validate
+        Car car = carRepository.findById(request.getCarId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy xe với ID: " + request.getCarId()));
+
+        if (car.getUser().getId() != user.getId()) {
+            throw new RuntimeException("Xe không thuộc về bạn");
+        }
+
         //Tạo reservation
         Reservation reservation = new Reservation();
         reservation.setUser(user);
         reservation.setChargerPoint(cp);
+        reservation.setCar(car);
         reservation.setStartDate(start);
         reservation.setEndDate(end);
         reservation.setStatus("PENDING");
@@ -159,6 +172,11 @@ public class ReservationService {
                     dto.setStationId(r.getChargerPoint().getStation().getId());
                 }
             }
+            // Lấy thông tin xe
+            if (r.getCar() != null) {
+                dto.setBrand(r.getCar().getCarBranch().getBrand());
+                dto.setLicensePlate(r.getCar().getLicensePlate());
+            }
             result.add(dto);
         }
         return result;
@@ -206,6 +224,11 @@ public class ReservationService {
                     dto.setStationName(r.getChargerPoint().getStation().getName());
                     dto.setStationId(r.getChargerPoint().getStation().getId());
                 }
+            }
+            // Lấy thông tin xe
+            if (r.getCar() != null) {
+                dto.setBrand(r.getCar().getCarBranch().getBrand());
+                dto.setLicensePlate(r.getCar().getLicensePlate());
             }
             result.add(dto);
         }

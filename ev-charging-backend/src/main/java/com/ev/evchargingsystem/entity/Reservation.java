@@ -34,4 +34,8 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "charger_point_id")
     private ChargerPoint chargerPoint;
+
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Car car;
 }
