@@ -38,7 +38,7 @@ const Users = () => {
     const nameRegex = /^[A-Za-zÀ-ỹ\s]{3,50}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
-const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
     // Load users
     const fetchUsers = async () => {
@@ -59,7 +59,7 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
         try {
             const res = await api.get("admin/users/user-stats");
             setStats(res.data);
-        } catch {}
+        } catch { }
     };
 
     useEffect(() => {
@@ -132,15 +132,19 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
                 if (!emailRegex.test(value)) error = "Email không hợp lệ";
                 break;
             case "phone":
-                if (value && !phoneRegex.test(value))
+                if (!value.trim()) {
+                    error = "SĐT không được để trống";
+                } else if (!phoneRegex.test(value)) {
                     error = "SĐT phải bắt đầu bằng 03, 05, 07, 08, 09 và gồm 10 số";
+                }
                 break;
+
             case "role":
                 if (!value) error = "Vui lòng chọn vai trò";
                 break;
             case "password":
                 if (!isEdit && !passwordRegex.test(value))
-                    error = "Mật khẩu tối thiểu 6 ký tự, gồm chữ & số";
+                    error = "Mật khẩu phải có ít nhất 8 ký tự!<br/>Mật khẩu phải gồm chữ hoa, chữ thường, số và ký tự đặc biệt!";
                 break;
         }
         setFormErrors((p) => ({ ...p, [name]: error }));
@@ -160,18 +164,64 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
     };
 
     // Validate all
+    const normalizePhone = (p) => (p || "").replace(/\D/g, "");
     const validateAll = () => {
         const errors = {};
 
-        if (!nameRegex.test(formValues.fullName)) errors.fullName = "Họ tên không hợp lệ";
-        if (!emailRegex.test(formValues.email)) errors.email = "Email không hợp lệ";
-        if (formValues.phone && !phoneRegex.test(formValues.phone))
-            errors.phone = "SĐT không hợp lệ";
-        if (!formValues.role) errors.role = "Vui lòng chọn vai trò";
+        const fullName = formValues.fullName.trim();
+        const email = formValues.email.trim();
+        const rawPhone = (formValues.phone || "").trim();
+        const phone = normalizePhone(rawPhone); // chỉ còn số
+
+        // Họ tên
+        if (!fullName || !nameRegex.test(fullName)) {
+            errors.fullName = "Họ tên không hợp lệ";
+        }
+
+        // Email
+        if (!email || !emailRegex.test(email)) {
+            errors.email = "Email không hợp lệ";
+        }
+
+        // SĐT
+        if (!phone || !phoneRegex.test(phone)) {
+            errors.phone = "SĐT phải bắt đầu bằng 03, 05, 07, 08, 09 và gồm 10 số";
+        }
+
+        // Vai trò
+        if (!formValues.role) {
+            errors.role = "Vui lòng chọn vai trò";
+        }
+
+        // Mật khẩu + check trùng 
+        const password = formValues.password || "";
+        const currentId = editUser?.id;
 
         if (!isEdit) {
-            if (!passwordRegex.test(formValues.password))
-                errors.password = "Mật khẩu phải ≥6 ký tự, gồm chữ & số";
+            if (!passwordRegex.test(password)) {
+                errors.password =
+                    "Mật khẩu phải có ít nhất 8 ký tự!<br/>Mật khẩu phải gồm chữ hoa, chữ thường, số và ký tự đặc biệt!";
+            }
+        }
+
+        // 🔥 Check trùng email 
+        const duplicateEmail = allUsers.some(
+            (u) =>
+                u.email.toLowerCase() === email.toLowerCase() &&
+                (!isEdit || u.id !== currentId)
+        );
+        if (duplicateEmail) {
+            errors.email = "Email đã tồn tại!";
+        }
+
+        // 🔥 Check trùng SĐT 
+        const duplicatePhone = allUsers.some(
+            (u) =>
+                normalizePhone(u.phone) === phone &&
+                (!isEdit || u.id !== currentId)
+        );
+        if (duplicatePhone) {
+            errors.phone = "Số điện thoại đã tồn tại!";
         }
 
         setFormErrors(errors);
@@ -234,7 +284,36 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
             setFormErrors({});
             fetchStats();
         } catch (e) {
-            message.error(e.response?.data?.message || "Lỗi khi tạo/cập nhật!");
+            console.log("Create user error:", e.response?.data || e);
+
+            const apiMessage =
+                e.response?.data?.message ||
+                e.response?.data ||
+                e.message;
+
+            message.error(apiMessage || "Lỗi khi tạo/cập nhật!");
+
+            if (typeof apiMessage === "string") {
+                const lower = apiMessage.toLowerCase();
+                const extraErrors = {};
+
+                if (lower.includes("email")) {
+                    extraErrors.email = apiMessage;            // ví dụ: "Lỗi: Email đã tồn tại!"
+                }
+                if (
+                    lower.includes("điện thoại") ||
+                    lower.includes("sdt") ||
+                    lower.includes("phone")
+                ) {
+                    extraErrors.phone = apiMessage;            // ví dụ: "Số điện thoại đã tồn tại!"
+                }
+
+                if (Object.keys(extraErrors).length > 0) {
+                    setFormErrors((prev) => ({ ...prev, ...extraErrors }));
+                }
+
+            }
+
         } finally {
             setSubmitLoading(false);
         }
@@ -373,7 +452,13 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
                                             onClick={() => setShowPassword(!showPassword)}
                                         ></i>
                                     </div>
-                                    {formErrors.password && <div className="error-text">{formErrors.password}</div>}
+                                    {formErrors.password && (
+                                        <div
+                                            className="error-text"
+                                            dangerouslySetInnerHTML={{ __html: formErrors.password }}
+                                        ></div>
+                                    )}
+
                                 </>
                             )}
 
