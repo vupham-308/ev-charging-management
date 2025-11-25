@@ -25,7 +25,7 @@ public class AuthenticationController {
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest) throws MessagingException {
         return ResponseEntity.ok(authenticationService.register(registerRequest));
     }
 

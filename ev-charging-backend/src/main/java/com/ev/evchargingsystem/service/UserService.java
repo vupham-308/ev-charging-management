@@ -6,6 +6,7 @@ import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
+import com.ev.evchargingsystem.model.request.UserCreateRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +40,6 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private TransactionRepository transactionRepository;
     @Autowired
     private StaffRepository staffRepository;
     @Autowired
@@ -154,13 +154,44 @@ public class UserService {
         return new UserStatsResponseForAdmin(total, drivers, staffs, admins);
     }
 
-    public User createUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        //        // nếu là STAFF thì tạo Staff tương ứng
+    public String generatePassword(int length) {
+        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lower = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String special = "!@#$%^&*";
+
+        String all = upper + lower + digits + special;
+
+        StringBuilder password = new StringBuilder();
+        Random random = new Random();
+
+        // đảm bảo có ít nhất 1 ký tự mỗi loại
+        password.append(upper.charAt(random.nextInt(upper.length())));
+        password.append(lower.charAt(random.nextInt(lower.length())));
+        password.append(digits.charAt(random.nextInt(digits.length())));
+        password.append(special.charAt(random.nextInt(special.length())));
+
+        // random các ký tự còn lại
+        for (int i = 4; i < length; i++) {
+            password.append(all.charAt(random.nextInt(all.length())));
+        }
+
+        return password.toString();
+    }
+
+
+    public User createUser(UserCreateRequest rq) throws MessagingException {
+        String temp = generatePassword(10);
+        User user = new User(passwordEncoder.encode(temp),
+                rq.getFullName(),
+                rq.getEmail(),
+                rq.getPhone(),
+                rq.getRole(),
+                true);
+        // nếu là STAFF thì tạo Staff tương ứng, setUser cho Staff
+        Staff staff = new Staff();
         if ("STAFF".equalsIgnoreCase(user.getRole())) {
-            Staff staff = new Staff();
             staff.setUser(user);
-            staffRepository.save(staff);
         }
         //check xem email, sđt đã tồn tại chưa
         List<User> users = userRepository.findAll();
@@ -172,6 +203,25 @@ public class UserService {
                 throw new RuntimeException("Số điện thoại đã tồn tại!");
             }
         }
+
+        String template = emailService.loadTemplate("mail/WelcomeUser.html");
+
+        String passwordSection =
+                    "<p><strong>Mật khẩu tạm thời:</strong> " + temp + "</p>";
+
+        String warning =
+                    "<p style='color:#d9534f; font-weight:bold; margin-top:16px;'>"
+                            + "Vui lòng đổi mật khẩu ngay sau khi đăng nhập để đảm bảo an toàn."
+                            + "</p>";
+
+        String html = template
+                .replace("{{userName}}", user.getFullName())
+                .replace("{{email}}", user.getEmail())
+                .replace("{{createdAt}}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+                .replace("{{passwordSection}}", passwordSection)
+                .replace("{{warning}}", warning);
+        emailService.sendMail(user.getEmail(), "EV Charging Station: Chào mừng bạn đến với hệ thống",html);
+        staffRepository.save(staff);
         return userRepository.save(user);
     }
 

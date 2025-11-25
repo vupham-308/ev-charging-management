@@ -42,4 +42,20 @@ public class ChargingResponse {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    public ChargingResponse(int id, ChargerPoint point, Car car, String paymentMethod, String status, int minute, double fee, double energyDelivered, int initBattery, int goalBattery, int currentBattery, Date startDate, Date endDate) {
+        this.id = id;
+        this.point = point;
+        this.car = car;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+        this.minute = minute;
+        this.fee = fee;
+        this.energyDelivered = energyDelivered;
+        this.initBattery = initBattery;
+        this.goalBattery = goalBattery;
+        this.currentBattery = currentBattery;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

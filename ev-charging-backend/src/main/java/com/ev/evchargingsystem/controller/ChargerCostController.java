@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/charger-cost")
+@RequestMapping("/api/charger-cost")
 public class ChargerCostController {
 
     @Autowired
