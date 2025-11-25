@@ -286,15 +286,6 @@ export const MonitoringTab = () => {
                         {loading ? "Đang dừng..." : style.btnText}
                       </Button>
                     )}
-
-                    {/* Button cho RESERVED */}
-                    {point.status === "RESERVED" && (
-                      <Button
-                        className={`w-full mt-4 font-medium ${style.btnClass}`}
-                      >
-                        {style.btnText}
-                      </Button>
-                    )}
                   </Card>
                 );
               })}
