@@ -18,7 +18,7 @@ public class ReviewStation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty(message = "Description cannot be empty!")
+    @NotEmpty(message = "Mô tả không được để trống!")
     @Column(columnDefinition = "NVARCHAR(500)")
     private String description;
     @NotNull

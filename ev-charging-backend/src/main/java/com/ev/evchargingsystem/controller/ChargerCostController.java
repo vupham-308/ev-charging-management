@@ -1,5 +1,7 @@
 package com.ev.evchargingsystem.controller;
 
+import com.ev.evchargingsystem.entity.ChargerCost;
+import com.ev.evchargingsystem.model.request.ChargerCostRequest;
 import com.ev.evchargingsystem.service.ChargerCostService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +16,16 @@ public class ChargerCostController {
 
     @Autowired
     ChargerCostService chargerCostService;
+
     //ADMIN: chức năng sửa giá sạc phụ thuộc vào cổng sạc
     @Operation(
             summary = "ADMIN: thay đổi giá trạm sạc phụ thuộc vào cổng sạc"
     )
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PutMapping("edit-cost/{portType}")
-    public ResponseEntity editChargerPointCost(float newCost, @PathVariable("portType") String chargerType){
-        try{
-            if(chargerCostService.editCost(newCost, chargerType)) {
+    @PutMapping("edit-cost/{chargerCostId}")
+    public ResponseEntity editChargerPointCost(float newCost, @PathVariable("chargerCostId") int chargerCostId) {
+        try {
+            if (chargerCostService.editCost(newCost, chargerCostId)) {
                 return ResponseEntity.ok("Đã thay đổi giá!");
             }
             return ResponseEntity.badRequest().build();
@@ -31,9 +34,18 @@ public class ChargerCostController {
         }
     }
 
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("get")
-    public ResponseEntity getCost(){
+    public ResponseEntity getCost() {
         return ResponseEntity.ok(chargerCostService.get());
     }
+
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/create")
+    public ResponseEntity create(ChargerCostRequest chargerCost) {
+        return ResponseEntity.ok(chargerCostService.create(chargerCost));
+    }
 }
+

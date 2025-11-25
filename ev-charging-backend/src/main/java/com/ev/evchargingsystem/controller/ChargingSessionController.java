@@ -56,7 +56,7 @@ public class ChargingSessionController {
         }
     }
 
-    @Operation(summary = "Driver: Hiển thị tất cả phiên sạc đang sạc")
+    @Operation(summary = "Driver: Hiển thị tất cả phiên sạc")
     @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/chargingsessions")
     public ResponseEntity viewSession() {

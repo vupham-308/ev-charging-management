@@ -377,7 +377,7 @@ const StationDetail = () => {
                                 <div>
                                     <b style={{ fontSize: 16 }}>{c.name}</b>
                                     <div style={{ color: "#555", marginTop: 4 }}>
-                                        {c.chargerCost?.portType || "?"} - {c.capacity ? `${c.capacity}kW` : "?kW"}
+{c.chargerCost?.portType || "?"} - {c.chargerCost?.power ? `${c.chargerCost.power}kW` : "?kW"}
                                     </div>
                                 </div>
                                 {/* Bên phải: Trạng thái và nút */}

@@ -32,7 +32,7 @@ const statusStyles = {
   OUT_OF_SERVICE: {
     tagColor: "red",
     tagText: "Ngừng hoạt động",
-    btnText: "Đánh dấu sẵn sàng",
+    btnText: "Đánh dấu trụ đã sẵn sàng",
     btnClass: "border-gray-300",
   },
 };
@@ -79,6 +79,21 @@ export const MonitoringTab = () => {
       bg: "bg-red-50",
     },
   ];
+
+  const getStatusTagClasses = (tagColor) => {
+    const baseClasses =
+      "inline-flex items-center px-3 py-1 rounded-xl text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-sm";
+
+    const colorClasses = {
+      green:
+        "bg-green-100 text-green-700 shadow-green-200/60 hover:shadow-green-300/60",
+      blue: "bg-blue-100 text-blue-700 shadow-blue-200/60 hover:shadow-blue-300/60",
+      gold: "bg-yellow-100 text-yellow-700 shadow-yellow-200/60 hover:shadow-yellow-300/60",
+      red: "bg-red-100 text-red-700 shadow-red-200/60 hover:shadow-red-300/60",
+    };
+
+    return `${baseClasses} ${colorClasses[tagColor] || colorClasses.green}`;
+  };
 
   const handleMarkAvailable = async (point) => {
     try {
@@ -182,9 +197,7 @@ export const MonitoringTab = () => {
                         </p>
                       </div>
                       <div className="text-right">
-                        <div
-                          className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-${style.tagColor}-100 text-${style.tagColor}-700`}
-                        >
+                        <div className={getStatusTagClasses(style.tagColor)}>
                           <span
                             className={`w-2.5 h-2.5 rounded-full mr-2 bg-${style.tagColor}-500`}
                           ></span>
@@ -204,10 +217,50 @@ export const MonitoringTab = () => {
                         <p className="text-red-600 font-medium">Đang bảo trì</p>
                       )}
                       {point.status === "OCCUPIED" && (
-                        <div>
-                          <p className="text-yellow-600 font-medium">
-                            Phiên sạc đang hoạt động
-                          </p>
+                        <div className="text-left space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Người dùng:</span>
+                            <span className="font-medium text-gray-800">
+                              {point?.chargingSession?.car?.user?.fullName}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Phiên sạc:</span>
+                            <span className="font-medium text-gray-800">
+                              {point.chargingSession?.startTime
+                                ? `${new Date(
+                                    point.chargingSession.startTime
+                                  ).toLocaleTimeString("vi-VN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })} - ${new Date(
+                                    point.chargingSession.endTime
+                                  ).toLocaleTimeString("vi-VN", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}`
+                                : "14:30 - 15:45"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Pin:</span>
+                            <span className="font-medium text-gray-800">
+                              {point.chargingSession?.batteryStart &&
+                              point.chargingSession?.batteryEnd
+                                ? `${point.chargingSession.batteryStart}% → ${point.chargingSession.batteryEnd}%`
+                                : "65% → 80%"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Chi phí:</span>
+                            <span className="font-medium text-gray-800">
+                              {point.chargingSession?.totalCost
+                                ? `${point.chargingSession.totalCost.toLocaleString(
+                                    "vi-VN"
+                                  )} VND`
+                                : "56.250 VND"}
+                            </span>
+                          </div>
                         </div>
                       )}
                     </div>

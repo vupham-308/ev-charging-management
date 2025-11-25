@@ -21,10 +21,10 @@ public class ProblemReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty(message = "Title cannot be empty!")
+    @NotEmpty(message = "Tiêu đề không được để trống!")
     @Column(columnDefinition = "NVARCHAR(200)")
     private String title;
-    @NotEmpty(message = "Description cannot be empty!")
+    @NotEmpty(message = "Mô tả không được để trống!")
     @Column(columnDefinition = "NVARCHAR(3000)")
     private String description;
     @NotNull

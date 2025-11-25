@@ -1,10 +1,12 @@
 package com.ev.evchargingsystem.service;
 
 import com.ev.evchargingsystem.entity.Car;
+import com.ev.evchargingsystem.entity.CarBranch;
 import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.CarCreateRequest;
 import com.ev.evchargingsystem.model.response.CarResponse;
+import com.ev.evchargingsystem.repository.CarBranchRepository;
 import com.ev.evchargingsystem.repository.CarRepository;
 import com.ev.evchargingsystem.repository.ChargingSessionRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
@@ -28,6 +30,8 @@ public class CarService {
     private UserRepository userRepository;
     @Autowired
     private ChargingSessionRepository chargingSessionRepository;
+    @Autowired
+    private CarBranchRepository carBranchRepository;
 
     private User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -44,7 +48,7 @@ public class CarService {
     private CarResponse toCarResponse(Car car) {
         CarResponse res = new CarResponse();
         res.setId(car.getId());
-        res.setBrand(car.getBrand());
+        res.setBrand(car.getCarBranch().getBrand());
         res.setColor(car.getColor());
         res.setInitBattery(car.getInitBattery());
         res.setLicensePlate(car.getLicensePlate());
@@ -53,17 +57,25 @@ public class CarService {
 
     // Thêm xe
     public Car addCar(CarCreateRequest req) {
+        //check biển số trong database
+        Car car = carRepository.findByLicensePlate(req.getLicensePlate());
+        if(car==null) car= new Car();
         User currentUser = getCurrentUser();
-        Car car = new Car();
-        car.setBrand(req.getBrand());
+        List<CarBranch> list = carBranchRepository.findAll();
+        for(CarBranch branch : list) {
+            if (req.getBrand().equalsIgnoreCase(branch.getBrand())){
+                car.setCarBranch(branch);
+            }
+        }
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());
 
-        // Random pin từ 1 đến 100
-        int randomBattery = new Random().nextInt(100) + 1;
+        // Random pin
+        double randomBattery = Math.round(new Random().nextDouble(car.getCarBranch().getBatteryCapacity()) * 1000.0) / 1000.0;
         car.setInitBattery(randomBattery);
 
         car.setUser(currentUser);
+        car.setActive(true);
         return carRepository.save(car);
     }
 
@@ -94,7 +106,12 @@ public class CarService {
 
         Car car = carOpt.get();
 
-        car.setBrand(req.getBrand());
+        List<CarBranch> list = carBranchRepository.findAll();
+        for(CarBranch branch : list) {
+            if (req.getBrand().equalsIgnoreCase(branch.getBrand())){
+                car.setCarBranch(branch);
+            }
+        }
         car.setColor(req.getColor());
         car.setLicensePlate(req.getLicensePlate());
 

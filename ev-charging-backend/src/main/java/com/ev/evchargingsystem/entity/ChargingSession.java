@@ -20,16 +20,16 @@ public class ChargingSession {
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
-    @NotNull
     private Date startTime;
-    @NotNull
     private Date endTime;
     @NotNull
     private String status;
     @NotNull
     private String paymentMethod;
     @NotNull
-    private int goalBattery;
+    private double initBattery;//kWh
+    @NotNull
+    private double goalBattery;
 
     @ManyToOne
     @JoinColumn(name="charger_point_id", referencedColumnName = "id")

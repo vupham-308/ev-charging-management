@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 @Entity
-@Check(constraints = "port_type IN ('AC', 'CCS', 'CHAdeMO') AND status IN ('AVAILABLE', 'OCCUPIED', 'OUT_OF_SERVICE', 'RESERVED')")
 @Table(name="charger_points")
 @Data
 @AllArgsConstructor
@@ -18,19 +17,19 @@ public class ChargerPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotEmpty (message = "Name cannot be empty!")
+    @NotEmpty (message = "Tên trụ sạc không được để trống!")
     @Column(columnDefinition = "NVARCHAR(30)")
     private String name;
-    @NotNull
-    private int capacity;
     @NotEmpty
     private String status;
+    @Column(nullable = true)
+    private Double powerRealTime;//công suất thực tế của trụ khi đang sạc
 
     @ManyToOne
     @JoinColumn(name="station_id", referencedColumnName = "id", nullable=false)
     private Station station;
 
     @ManyToOne
-    @JoinColumn(name="port_type", referencedColumnName = "port_type", nullable = false)
+    @JoinColumn(name="charger_cost_id", referencedColumnName = "id", nullable = false)
     private ChargerCost chargerCost;
 }
