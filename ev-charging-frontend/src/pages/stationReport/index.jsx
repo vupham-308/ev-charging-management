@@ -57,7 +57,7 @@ const ManageStationReport = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast.success("🚀 Gửi báo cáo thành công!");
+      toast.success("Gửi báo cáo thành công!");
       navigate(-1);
     } catch (err) {
       console.error("❌ Lỗi khi gửi báo cáo:", err);

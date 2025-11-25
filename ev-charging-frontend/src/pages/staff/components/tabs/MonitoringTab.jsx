@@ -111,17 +111,16 @@ export const MonitoringTab = () => {
       }
 
       console.log("Bắt đầu dừng phiên sạc với ID:", sessionId);
-      
+
       // Gọi API dừng phiên sạc
       await stopSession(sessionId);
       console.log("Stop session API thành công");
-      
+
       // Cập nhật trạng thái sang AVAILABLE
       await updatePointStatus(point.id, "AVAILABLE");
       console.log("Update status thành công");
-      
-      message.success("Đã dừng phiên sạc thành công");
 
+      message.success("Đã dừng phiên sạc thành công");
     } catch (error) {
       console.error("Lỗi trong handleStopSession:", error);
       message.error("Dừng phiên sạc thất bại: " + error.message);
@@ -209,7 +208,6 @@ export const MonitoringTab = () => {
                           <p className="text-yellow-600 font-medium">
                             Phiên sạc đang hoạt động
                           </p>
-                        
                         </div>
                       )}
                     </div>
@@ -233,15 +231,6 @@ export const MonitoringTab = () => {
                         icon={<PoweroffOutlined />}
                       >
                         {loading ? "Đang dừng..." : style.btnText}
-                      </Button>
-                    )}
-
-                    {/* Button cho RESERVED */}
-                    {point.status === "RESERVED" && (
-                      <Button
-                        className={`w-full mt-4 font-medium ${style.btnClass}`}
-                      >
-                        {style.btnText}
                       </Button>
                     )}
                   </Card>

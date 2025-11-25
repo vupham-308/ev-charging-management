@@ -293,7 +293,7 @@ const ManageBooking = () => {
                   Loại: {charger.chargerCost?.portType || "N/A"}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Công suất: {charger.capacity} kW
+                  Công suất: {charger.chargerCost?.power} kW
                 </p>
 
                 <p
@@ -446,7 +446,9 @@ const ManageBooking = () => {
             <strong>Trạm sạc:</strong> {station.name}
           </p>
           <p>
-            <strong>Trụ sạc:</strong> Trụ #{selectedCharger}
+            <strong>Trụ sạc:</strong>{" "}
+            {chargers.find((c) => c.id === selectedCharger)?.name ||
+              `Trụ #${selectedCharger}`}
           </p>
           <p>
             <strong>Ngày:</strong>{" "}
@@ -459,7 +461,7 @@ const ManageBooking = () => {
             <strong>Giá:</strong>{" "}
             {chargers.find((c) => c.id === selectedCharger)?.chargerCost
               ?.cost || 0}{" "}
-            VND/phút
+            kWh/phút
           </p>
         </div>
 
