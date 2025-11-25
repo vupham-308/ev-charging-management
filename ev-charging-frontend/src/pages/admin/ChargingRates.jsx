@@ -11,7 +11,8 @@ const ChargingRates = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
-        const res = await api.get("admin/get");
+        const res = await api.get("/charger-cost");
+
         console.log("Dữ liệu từ server:", res.data);
 
         // map dữ liệu từ API về state
@@ -19,11 +20,11 @@ const ChargingRates = () => {
           id: index + 1,
           power:
             item.portType === "AC"
-              ? "50kW"
+              ? "7kW"
               : item.portType === "CHAdeMO"
-              ? "15kW"
+              ? "22kW"
               : item.portType === "CCS"
-              ? "25kW"
+              ? "50kW"
               : "N/A",
           type: item.portType,
           price: item.cost,
@@ -56,9 +57,14 @@ const ChargingRates = () => {
     if (!rate) return;
 
     try {
-      const res = await api.put(
-        `admin/edit-cost/${rate.type}?newCost=${rate.price}`
-      );
+     const body = {
+  portType: rate.type,
+  power: parseInt(rate.power),   // nếu rate.power = "7kW" thì parse ra 7
+  cost: Number(rate.price),
+};
+
+const res = await api.put(`/charger-cost/${rate.id}`, body);
+
 
       alert(`✅ Cập nhật giá ${rate.type} thành công!`);
       console.log("Server response:", res.data);
