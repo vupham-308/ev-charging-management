@@ -162,6 +162,16 @@ public class UserService {
             staff.setUser(user);
             staffRepository.save(staff);
         }
+        //check xem email, sđt đã tồn tại chưa
+        List<User> users = userRepository.findAll();
+        for (User u : users) {
+            if(u.getEmail().equals(user.getEmail())){
+                throw new RuntimeException("Email đã tồn tại!");
+            }
+            if(u.getPhone().equals(user.getPhone())){
+                throw new RuntimeException("Số điện thoại đã tồn tại!");
+            }
+        }
         return userRepository.save(user);
     }
 

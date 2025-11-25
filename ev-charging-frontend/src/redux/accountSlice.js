@@ -14,10 +14,13 @@ export const accountSlice = createSlice({
       return initialState;
     },
     setAccount: (state, action) => action.payload,
+    clearAccount: () => {
+      return null;
+    }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { login, logout,setAccount  } = accountSlice.actions;
+export const { login, logout,setAccount, clearAccount  } = accountSlice.actions;
 
 export default accountSlice.reducer;

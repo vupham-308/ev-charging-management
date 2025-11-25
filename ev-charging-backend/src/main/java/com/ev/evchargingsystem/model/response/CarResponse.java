@@ -7,6 +7,6 @@ public class CarResponse {
     private Integer id;
     private String brand;
     private String color;
-    private double initBattery;
+    private double initBattery;//init này tính bằng percent
     private String licensePlate;
 }

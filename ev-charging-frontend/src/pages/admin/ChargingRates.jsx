@@ -19,11 +19,11 @@ const ChargingRates = () => {
           id: index + 1,
           power:
             item.portType === "AC"
-              ? "22kW"
+              ? "50kW"
               : item.portType === "CHAdeMO"
-              ? "75kW"
+              ? "15kW"
               : item.portType === "CCS"
-              ? "120kW"
+              ? "25kW"
               : "N/A",
           type: item.portType,
           price: item.cost,

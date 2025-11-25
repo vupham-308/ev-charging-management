@@ -1,6 +1,7 @@
 import { Card, Button, Modal, Form, Input, message } from "antd";
 import { WarningOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { ProblemCard } from "../ProblemCard.";
+import { ReportedProblemCard } from "../ReportedProblemCard";
 import { StatusBadges } from "../StatusBadges.";
 import { getStatusCounts } from "../../utils/problemHelpers";
 import { useProblems } from "./../../hooks/useProblems";
@@ -20,8 +21,8 @@ export const IssuesTab = () => {
   const [form] = Form.useForm();
 
   // --- Phân loại sự cố ---
-  const customerProblems = problems; // Chỉ sự cố từ khách hàng
-  const reportedProblemsList = reportedProblems; // Sự cố đã báo cáo từ API (bao gồm cả của nhân viên)
+  const customerProblems = problems;
+  const reportedProblemsList = reportedProblems;
 
   // Hàm xử lý mở modal báo cáo sự cố
   const handleOpenReportModal = () => {
@@ -34,11 +35,26 @@ export const IssuesTab = () => {
     form.resetFields();
   };
 
-  // Hàm thêm problem mới vào local state (CHỈ thêm vào reported problems)
+  // Hàm thêm problem mới vào local state với data đầy đủ
   const addProblemToLocalState = (newProblem) => {
-    // CHỈ thêm vào danh sách reported problems (tab Sự cố đã báo cáo)
-    // KHÔNG thêm vào problems (tab Từ khách hàng) vì đây là báo cáo của nhân viên
-    setReportedProblems(prev => [newProblem, ...prev]);
+    // Tạo object problem hoàn chỉnh với tất cả các trường cần thiết
+    const completeProblem = {
+      ...newProblem,
+      id: newProblem.id || Date.now(), // Fallback ID nếu API không trả về
+      status: "PENDING", // Mặc định khi mới tạo
+      createdAt: new Date().toISOString(),
+      user: {
+        fullName: "Nhân viên", // Hoặc lấy từ user context
+        role: "staff"
+      },
+      station: {
+        name: "Trạm hiện tại", // Hoặc lấy từ station context
+        location: "Địa chỉ trạm"
+      },
+      reportedBy: "staff"
+    };
+    
+    setReportedProblems(prev => [completeProblem, ...prev]);
   };
 
   const handleSubmitProblemToAdmin = async (values) => {
@@ -48,27 +64,30 @@ export const IssuesTab = () => {
       const problemData = {
         title: values.title,
         description: values.description,
-        // Có thể thêm flag để phân biệt đây là báo cáo từ nhân viên
-        reportedBy: "staff" // hoặc "employee"
+        reportedBy: "staff"
       };
 
-      // Gửi request tạo problem và nhận kết quả trả về
+      // Gửi request tạo problem
       const newProblem = await handleCreateProblem(stationId, problemData);
       
-      // CẬP NHẬT NGAY LẬP TỨC VÀO STATE (CHỈ reported problems)
+      // CẬP NHẬT NGAY LẬP TỨC VÀO STATE mà không cần chờ refetch
       if (newProblem) {
         addProblemToLocalState(newProblem);
+        message.success("Báo cáo sự cố đã được gửi thành công đến quản trị viên!");
+        
+        // Đóng modal và reset form ngay lập tức
+        setIsModalVisible(false);
+        form.resetFields();
+        
+        // Tự động chuyển sang tab "Sự cố đã báo cáo" để user thấy kết quả
+        setActiveTabKey("reported");
+        
+        // Refetch dữ liệu mới nhất từ server trong background (optional)
+        // Không cần chờ kết quả, chỉ để đồng bộ hóa
+        setTimeout(() => {
+          fetchReportedProblems().catch(console.error);
+        }, 500);
       }
-      
-      message.success("Báo cáo sự cố đã được gửi thành công đến quản trị viên!");
-      setIsModalVisible(false);
-      form.resetFields();
-      
-      // Đồng bộ với server (chạy ngầm, không ảnh hưởng UX)
-      setTimeout(() => {
-        refetch(); // Vẫn refetch problems từ khách hàng
-        fetchReportedProblems(); // Và refetch reported problems
-      }, 1000);
       
     } catch (error) {
       message.error("Có lỗi xảy ra khi gửi báo cáo sự cố!");
@@ -107,7 +126,11 @@ export const IssuesTab = () => {
     return (
       <div className="grid grid-cols-1 gap-4">
         {sortedList.map((problem) => (
-          <ProblemCard key={problem.id} problem={problem} />
+          tabType === "customer" ? (
+            <ProblemCard key={problem.id} problem={problem} />
+          ) : (
+            <ReportedProblemCard key={problem.id} problem={problem} />
+          )
         ))}
       </div>
     );
@@ -164,10 +187,10 @@ export const IssuesTab = () => {
           </p>
         
 
-        {/* --- KHU VỰC THAY THẾ TABS (Sử dụng DIV/Button để mô phỏng Tab) --- */}
+        {/* --- TABS --- */}
         <div className="p-1 bg-gray-100 rounded-lg flex space-x-1 shadow-inner mt-6">
           
-          {/* Tab "Từ khách hàng" - CHỈ sự cố từ khách hàng */}
+          {/* Tab "Từ khách hàng" */}
           <div
             className={`
               flex-1 text-center py-2 px-4 rounded-lg cursor-pointer transition-colors font-semibold 
@@ -181,7 +204,7 @@ export const IssuesTab = () => {
             Từ khách hàng ({customerCount})
           </div>
 
-          {/* Tab "Sự cố đã báo cáo" - SỰ CỐ ĐÃ BÁO CÁO LÊN ADMIN (của nhân viên) */}
+          {/* Tab "Sự cố đã báo cáo" */}
           <div
             className={`
               flex-1 text-center py-2 px-4 rounded-lg cursor-pointer transition-colors font-semibold
@@ -195,7 +218,6 @@ export const IssuesTab = () => {
             Sự cố đã báo cáo ({reportedCount})
           </div>
         </div>
-        {/* --- Kết thúc KHU VỰC TAB TÙY CHỈNH --- */}
         
         {/* Hiển thị danh sách sự cố tương ứng */}
         <div className="mt-4">

@@ -18,7 +18,7 @@ public class Car {
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="branch_id",referencedColumnName = "id", nullable=false)
     private CarBranch carBranch;
 
