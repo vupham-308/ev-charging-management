@@ -12,7 +12,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/car-branch")
+@RequestMapping("/api/car-branch")
 public class CarBranchController {
     @Autowired
     CarBranchService carBranchService;

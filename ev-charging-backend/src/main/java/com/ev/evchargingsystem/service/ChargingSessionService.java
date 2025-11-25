@@ -173,7 +173,6 @@ public class ChargingSessionService {
         //đổi sang phần trăm
         int initBatteryPercent= (int) Math.round(charge.getInitBattery()/charge.getCar().getCarBranch().getBatteryCapacity()*100);
         int goalBatteryPercent= (int) Math.round(charge.getGoalBattery()/charge.getCar().getCarBranch().getBatteryCapacity()*100);
-        int currentBatteryPercent= (int) Math.round(car.getInitBattery()/charge.getCar().getCarBranch().getBatteryCapacity()*100);
 
         charge.setPaymentMethod(rq.getPaymentMethod());
         charge.setStatus("WAITING_TO_PAY");
@@ -184,7 +183,7 @@ public class ChargingSessionService {
         //Map từ ChargingSession về ChargingResponse
         return new ChargingResponse(charge.getId(),charge.getChargerPoint(),charge.getCar(),
                 charge.getPaymentMethod(),charge.getStatus(),minutes,fee,initBatteryPercent, goalBatteryPercent,
-                currentBatteryPercent,charge.getStartTime(),null);
+                initBatteryPercent,charge.getStartTime(),null);
     }
 
 
@@ -213,15 +212,18 @@ public class ChargingSessionService {
         for(ChargingSession c : list) {
             int estimateTimeRemain = getEstimateTime(c.getCar().getInitBattery(), c.getGoalBattery(), c.getChargerPoint(), c.getCar());
             int currentBatteryPercent = (int) Math.round(c.getCar().getInitBattery() / c.getCar().getCarBranch().getBatteryCapacity() * 100);
-            if(c.getStatus().equals("COMPLETED")){
-                estimateTimeRemain = 0;
-                currentBatteryPercent = 0;
-            }
             double feeCharged = getFeeCharge(c.getInitBattery(),c.getCar().getInitBattery(),c.getChargerPoint());
             double energyDeliverd = c.getCar().getInitBattery()-c.getInitBattery();
             int initBatteryPercent= (int) Math.round(c.getInitBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
             int goalBatteryPercent= (int) Math.round(c.getGoalBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
             long durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            if(c.getStatus().equals("COMPLETED")){
+                estimateTimeRemain = 0;
+                durationMs=c.getEndTime().getTime() - c.getStartTime().getTime();
+                Transaction t = transactionRepository.findTransactionByChargingSessionId(c.getId());
+                feeCharged = t.getTotalAmount();
+                energyDeliverd = c.getGoalBattery()-c.getInitBattery();
+            }
             long duration = durationMs / (1000 * 60);//phút
             ChargingResponse r = new ChargingResponse(c.getId(),c.getChargerPoint(),c.getCar(),
                     c.getPaymentMethod(),c.getStatus(),estimateTimeRemain,feeCharged,energyDeliverd,initBatteryPercent,
@@ -240,18 +242,25 @@ public class ChargingSessionService {
 
         //sửa lại thông tin session thực tế
         s.setEndTime(new Date(System.currentTimeMillis()));
+        s.setGoalBattery(s.getCar().getInitBattery());
         s.setStatus("COMPLETED");
         chargingSessionRepository.save(s);
         //sửa lại trạng thái cua trụ sạc về Available
         s.getChargerPoint().setStatus("AVAILABLE");
+        s.getChargerPoint().setPowerRealTime(null);
         chargerPointRepository.save(s.getChargerPoint());
         //sửa transaction mới tương ứng
         Transaction tranNew = transactionRepository.findTransactionByChargingSessionId(s.getId());
-        Date current = new Date(System.currentTimeMillis());
-        int timeCharged = (int) (current.getTime()-s.getStartTime().getTime())/36000;
-        double total = timeCharged*s.getChargerPoint().getChargerCost().getCost();
-        tranNew.setTotalAmount(total);
-        transactionRepository.save(tranNew);
+
+        //nếu kh chọn cash thì không cập nhật giá tiền mới
+
+        //tính lại tổng tiền dựa trên thời gian sạc thực tế
+        if(!tranNew.getPaymentMethod().equals("CASH")) {
+            double charged = s.getGoalBattery() - s.getInitBattery();
+            double total = s.getChargerPoint().getChargerCost().getCost() * charged;
+            tranNew.setTotalAmount(total);
+            transactionRepository.save(tranNew);
+        }
         return true;
     }
 
@@ -262,15 +271,18 @@ public class ChargingSessionService {
         List<ChargingSession> list = chargingSessionRepository.findChargingSessionByStationId(s.getId());
         List<ChargingResponse> rsList = new ArrayList<>();
         Transaction tranNew=null;
-//        for(ChargingSession x: list){
-//            tranNew = transactionRepository.findTransactionByChargingSessionId(x.getId());
-//            //thời gian còn lại để sạc đến goal
-//            int minute = caculateTimeToReachGoalBattery(x.getChargerPoint().getChargerCost().getPortType(),
-//                    x.getCar().getInitBattery(), x.getGoalBattery());
-//            rsList.add(new ChargingResponse(x.getId(),x.getChargerPoint(),
-//                    x.getCar(),x.getPaymentMethod(),x.getStatus(),minute,
-//                    tranNew.getTotalAmount(),x.getCar().getInitBattery(),x.getGoalBattery(),x.getStartTime()));
-//        }
+        for(ChargingSession x: list){
+            tranNew = transactionRepository.findTransactionByChargingSessionId(x.getId());
+            //thời gian còn lại để sạc đến goal
+            int minute = getEstimateTime(x.getCar().getInitBattery(),x.getGoalBattery(),x.getChargerPoint(),x.getCar());
+            double energyDeliverd = x.getCar().getInitBattery()-x.getInitBattery();
+            rsList.add(new ChargingResponse(x.getId(),x.getChargerPoint(),x.getCar(),
+                    x.getPaymentMethod(),x.getStatus(),minute,tranNew.getTotalAmount(), energyDeliverd,
+                    (int) Math.round(x.getInitBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
+                    (int) Math.round(x.getGoalBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
+                    (int) Math.round(x.getCar().getInitBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
+                    x.getStartTime(),x.getEndTime()));
+        }
         return rsList;
     }
 

@@ -29,7 +29,7 @@ public class ChargingSession {
     @NotNull
     private double initBattery;//kWh
     @NotNull
-    private double goalBattery;
+    private double goalBattery;//kWh
 
     @ManyToOne
     @JoinColumn(name="charger_point_id", referencedColumnName = "id")

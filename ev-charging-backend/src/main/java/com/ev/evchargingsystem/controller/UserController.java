@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
+import com.ev.evchargingsystem.model.request.UserCreateRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.StaffStationResponse;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
@@ -14,6 +15,7 @@ import com.ev.evchargingsystem.service.StaffService;
 import com.ev.evchargingsystem.service.StationService;
 import com.ev.evchargingsystem.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,9 +67,9 @@ public class UserController {
         return ResponseEntity.ok(stats);
     }
 
-    @Operation(summary = "Chỉ cần nhập: password,fullName,Phone,Email, Role")
+
     @PostMapping("/create-user")
-    public ResponseEntity createUser(@RequestBody @Valid User user){
+    public ResponseEntity createUser(@RequestBody @Valid UserCreateRequest user) throws MessagingException {
         return ResponseEntity.ok(userService.createUser(user));
     }
 

@@ -7,6 +7,7 @@ import com.ev.evchargingsystem.model.request.RegisterRequest;
 import com.ev.evchargingsystem.model.response.UserResponse;
 import com.ev.evchargingsystem.repository.AuthenticationRepository;
 import com.ev.evchargingsystem.repository.StaffRepository;
+import jakarta.mail.MessagingException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class AuthenticationService implements UserDetailsService {
@@ -38,9 +42,9 @@ public class AuthenticationService implements UserDetailsService {
     TokenService tokenService;
 
     @Autowired
-    private StaffRepository staffRepository;
+    private EmailService emailService;
 
-    public User register(RegisterRequest registerRequest) {
+    public User register(RegisterRequest registerRequest) throws MessagingException {
         // Kiểm tra email đã tồn tại chưa
         User existing = authenticationRepository.findUserByEmail(registerRequest.getEmail());
 
@@ -60,16 +64,16 @@ public class AuthenticationService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole("USER"); // mặc định USER
         user.setActive(true);
-        return authenticationRepository.save(user);
 
-//        // nếu là STAFF thì tạo Staff tương ứng
-//        if ("STAFF".equalsIgnoreCase(savedUser.getRole())) {
-//            Staff staff = new Staff();
-//            staff.setUser(savedUser);
-//            staffRepository.save(staff);
-//        }
-//
-//        return savedUser;
+        String template = emailService.loadTemplate("mail/WelcomeUser.html");
+        String html = template
+                .replace("{{userName}}", user.getFullName())
+                .replace("{{email}}", user.getEmail())
+                .replace("{{createdAt}}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+                .replace("{{passwordSection}}", "")
+                .replace("{{warning}}", "");
+        emailService.sendMail(user.getEmail(), "EV Charging Station: Chào mừng bạn đến với hệ thống",html);
+        return authenticationRepository.save(user);
     }
 
     public UserResponse login(LoginRequest loginRequest) {
