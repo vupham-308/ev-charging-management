@@ -16,4 +16,6 @@ public interface ChargerCostRepository extends JpaRepository<ChargerCost,Integer
     ChargerCost findChargerCostByPortType(String portType);
 
     ChargerCost findChargerCostById(@NotEmpty int chargerCostId);
+
+    boolean existsByPortType(String portType);
 }

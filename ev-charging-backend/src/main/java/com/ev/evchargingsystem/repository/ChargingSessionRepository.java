@@ -107,4 +107,7 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
     );
 
     List<ChargingSession> findAllByStatus(String ongoing);
+
+    @Query("SELECT COUNT(cs) > 0 FROM ChargingSession cs WHERE cs.chargerPoint.chargerCost.id = :costId AND cs.status = 'ONGOING'")
+    boolean existsOngoingSessionByCostId(@Param("costId") int costId);
 }
