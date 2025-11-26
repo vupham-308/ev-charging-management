@@ -46,7 +46,7 @@ export const ReportedProblemCard = ({ problem }) => {
       </h3>
       
       <p className="text-sm text-gray-600 mb-3">
-        {problem?.station?.name || "N/A"} - {problem?.station.address || "Chưa có địa chỉ"}
+        {problem?.station?.name || "N/A"} - {problem?.station?.address || "Chưa có địa chỉ"}
       </p>
 
       {/* Mô tả sự cố */}

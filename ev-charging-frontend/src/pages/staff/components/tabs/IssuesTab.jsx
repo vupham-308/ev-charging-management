@@ -59,7 +59,7 @@ export const IssuesTab = () => {
 
   const handleSubmitProblemToAdmin = async (values) => {
     try {
-      const stationId = 4; // Thay bằng stationId từ context/global state
+      const stationId = 1; // Thay bằng stationId từ context/global state
       
       const problemData = {
         title: values.title,

@@ -57,7 +57,13 @@ const ManageStartCharging = () => {
         setStation(stationRes.data);
         setCars(Array.isArray(carRes.data) ? carRes.data : []);
         setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
-        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+        setReviews(
+          Array.isArray(reviewRes.data)
+            ? reviewRes.data.sort(
+                (a, b) => new Date(b.reviewDate) - new Date(a.reviewDate)
+              )
+            : []
+        );
 
         if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
@@ -139,7 +145,9 @@ const ManageStartCharging = () => {
       await api.post(`/charging/${confirmData.chargeData.id}`);
       toast.success("Phiên sạc đã bắt đầu!");
       setShowConfirm(false);
-      navigate("/driver/chargingSession");
+      navigate("/driver/chargingSession", {
+        state: { defaultFilter: "CHARGING" },
+      });
     } catch (err) {
       console.error("❌ Lỗi khi bắt đầu sạc:", err);
       const errorMsg =
@@ -284,7 +292,7 @@ const ManageStartCharging = () => {
               >
                 {cars.map((car) => (
                   <Select.Option key={car.id} value={car.id}>
-                    {car.brand} ({car.initBattery}%)
+                    {car.brand} • {car.licensePlate} ({car.initBattery}%)
                   </Select.Option>
                 ))}
               </Select>
@@ -303,8 +311,9 @@ const ManageStartCharging = () => {
               >
                 {chargers.map((ch) => (
                   <Select.Option key={ch.id} value={ch.id}>
-                    {ch.name} • {ch.capacity}kW • {ch.chargerCost?.portType} •{" "}
-                    {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/phút
+                    {ch.name} • {ch.chargerCost?.power}kW •{" "}
+                    {ch.chargerCost?.portType} •{" "}
+                    {ch.chargerCost?.cost?.toLocaleString("vi-VN")}đ/kWh
                   </Select.Option>
                 ))}
               </Select>
@@ -412,50 +421,178 @@ const ManageStartCharging = () => {
 
       {/* Popup Confirm Bill */}
       <Modal
-        title="Xác nhận thông tin sạc"
+        title={null}
         open={showConfirm}
         onCancel={() => setShowConfirm(false)}
         footer={null}
         centered
-        width={600}
+        width={720}
+        closable={false}
       >
         {confirmData ? (
-          <div className="space-y-3">
-            <p>
-              <strong>Trạm:</strong> {confirmData.station.name}
-            </p>
-            <p>
-              <strong>Trụ sạc:</strong> {confirmData.selectedCharger.name} •{" "}
-              {confirmData.selectedCharger.capacity}kW
-            </p>
-            <p>
-              <strong>Xe:</strong> {confirmData.selectedCar.brand}
-            </p>
-            <p>
-              <strong>Pin:</strong> {confirmData.chargeData.initBattery}% →{" "}
-              {confirmData.chargeData.goalBattery}%
-            </p>
-            <p>
-              <strong>Thanh toán:</strong>{" "}
-              {confirmData.chargeData.paymentMethod === "BALANCE"
-                ? "Số dư tài khoản"
-                : "Tiền mặt"}
-            </p>
-            <p>
-              <strong>Ước tính:</strong>{" "}
-              {confirmData.chargeData.fee.toLocaleString("vi-VN")}đ •{" "}
-              {confirmData.chargeData.minute} phút
-            </p>
+          <div className="space-y-4 text-gray-700">
+            {/* HEADER */}
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-400">
+                  XÁC NHẬN PHIÊN SẠC
+                </p>
+                <h2 className="text-lg font-semibold">
+                  {confirmData.station.name}
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {confirmData.station.address}
+                </p>
+              </div>
+              <div className="text-right text-xs text-gray-500">
+                <p>
+                  Tên trụ:{" "}
+                  <span className="font-medium text-gray-700">
+                    {confirmData.selectedCharger.name}
+                  </span>
+                </p>
+                <p>
+                  Công suất:{" "}
+                  <span className="font-medium">
+                    {confirmData.selectedCharger.chargerCost?.power} kW
+                  </span>
+                </p>
+                <p>
+                  Đơn giá:&nbsp;
+                  <span className="font-medium">
+                    {confirmData.selectedCharger.chargerCost?.cost?.toLocaleString(
+                      "vi-VN"
+                    ) || "—"}
+                    đ/kWh
+                  </span>
+                </p>
+              </div>
+            </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button onClick={() => setShowConfirm(false)}>Hủy</Button>
-              <Button
-                type="primary"
-                loading={confirmLoading}
-                onClick={handleConfirm}
-              >
-                Xác nhận
-              </Button>
+            {/* BODY: 2 CỘT */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* CỘT TRÁI: THÔNG TIN XE & PIN */}
+              <div className="border rounded-xl p-4 bg-gray-50 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                  <FaCarSide className="text-blue-600" />
+                  Thông tin xe
+                </p>
+                <div className="space-y-1">
+                  <p className="text-sm">
+                    <span className="font-medium">Xe:</span>{" "}
+                    {confirmData.selectedCar.brand}
+                  </p>
+                  {confirmData.selectedCar.licensePlate && (
+                    <p className="text-sm">
+                      <span className="font-medium">Biển số:</span>{" "}
+                      {confirmData.selectedCar.licensePlate}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-3 border-t pt-3">
+                  <p className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                    <FaBatteryHalf className="text-green-600" />
+                    Mức pin
+                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <div>
+                      <p className="text-xs text-gray-500">Ban đầu</p>
+                      <p className="text-lg font-semibold text-gray-800">
+                        {confirmData.chargeData.initBattery}%
+                      </p>
+                    </div>
+                    <div className="text-2xl text-gray-400">→</div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">Mục tiêu</p>
+                      <p className="text-lg font-semibold text-blue-700">
+                        {confirmData.chargeData.goalBattery}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CỘT PHẢI: TIỀN & THỜI GIAN */}
+              <div className="border rounded-xl p-4 bg-blue-50/60 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 flex items-center gap-2">
+                  <FaMoneyBillWave className="text-green-700" />
+                  Tóm tắt chi phí
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-500">Tổng ước tính</p>
+                    <p className="text-2xl font-bold text-blue-700">
+                      {confirmData.chargeData.estimatedFee.toLocaleString(
+                        "vi-VN"
+                      )}
+                      đ
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">Thời gian dự kiến</p>
+                    <p className="text-lg font-semibold text-gray-800">
+                      {confirmData.chargeData.minute} phút
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs mt-2">
+                  <div className="space-y-1">
+                    <p className="text-gray-500">Phương thức thanh toán</p>
+                    <p className="font-medium">
+                      {confirmData.chargeData.paymentMethod === "BALANCE"
+                        ? "Số dư tài khoản"
+                        : "Tiền mặt"}
+                    </p>
+                  </div>
+                  <div className="space-y-1 text-right">
+                    <p className="text-gray-500">Loại cổng</p>
+                    <p className="font-medium">
+                      {confirmData.selectedCharger.chargerCost?.portType || "—"}
+                    </p>
+                  </div>
+                </div>
+
+                {typeof confirmData.chargeData.energy === "number" && (
+                  <div className="mt-2 text-xs text-gray-600">
+                    Năng lượng sạc dự kiến:{" "}
+                    <span className="font-medium">
+                      {confirmData.chargeData.energy.toFixed(2)} kWh
+                    </span>
+                  </div>
+                )}
+
+                {confirmData.chargeData.warning && (
+                  <div className="mt-2 text-xs text-red-600 flex gap-1">
+                    <FaExclamationTriangle className="mt-[2px]" />
+                    <span>
+                      <strong>Cảnh báo:</strong>{" "}
+                      {confirmData.chargeData.warning}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* NOTE + BUTTONS */}
+            <div className="flex items-start justify-between pt-2">
+              <p className="text-[11px] text-gray-400 max-w-md">
+                Chi phí và thời gian là ước tính dựa trên thông tin hiện tại.
+                Thực tế có thể thay đổi tùy theo tình trạng pin, nhiệt độ và tải
+                của trạm.
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={() => setShowConfirm(false)}>Hủy</Button>
+                <Button
+                  type="primary"
+                  loading={confirmLoading}
+                  onClick={handleConfirm}
+                >
+                  Xác nhận bắt đầu sạc
+                </Button>
+              </div>
             </div>
           </div>
         ) : (

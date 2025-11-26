@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Input, Button, Form, message, Select } from "antd";
 import { toast } from "react-toastify";
@@ -7,9 +7,31 @@ import api from "../../config/axios";
 
 const ManageAddCar = () => {
   const [loading, setLoading] = useState(false);
+  const [brands, setBrands] = useState([]);
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { Option } = Select;
+
+  // 🔥 Lấy danh sách brand từ API
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await api.get("/car-branch/getAll", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.data) {
+          setBrands(res.data); // Lưu vào state
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách hãng xe:", error);
+        message.error("Không thể tải hãng xe!");
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   const handleAddCar = async (values) => {
     const { brand, color, licensePlate } = values;
@@ -25,12 +47,18 @@ const ManageAddCar = () => {
       );
 
       toast.success("Thêm xe thành công!");
-      message.success("✅ Xe mới đã được thêm!");
+      message.success("Xe mới đã được thêm!");
       navigate("/driver/myCar", { state: { newCar: response.data } });
     } catch (error) {
       console.error("❌ Lỗi khi thêm xe:", error);
-      toast.error(" Lỗi khi thêm xe");
-      message.error("Không thể thêm xe. Vui lòng thử lại!");
+
+      const apiMessage = error.response?.data;
+
+      if (apiMessage) {
+        toast.error(apiMessage);
+      } else {
+        toast.error("Không thể thêm xe. Vui lòng thử lại!");
+      }
     } finally {
       setLoading(false);
     }
@@ -53,16 +81,15 @@ const ManageAddCar = () => {
           </span>
         }
         bordered={false}
-        className="w-full max-w-lg rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 bg-white"
+        className="w-full max-w-lg rounded-2xl shadow-md bg-white"
       >
         <Form
           form={form}
           layout="vertical"
           onFinish={handleAddCar}
-          autoComplete="off"
           className="mt-3"
         >
-          {/* Hãng xe */}
+          {/* 🔥 Hãng xe lấy từ API */}
           <Form.Item
             label={
               <span className="font-medium text-gray-700 flex items-center gap-2">
@@ -72,28 +99,17 @@ const ManageAddCar = () => {
             name="brand"
             rules={[{ required: true, message: "Vui lòng chọn hãng xe!" }]}
           >
-            <Select placeholder="Chọn hãng xe" size="large" showSearch>
-              <Option value="VinFast VF3">VinFast VF3</Option>
-              <Option value="VinFast VF5">VinFast VF5</Option>
-              <Option value="VinFast VF6">VinFast VF6</Option>
-              <Option value="VinFast VF7">VinFast VF7</Option>
-              <Option value="VinFast VF8">VinFast VF8</Option>
-              <Option value="VinFast VF9">VinFast VF9</Option>
-              <Option value="VinFast VF e34">VinFast VF e34</Option>
-              <Option value="VinFast EC Van">VinFast EC Van</Option>
-              <Option value="Hyundai IONIQ 5">Hyundai IONIQ 5</Option>
-              <Option value="Hyundai IONIQ 6">Hyundai IONIQ 6</Option>
-              <Option value="Hyundai IONIQ 9">Hyundai IONIQ 9</Option>
-              <Option value="Hyundai KONA Electric">
-                Hyundai KONA Electric
-              </Option>
-              <Option value="Hyundai INSTER">Hyundai INSTER</Option>
-              <Option value="Hyundai NEXO">Hyundai NEXO</Option>
-              <Option value="Hyundai ST1">Hyundai ST1</Option>
-              <Option value="Nissan LEAF">Nissan LEAF</Option>
-              <Option value="Nissan ARIYA">Nissan ARIYA</Option>
-              <Option value="Nissan e-NV200">Nissan e-NV200</Option>
-              <Option value="Nissan Micra EV">Nissan Micra EV</Option>
+            <Select
+              placeholder="Chọn hãng xe"
+              size="large"
+              showSearch
+              loading={brands.length === 0}
+            >
+              {brands.map((item) => (
+                <Option key={item.id} value={item.brand}>
+                  {item.brand}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -121,14 +137,14 @@ const ManageAddCar = () => {
                       }
                     />
 
-                    {/* Preset màu */}
                     <div className="flex flex-wrap gap-2 mt-3">
                       {colors.map((c) => (
                         <div
                           key={c.value}
                           title={c.name}
                           onClick={() => setFieldsValue({ color: c.value })}
-                          className={`w-8 h-8 rounded-full cursor-pointer transition-all duration-200 ${
+                          className={`w-8 h-8 rounded-full cursor-pointer 
+                          ${
                             currentColor === c.value
                               ? "ring-2 ring-black scale-110"
                               : ""
@@ -159,20 +175,21 @@ const ManageAddCar = () => {
             <Input placeholder="VD: 59A-12345" size="large" />
           </Form.Item>
 
-          {/* Nút hành động */}
+          {/* Nút bấm */}
           <Form.Item className="text-right mt-8">
             <Button
               icon={<FaArrowLeft />}
               onClick={() => navigate("/driver/myCar")}
-              className="px-5 py-2 rounded-lg border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400 mr-3"
+              className="px-5 py-2 mr-3"
             >
               Hủy
             </Button>
+
             <Button
               type="primary"
               htmlType="submit"
               loading={loading}
-              className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium"
+              className="px-6 py-2"
             >
               Thêm xe
             </Button>

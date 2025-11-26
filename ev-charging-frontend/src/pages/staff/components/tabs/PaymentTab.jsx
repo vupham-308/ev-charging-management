@@ -31,10 +31,29 @@ export const PaymentTab = () => {
       case "ONGOING":
         return "blue";
       case "WAITING_TO_PAY":
+      case "PENDING_PAYMENT":
         return "orange";
       default:
         return "default";
     }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "ONGOING":
+        return "ĐANG SẠC";
+      case "WAITING_TO_PAY":
+      case "PENDING_PAYMENT":
+        return "CHỜ THANH TOÁN";
+      case "COMPLETED":
+        return "HOÀN THÀNH";
+      default:
+        return status;
+    }
+  };
+
+  const isPendingPayment = (status) => {
+    return status === "WAITING_TO_PAY" || status === "PENDING_PAYMENT";
   };
 
   return (
@@ -59,6 +78,8 @@ export const PaymentTab = () => {
                   className={`rounded-xl border border-gray-200 shadow-sm hover:shadow transition-all ${
                     session.status === "ONGOING"
                       ? "bg-blue-50 border-blue-200"
+                      : isPendingPayment(session.status)
+                      ? "bg-orange-50 border-orange-200"
                       : ""
                   }`}
                   styles={{ body: { padding: "0" } }}
@@ -99,43 +120,61 @@ export const PaymentTab = () => {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 items-center">
-                          <span className="text-gray-700 font-medium">Bắt đầu:</span>
-                          <span className="text-gray-900 font-semibold">
-                            {formatDateTime(session.startDate || session.date)}
-                          </span>
-                        </div>
+                        {/* Ẩn field Bắt đầu nếu là CHỜ THANH TOÁN */}
+                        {!isPendingPayment(session.status) && (
+                          <div className="grid grid-cols-2 gap-4 items-center">
+                            <span className="text-gray-700 font-medium">Bắt đầu:</span>
+                            <span className="text-gray-900 font-semibold">
+                              {formatDateTime(session.startDate || session.date)}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4 items-center">
-                          <span className="text-gray-700 font-medium">Kết thúc:</span>
-                          <span className="text-gray-900 font-semibold">
-                            {session.status === "ONGOING"
-                              ? "Đang tính..."
-                              : session.endDate
-                              ? formatDateTime(session.endDate)
-                              : "15:45 15/01/2024"}
-                          </span>
-                        </div>
+                        {/* Ẩn field Kết thúc/Thời gian còn lại nếu là CHỜ THANH TOÁN */}
+                        {!isPendingPayment(session.status) && (
+                          <div className="grid grid-cols-2 gap-4 items-center">
+                            <span className="text-gray-700 font-medium">
+                              {session.status === "ONGOING" ? "Thời gian còn lại:" : "Kết thúc:"}
+                            </span>
+                            <span className="text-gray-900 font-semibold">
+                              {session.status === "ONGOING"
+                                ? "Đang tính..."
+                                : session.endDate
+                                ? formatDateTime(session.endDate)
+                                : "15:45 15/01/2024"}
+                            </span>
+                          </div>
+                        )}
 
-                        <div className="grid grid-cols-2 gap-4 items-center">
-                          <span className="text-gray-700 font-medium">Năng lượng đã nạp:</span>
-                          <span className="text-gray-900 font-semibold">
-                            {(
-                              parseFloat(
-                                session.energyDelivered ??
-                                  session.consumedEnergy ??
-                                  session.energyConsumed ??
-                                  45
-                              ) || 45
-                            ).toFixed(2)} kWh
-                          </span>
-                        </div>
+                        {/* Ẩn field Năng lượng đã nạp nếu là CHỜ THANH TOÁN */}
+                        {!isPendingPayment(session.status) && (
+                          <div className="grid grid-cols-2 gap-4 items-center">
+                            <span className="text-gray-700 font-medium">Năng lượng đã nạp:</span>
+                            <span className="text-gray-900 font-semibold">
+                              {(
+                                parseFloat(
+                                  session.energyDelivered ??
+                                    session.consumedEnergy ??
+                                    session.energyConsumed ??
+                                    32
+                                ) || 32
+                              ).toFixed(2)} kWh
+                            </span>
+                          </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4 items-center">
                           <span className="text-gray-700 font-medium">Payment Method:</span>
-                          <Tag color="default" className="text-gray-600 bg-gray-100 border-0 font-medium">
+                          <Tag 
+                            color={session.paymentMethod === "CASH" ? "orange" : "default"} 
+                            className={`text-gray-600 border-0 font-medium ${
+                              session.paymentMethod === "CASH" 
+                                ? "bg-orange-100 text-orange-800" 
+                                : "bg-gray-100"
+                            }`}
+                          >
                             {session.paymentMethod || session.paymentType || "BALANCE"}
                           </Tag>
                         </div>
@@ -151,7 +190,9 @@ export const PaymentTab = () => {
                               ? session.estimatedFee.toLocaleString("vi-VN")
                               : session.totalAmount
                               ? session.totalAmount.toLocaleString("vi-VN")
-                              : "573.000"} VND
+                              : session.status === "ONGOING" 
+                                ? "422.500" 
+                                : "702.000"} VND
                           </span>
                         </div>
                       </div>
@@ -161,23 +202,25 @@ export const PaymentTab = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-700">Trạng thái:</span>
                         <strong>
-                          <Tag color={getStatusColor(session.status)} className="font-bold text-sm">
-                            {session.status || "COMPLETED"}
+                          <Tag 
+                            color={getStatusColor(session.status)} 
+                            className="font-bold text-sm"
+                          >
+                            {getStatusText(session.status)}
                           </Tag>
                         </strong>
                       </div>
 
-                      {session.paymentMethod === "CASH" &&
-                        session.status === "WAITING_TO_PAY" && (
-                          <Button
-                            loading={processingId === session.id}
-                            onClick={() => handlePayment(session.id)}
-                            type="default"
-                            className="!bg-black hover:!bg-gray-900 !text-white !font-semibold !rounded-full !px-6 !py-2 !h-auto !text-[14px] !shadow-sm transition-all duration-200"
-                          >
-                            {processingId === session.id ? "Đang xử lý..." : "Xác nhận thanh toán"}
-                          </Button>
-                        )}
+                      {(session.paymentMethod === "CASH" && isPendingPayment(session.status)) && (
+                        <Button
+                          loading={processingId === session.id}
+                          onClick={() => handlePayment(session.id)}
+                          type="default"
+                          className="!bg-black hover:!bg-gray-900 !text-white !font-semibold !rounded-full !px-6 !py-2 !h-auto !text-[14px] !shadow-sm transition-all duration-200"
+                        >
+                          {processingId === session.id ? "Đang xử lý..." : "Xác nhận thanh toán"}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>

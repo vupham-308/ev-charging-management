@@ -48,8 +48,13 @@ const ManageBooking = () => {
         ]);
         setStation(stationRes.data);
         setChargers(chargerRes.data);
-
-        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+        setReviews(
+          Array.isArray(reviewRes.data)
+            ? reviewRes.data.sort(
+                (a, b) => new Date(b.reviewDate) - new Date(a.reviewDate)
+              )
+            : []
+        );
 
         if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
@@ -84,8 +89,7 @@ const ManageBooking = () => {
     return (
       selectedDate &&
       selectedCharger &&
-      r.stationId === Number(stationId) &&
-      r.chargerpointId === selectedCharger && // 🔹 Chỉ lấy slot của trụ đã chọn
+      r.chargerPoint?.id === selectedCharger &&
       dayjs(r.startDate).isSame(selectedDate, "day")
     );
   });
@@ -156,6 +160,47 @@ const ManageBooking = () => {
     }
   };
 
+  const [compatibleCars, setCompatibleCars] = useState([]);
+  useEffect(() => {
+    const fetchCompatibleCars = async () => {
+      if (!selectedCharger) return;
+
+      const charger = chargers.find((c) => c.id === selectedCharger);
+      const portType = charger?.chargerCost?.portType;
+      if (!portType) return;
+
+      try {
+        const res = await api.get(`/cars/getAlls/${portType}`);
+        setCompatibleCars(res.data || []);
+      } catch (err) {
+        console.error("Lỗi khi lấy danh sách xe tương thích:", err);
+        setCompatibleCars([]);
+      }
+    };
+
+    fetchCompatibleCars();
+  }, [selectedCharger, chargers]);
+
+  const statusStyles = {
+    AVAILABLE: {
+      border: "border-green-400",
+      selected: "border-green-500 bg-green-50",
+      dot: "bg-green-500",
+      text: "text-green-600",
+    },
+    OCCUPIED: {
+      border: "border-green-400",
+      selected: "border-green-500 bg-green-50",
+      dot: "bg-green-500",
+      text: "text-green-600",
+    },
+    RESERVED: {
+      border: "border-green-400",
+      selected: "border-green-500 bg-green-50",
+      dot: "bg-green-500",
+      text: "text-green-600",
+    },
+  };
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -261,59 +306,41 @@ const ManageBooking = () => {
             Chọn trụ sạc phù hợp với xe của bạn
           </p>
           <div className="grid grid-cols-2 gap-4">
-            {chargers.map((charger) => (
-              <div
-                key={charger.id}
-                onClick={() =>
-                  charger.status === "AVAILABLE" &&
-                  setSelectedCharger(charger.id)
+            {chargers
+              .filter((c) => c.status !== "OUT_OF_SERVICE")
+              .map((charger) => (
+                <div
+                  key={charger.id}
+                  onClick={() =>
+                    charger.status !== "OUT_OF_SERVICE" &&
+                    setSelectedCharger(charger.id)
+                  }
+                  className={`p-4 border rounded-xl transition hover:shadow-md
+                ${
+                  selectedCharger === charger.id
+                    ? statusStyles[charger.status].selected
+                    : statusStyles[charger.status].border
                 }
-                className={`p-4 border rounded-xl cursor-pointer transition hover:shadow-md ${
-                  charger.status !== "AVAILABLE"
-                    ? "opacity-50 cursor-not-allowed"
-                    : selectedCharger === charger.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-semibold">{charger.name}</h4>
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      charger.status === "AVAILABLE"
-                        ? "bg-green-500"
-                        : charger.status === "OUT_OF_SERVICE"
-                        ? "bg-gray-400"
-                        : "bg-red-500"
-                    }`}
-                  ></div>
-                </div>
-
-                <p className="text-sm text-gray-600">
-                  Loại: {charger.chargerCost?.portType || "N/A"}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Công suất: {charger.capacity} kW
-                </p>
-
-                <p
-                  className={`mt-2 text-sm font-semibold ${
-                    charger.status === "AVAILABLE"
-                      ? "text-green-600"
-                      : charger.status === "OUT_OF_SERVICE"
-                      ? "text-gray-500"
-                      : "text-red-600"
-                  }`}
+`}
                 >
-                  Trạng thái:{" "}
-                  {charger.status === "AVAILABLE"
-                    ? "Sẵn sàng"
-                    : charger.status === "OUT_OF_SERVICE"
-                    ? "Bảo trì"
-                    : "Đang sử dụng"}
-                </p>
-              </div>
-            ))}
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-semibold">{charger.name}</h4>
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        statusStyles[charger.status].dot
+                      }`}
+                    ></div>
+                  </div>
+
+                  <p className="text-sm text-gray-600">
+                    Loại: {charger.chargerCost?.portType || "N/A"}
+                  </p>
+
+                  <p className="text-sm text-gray-600">
+                    Công suất: {charger.chargerCost?.power} kW
+                  </p>
+                </div>
+              ))}
           </div>
         </Card>
 
@@ -434,45 +461,150 @@ const ManageBooking = () => {
         </Card>
       </div>
 
-      {/* Modal xác nhận */}
+      {/* Modal xác nhận đặt chỗ */}
       <Modal
-        title={<span className="font-semibold text-lg">Xác nhận đặt chỗ</span>}
+        title={null}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
+        centered
+        width={720}
+        closable={false} // ẩn dấu X góc phải
       >
-        <div className="space-y-2 text-gray-700">
-          <p>
-            <strong>Trạm sạc:</strong> {station.name}
-          </p>
-          <p>
-            <strong>Trụ sạc:</strong> Trụ #{selectedCharger}
-          </p>
-          <p>
-            <strong>Ngày:</strong>{" "}
-            {selectedDate ? selectedDate.format("DD/MM/YYYY") : "-"}
-          </p>
-          <p>
-            <strong>Giờ:</strong> {selectedTime}
-          </p>
-          <p>
-            <strong>Giá:</strong>{" "}
-            {chargers.find((c) => c.id === selectedCharger)?.chargerCost
-              ?.cost || 0}{" "}
-            VND/phút
-          </p>
-        </div>
+        {(() => {
+          const charger = chargers.find((c) => c.id === selectedCharger);
+          if (!charger || !selectedDate || !selectedTime) return null;
 
-        <div className="flex justify-end gap-3 mt-6">
-          <Button onClick={() => setIsModalVisible(false)}>Hủy</Button>
-          <Button
-            type="primary"
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={handleCreateReservation}
-          >
-            Xác nhận đặt chỗ
-          </Button>
-        </div>
+          const start = dayjs(selectedTime, "HH:mm");
+          const end = start.add(30, "minute");
+
+          return (
+            <div className="text-gray-800 space-y-4">
+              {/* HEADER */}
+              <div className="flex items-start justify-between border-b pb-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-400">
+                    XÁC NHẬN ĐẶT CHỖ TRẠM SẠC
+                  </p>
+                  <h2 className="text-lg font-semibold">{station?.name}</h2>
+                  <p className="text-xs text-gray-500">{station?.address}</p>
+                </div>
+
+                <div className="text-right text-xs text-gray-500">
+                  <p>
+                    Mã trụ:{" "}
+                    <span className="font-medium text-gray-700">
+                      {charger.name}
+                    </span>
+                  </p>
+                  <p>
+                    Công suất:{" "}
+                    <span className="font-medium">
+                      {charger.chargerCost?.power} kW
+                    </span>
+                  </p>
+                  <p>
+                    Đơn giá:{" "}
+                    <span className="font-medium">
+                      {charger.chargerCost?.cost?.toLocaleString("vi-VN") ||
+                        "—"}
+                      đ/kWh
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              {/* BODY: 2 CỘT */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* CỘT TRÁI: THÔNG TIN TRỤ */}
+                <div className="border rounded-xl p-4 bg-gray-50 space-y-3">
+                  <p className="text-xs font-semibold text-gray-500">
+                    Thông tin trụ
+                  </p>
+
+                  <div className="space-y-1 text-sm">
+                    <p>
+                      <span className="font-medium">Trụ sạc:</span>{" "}
+                      {charger.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">Cổng sạc:</span>{" "}
+                      {charger.chargerCost?.portType || "N/A"}
+                    </p>
+                    <p>
+                      <span className="font-medium">Công suất:</span>{" "}
+                      {charger.chargerCost?.power} kW
+                    </p>
+                    <p>
+                      <span className="font-medium">Đơn giá:</span>{" "}
+                      {charger.chargerCost?.cost?.toLocaleString("vi-VN") ||
+                        "—"}
+                      đ/kWh
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t text-xs">
+                    {compatibleCars.length > 0 ? (
+                      <p className="italic text-gray-600">
+                        (*) Trụ sạc này khả dụng với xe:{" "}
+                        <span className="font-medium">
+                          {compatibleCars.join(", ")}
+                        </span>
+                      </p>
+                    ) : (
+                      <p className="italic text-red-500 font-medium">
+                        Hiện tại trụ này không có xe nào của bạn phù hợp.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* CỘT PHẢI: THÔNG TIN ĐẶT CHỖ */}
+                <div className="border rounded-xl p-4 bg-blue-50/60 space-y-3">
+                  <p className="text-xs font-semibold text-gray-500">
+                    Thông tin đặt chỗ
+                  </p>
+
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <span className="font-medium">Ngày:</span>{" "}
+                      {selectedDate.format("DD/MM/YYYY")}
+                    </p>
+                    <p>
+                      <span className="font-medium">Giờ đặt:</span>{" "}
+                      {start.format("HH:mm")} → {end.format("HH:mm")}
+                    </p>
+                    <p>
+                      <span className="font-medium">Thời lượng giữ chỗ:</span>{" "}
+                      30 phút
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* NOTE + BUTTONS */}
+              <div className="flex items-start justify-between pt-2">
+                <p className="text-[11px] text-gray-400 max-w-md">
+                  Chi tiết đặt chỗ được tính dựa trên thông tin hiện tại. Nếu
+                  bạn không đến và bắt đầu sạc trong thời gian cho phép, hệ
+                  thống có thể tự động hủy đặt chỗ.
+                </p>
+
+                <div className="flex gap-2">
+                  <Button onClick={() => setIsModalVisible(false)}>Hủy</Button>
+                  <Button
+                    type="primary"
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={handleCreateReservation}
+                    disabled={compatibleCars.length === 0}
+                  >
+                    Xác nhận đặt chỗ
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </Modal>
     </div>
   );
