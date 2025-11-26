@@ -9,6 +9,7 @@ import React from "react";
 import { Button, Card, message } from "antd";
 import { useChargerPointsContext } from "../../contexts/ChargerPointsContext";
 import { useStopSession } from "../../hooks/useStopSession";
+import { useCancelReserve } from "../../hooks/useCancelReserve";
 
 const statusStyles = {
   AVAILABLE: {
@@ -40,7 +41,8 @@ const statusStyles = {
 export const MonitoringTab = () => {
   const { points, updatePointStatus, fetchChargerPoints } =
     useChargerPointsContext();
-  const { stopSession, loading } = useStopSession();
+  const { stopSession, loading: stopLoading } = useStopSession();
+  const { cancel, loading: cancelLoading } = useCancelReserve();
 
   const available = points.filter((p) => p.status === "AVAILABLE").length;
   const occupied = points.filter((p) => p.status === "OCCUPIED").length;
@@ -106,35 +108,20 @@ export const MonitoringTab = () => {
 
   const handleStopSession = async (point) => {
     try {
-      console.log("=== BẮT ĐẦU handleStopSession ===");
-      console.log("Point data:", point);
-
-      // Kiểm tra point có tồn tại không
       if (!point) {
-        console.error("Point is undefined!");
         message.error("Không tìm thấy thông tin trụ sạc");
         return;
       }
 
       const sessionId = point?.chargingSession?.id;
-      console.log("Session ID:", sessionId);
 
       if (!sessionId) {
-        console.error("Không có sessionId");
         message.error("Không tìm thấy thông tin phiên sạc");
         return;
       }
 
-      console.log("Bắt đầu dừng phiên sạc với ID:", sessionId);
-
-      // Gọi API dừng phiên sạc
       await stopSession(sessionId);
-      console.log("Stop session API thành công");
-
-      // Cập nhật trạng thái sang AVAILABLE
       await updatePointStatus(point.id, "AVAILABLE");
-      console.log("Update status thành công");
-
       message.success("Đã dừng phiên sạc thành công");
     } catch (error) {
       console.error("Lỗi trong handleStopSession:", error);
@@ -142,7 +129,68 @@ export const MonitoringTab = () => {
     }
   };
 
-  // Thêm useEffect để debug khi points thay đổi
+  const formatTimeRange = (reservation) => {
+    if (!reservation?.startDate || !reservation?.endDate)
+      return "16:00 - 17:15";
+
+    const start = new Date(reservation.startDate);
+    const end = new Date(reservation.endDate);
+
+    const format = (d) =>
+      d.toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+
+    return `${format(start)} - ${format(end)}`;
+  };
+
+  const handleCancelReservation = async (point) => {
+    try {
+      const reservationId = point?.reservation?.id;
+
+      if (!reservationId) {
+        message.error("Không tìm thấy ID đặt chỗ");
+        return;
+      }
+
+      // Gọi API hủy đặt chỗ
+      await cancel(reservationId);
+
+      // CẬP NHẬT QUAN TRỌNG: Refetch dữ liệu mới nhất
+      await fetchChargerPoints();
+
+      message.success("Đã hủy đặt chỗ thành công");
+    } catch (error) {
+      console.error("Lỗi khi hủy đặt chỗ:", error);
+      message.error("Hủy đặt chỗ thất bại");
+    }
+  };
+
+  // Hoặc phương án 2: Cập nhật trực tiếp state (nếu bạn muốn tối ưu performance)
+  const handleCancelReservationOptimized = async (point) => {
+    try {
+      const reservationId = point?.reservation?.id;
+
+      if (!reservationId) {
+        message.error("Không tìm thấy ID đặt chỗ");
+        return;
+      }
+
+      // Gọi API hủy đặt chỗ
+      await cancel(reservationId);
+
+      // PHƯƠNG ÁN TỐI ƯU: Cập nhật trực tiếp trạng thái mà không cần refetch
+      await updatePointStatus(point.id, "AVAILABLE");
+
+      message.success("Đã hủy đặt chỗ thành công");
+    } catch (error) {
+      console.error("Lỗi khi hủy đặt chỗ:", error);
+      message.error("Hủy đặt chỗ thất bại");
+    }
+  };
+
   React.useEffect(() => {
     console.log("Points đã thay đổi:", points);
   }, [points]);
@@ -224,41 +272,21 @@ export const MonitoringTab = () => {
                               {point?.chargingSession?.car?.user?.fullName}
                             </span>
                           </div>
+                        </div>
+                      )}
+                      {point.status === "RESERVED" && (
+                        <div className="text-left space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Phiên sạc:</span>
+                            <span className="text-gray-600">Đặt bởi:</span>
                             <span className="font-medium text-gray-800">
-                              {point.chargingSession?.startTime
-                                ? `${new Date(
-                                    point.chargingSession.startTime
-                                  ).toLocaleTimeString("vi-VN", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })} - ${new Date(
-                                    point.chargingSession.endTime
-                                  ).toLocaleTimeString("vi-VN", {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}`
-                                : "14:30 - 15:45"}
+                              {point?.reservation?.user?.fullName ||
+                                "Lê Minh Tuấn"}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Pin:</span>
+                            <span className="text-gray-600">Thời gian:</span>
                             <span className="font-medium text-gray-800">
-                              {point.chargingSession?.batteryStart &&
-                              point.chargingSession?.batteryEnd
-                                ? `${point.chargingSession.batteryStart}% → ${point.chargingSession.batteryEnd}%`
-                                : "65% → 80%"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Chi phí:</span>
-                            <span className="font-medium text-gray-800">
-                              {point.chargingSession?.totalCost
-                                ? `${point.chargingSession.totalCost.toLocaleString(
-                                    "vi-VN"
-                                  )} VND`
-                                : "56.250 VND"}
+                              {formatTimeRange(point?.reservation)}
                             </span>
                           </div>
                         </div>
@@ -279,11 +307,11 @@ export const MonitoringTab = () => {
                       <Button
                         className={`w-full mt-4 font-medium ${style.btnClass}`}
                         onClick={() => handleStopSession(point)}
-                        loading={loading}
+                        loading={stopLoading}
                         danger
                         icon={<PoweroffOutlined />}
                       >
-                        {loading ? "Đang dừng..." : style.btnText}
+                        {stopLoading ? "Đang dừng..." : style.btnText}
                       </Button>
                     )}
 
@@ -291,8 +319,11 @@ export const MonitoringTab = () => {
                     {point.status === "RESERVED" && (
                       <Button
                         className={`w-full mt-4 font-medium ${style.btnClass}`}
+                        onClick={() => handleCancelReservationOptimized(point)} // Sử dụng phiên bản tối ưu
+                        loading={cancelLoading}
+                        danger
                       >
-                        {style.btnText}
+                        {cancelLoading ? "Đang hủy..." : style.btnText}
                       </Button>
                     )}
                   </Card>
