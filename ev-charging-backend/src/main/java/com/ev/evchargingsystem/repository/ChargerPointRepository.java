@@ -46,4 +46,5 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
     @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OUT_OF_SERVICE'")
     int countOutOfServiceByStationId(@Param("stationId") int stationId);
 
+    boolean existsByChargerCostId(int chargerCostId);
 }
