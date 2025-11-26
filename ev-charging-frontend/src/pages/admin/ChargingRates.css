@@ -132,3 +132,221 @@
 .btn-save:hover {
     background-color: #4338ca;
 }
+
+.brand-container {
+    margin-top: 30px;
+}
+
+.brand-header h2 {
+    font-size: 22px;
+    margin: 0;
+}
+
+.brand-header p {
+    color: #666;
+    margin: 4px 0 12px 0;
+}
+
+.btn-add {
+    background: #0a0a23;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.brand-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    border: 1px solid #eee;
+}
+
+.brand-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand-icon {
+    color: #2563eb;
+    font-size: 30px;
+}
+.brand-name {
+    font-size: 18px;
+    margin: 0;
+}
+
+.port-type {
+    background: #e5e7eb;
+    padding: 4px 10px;
+    margin-left: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.battery {
+    color: #555;
+    margin-top: 4px;
+}
+
+.brand-actions button {
+    border: none;
+    background: transparent;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn-edit {
+    background: #f3f4f6;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Popup */
+/* Overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+/* Popup box */
+.brand-popup {
+    width: 480px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Close button */
+.popup-close {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: black;
+}
+
+/* Title */
+.brand-popup h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+/* Subtitle */
+.popup-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+/* Fields */
+.popup-field label {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.popup-field input,
+.popup-field select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #f5f6f8;
+    margin-bottom: 18px;
+    font-size: 15px;
+}
+
+/* Actions */
+.popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-cancel {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-save-dark {
+    padding: 10px 22px;
+    border-radius: 10px;
+    background: #000;
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header thương hiệu */
+.brand-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* Mô tả */
+.brand-desc {
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* Nút thêm thương hiệu */
+.btn-add-brand {
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    height: 42px;
+}
