@@ -7,6 +7,7 @@ import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.ReservationRequest;
 import com.ev.evchargingsystem.model.response.ReservationResponse;
 import com.ev.evchargingsystem.repository.ChargerPointRepository;
+import com.ev.evchargingsystem.repository.ChargingSessionRepository;
 import com.ev.evchargingsystem.repository.ReservationRepository;
 import com.ev.evchargingsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class ReservationService {
     private ChargerPointRepository chargerPointRepository;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private ChargingSessionRepository chargingSessionRepository;
 
     private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -46,14 +49,6 @@ public class ReservationService {
             if (!"COMPLETED".equalsIgnoreCase(r.getStatus()) && !"CANCELLED".equalsIgnoreCase(r.getStatus())) {
                 throw new RuntimeException("Bạn đang có một đặt chỗ chưa hoàn tất. Vui lòng hoàn tất trước khi đặt mới.");
             }
-        }
-
-        //Lấy trụ sạc
-        ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
-
-        //Trụ phải đang AVAILABLE mới cho đặt
-        if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
-            throw new RuntimeException("This charger point is not available");
         }
 
         //Validate thời gian
@@ -81,6 +76,27 @@ public class ReservationService {
             throw new RuntimeException( "Thời gian đặt chỗ phải ở tương lai");
         }
 
+        //Lấy trụ sạc
+        ChargerPoint cp = chargerPointRepository.findChargerPointById(request.getChargerPointId());
+
+        //Trụ phải đang AVAILABLE mới cho đặt
+        if (!"AVAILABLE".equalsIgnoreCase(cp.getStatus())) {
+            if ("RESERVED".equalsIgnoreCase(cp.getStatus())) {
+                // Cho phép đi tiếp, sẽ check trùng lịch ở bước sau
+            } else if ("OCCUPIED".equalsIgnoreCase(cp.getStatus())) {
+                ChargingSession currentSession = chargingSessionRepository.findFirstByChargerPointIdAndStatus(cp.getId(), "ONGOING");
+                if (currentSession != null) {
+                    if (start.before(currentSession.getEndTime())) {
+                        throw new RuntimeException("Trụ sạc đang bận. Vui lòng đặt sau: " + currentSession.getEndTime());
+                    }
+                } else {
+                    throw new RuntimeException("Trụ sạc không khả dụng");
+                }
+            } else {
+                throw new RuntimeException("Trụ sạc không khả dụng");
+            }
+        }
+
         //kiểm tra trùng lặp với các reservation khác
         List<Reservation> existingReservations = reservationRepository.findByChargerPointIdAndStatus(cp.getId(), "PENDING");
         for (Reservation r : existingReservations) {
@@ -99,7 +115,7 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
 
-        return "Reservation successful";
+        return "Đặt chỗ thành công!";
     }
 
     @Scheduled(fixedRate = 10000)//chạy mỗi 10s
@@ -152,14 +168,8 @@ public class ReservationService {
             dto.setStartDate(r.getStartDate());
             dto.setEndDate(r.getEndDate());
 
-            // Lấy tên trụ và trạm
             if (r.getChargerPoint() != null) {
-                dto.setChargerPointName(r.getChargerPoint().getName());
-                dto.setChargerpointId(r.getChargerPoint().getId());
-                if (r.getChargerPoint().getStation() != null) {
-                    dto.setStationName(r.getChargerPoint().getStation().getName());
-                    dto.setStationId(r.getChargerPoint().getStation().getId());
-                }
+                dto.setChargerPoint(r.getChargerPoint());
             }
             result.add(dto);
         }
@@ -202,12 +212,7 @@ public class ReservationService {
 
             // Lấy tên trụ và trạm
             if (r.getChargerPoint() != null) {
-                dto.setChargerPointName(r.getChargerPoint().getName());
-                dto.setChargerpointId(r.getChargerPoint().getId());
-                if (r.getChargerPoint().getStation() != null) {
-                    dto.setStationName(r.getChargerPoint().getStation().getName());
-                    dto.setStationId(r.getChargerPoint().getStation().getId());
-                }
+                dto.setChargerPoint(r.getChargerPoint());
             }
             result.add(dto);
         }

@@ -25,7 +25,7 @@ public class ReservationController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('USER')")
-    @Operation(summary = "json mẫu: {\"chargerPointId\":1,\"startDate\":\"2024-07-01 10:00:00\",\"endDate\":\"2024-07-01 12:00:00\"}")
+    @Operation(summary = "json mẫu: {\"chargerPointId\":1,\"startDate\":\"2025-07-01 10:00:00\",\"endDate\":\"2025-07-01 12:00:00\"}")
     public ResponseEntity<?> createReservation(Authentication authentication,
                                                @RequestBody ReservationRequest request) {
         String email = authentication.getName();  // lấy email đăng nhập của user
