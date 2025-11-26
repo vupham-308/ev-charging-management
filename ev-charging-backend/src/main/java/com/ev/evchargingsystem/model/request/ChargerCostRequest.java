@@ -17,7 +17,7 @@ public class ChargerCostRequest {
         @Column(name="port_type")
         private String portType;
         @NotNull//kW
-        private int capacity;
+        private int power;
         @NotNull//cost ? kWh
         private double cost;
 
