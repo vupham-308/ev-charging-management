@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 @Entity
+@Check(constraints = "status IN ('AVAILABLE', 'OCCUPIED', 'OUT_OF_SERVICE', 'RESERVED')")
 @Table(name="charger_points")
 @Data
 @AllArgsConstructor
