@@ -31,7 +31,7 @@ public class Car {
 
     @Column(unique = true)
     @NotNull(message = "Biển số xe không được để trống!")
-    @Pattern(regexp = "^\\d{2}[A-Z]-\\d{4,5}$", message = "Invalid license plate format. Example: 51F-12345")
+    @Pattern(regexp = "^\\d{2}[A-Z]-\\d{4,5}$", message = "Biển số xe không hợp lệ.")
     private String licensePlate;
 
     @ManyToOne

@@ -17,7 +17,7 @@ public class ChargerPointRequest {
     @Column(columnDefinition = "NVARCHAR(30)")
     private String name;
     @NotEmpty
-    private String portType;
+    private int chargerCostId;
     @NotEmpty
     private String status;
 }
