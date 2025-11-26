@@ -18,44 +18,29 @@ public class ChargingResponse {
     private Car car;
     private String paymentMethod;
     private String status;
-    private int minute;//thời gian sạc ước tính
-    private double fee;//chi phí ước tính
+    private int minute;//thời gian sạc dự kiến/thời gian còn lại
+    private double fee;//chi phí theo thời gian thực
+    private Double estimatedFee;//chi phí ước tính
     private double energyDelivered;//kwh đã sạc cho xe
     private int initBattery;//pin lúc bắt đầu sạc (%)
     private int goalBattery;//mục tiêu pin mong muốn
     private int currentBattery;
     private Date startDate;
     private Date endDate;
-    private long duration;//phút
+    private int duration;//phút đã sạc
 
-    public ChargingResponse(int id, ChargerPoint point, Car car, String paymentMethod, String status, int minute, double fee, int initBattery, int goalBattery, int currentBattery, Date startDate, Date endDate) {
+    //dùng khi create, không cần energyDelivered
+    public ChargingResponse(int id, ChargerPoint point, Car car, String paymentMethod, String status, int minute, Double estimatedFee, int initBattery, int goalBattery) {
         this.id = id;
         this.point = point;
         this.car = car;
         this.paymentMethod = paymentMethod;
         this.status = status;
         this.minute = minute;
-        this.fee = fee;
+        this.estimatedFee = estimatedFee;
         this.initBattery = initBattery;
         this.goalBattery = goalBattery;
-        this.currentBattery = currentBattery;
-        this.startDate = startDate;
-        this.endDate = endDate;
     }
 
-    public ChargingResponse(int id, ChargerPoint point, Car car, String paymentMethod, String status, int minute, double fee, double energyDelivered, int initBattery, int goalBattery, int currentBattery, Date startDate, Date endDate) {
-        this.id = id;
-        this.point = point;
-        this.car = car;
-        this.paymentMethod = paymentMethod;
-        this.status = status;
-        this.minute = minute;
-        this.fee = fee;
-        this.energyDelivered = energyDelivered;
-        this.initBattery = initBattery;
-        this.goalBattery = goalBattery;
-        this.currentBattery = currentBattery;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
+
 }

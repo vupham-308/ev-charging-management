@@ -71,6 +71,8 @@ public class ChargingSessionService {
         c.getChargerPoint().setStatus("OCCUPIED");
         chargerPointRepository.save(c.getChargerPoint());
         c.setStartTime(new Date());
+        int minutes = getEstimateTime(c.getCar().getInitBattery(),c.getGoalBattery(),c.getChargerPoint(),c.getCar());
+        c.setEndTime(new Date(new Date().getTime() + minutes * 60 * 1000));//dự kiến
         return chargingSessionRepository.save(c);
     }
 
@@ -159,9 +161,8 @@ public class ChargingSessionService {
         //kWh cần sạc
         double goalBattery = rq.getGoalBattery()*car.getCarBranch().getBatteryCapacity()/100;//kWh mục tiêu
         charge.setGoalBattery(goalBattery);
-        //giá tiền cần trả
-        double fee = getFeeCharge(charge.getCar().getInitBattery(),goalBattery,point);
-
+        //giá tiền ucows tính
+        double estimateFee = getFeeCharge(charge.getInitBattery(),charge.getGoalBattery(),point);
 
         //100%    batteryCapacityNeedToCharge
         //20/7h                  ?               ( thời gian để sạc đến mục tiêu)
@@ -177,13 +178,12 @@ public class ChargingSessionService {
         charge.setPaymentMethod(rq.getPaymentMethod());
         charge.setStatus("WAITING_TO_PAY");
         chargingSessionRepository.save(charge);
-        transactionService.createTransaction(charge,fee);
+        transactionService.createTransaction(charge,estimateFee);
 
         //=====================
         //Map từ ChargingSession về ChargingResponse
         return new ChargingResponse(charge.getId(),charge.getChargerPoint(),charge.getCar(),
-                charge.getPaymentMethod(),charge.getStatus(),minutes,fee,initBatteryPercent, goalBatteryPercent,
-                initBatteryPercent,charge.getStartTime(),null);
+                charge.getPaymentMethod(),charge.getStatus(),minutes,estimateFee,initBatteryPercent, goalBatteryPercent);
     }
 
 
@@ -192,10 +192,15 @@ public class ChargingSessionService {
         //Thực tế: công suất sạc chỉ được khoảng 80-95%, phụ thuộc vào SoH, nhiệt độ pin
         //thời gian ước tính sạc đầy, lấy mức 87% công suất lý tưởng để ước tính
         //công suất thực tế ước tính (87%)
+        //1h   trụ 50kW sạc được 50kWh
+        //1h   trụ 0.87*50kW sạc được 0,87*50kWh
+        //0,367h trụ 0.87*50kW sạc được 18.35kW (vf3)
+        //?h   trụ 0.87*50kW sạc được ? kWh
+        //=>hour = kWh của xe * 1 /(0.87*power of charger)
         double powerEstimate = 0.87*point.getChargerCost().getPower();
-        double hours = batteryCapacityNeedToCharge*car.getCarBranch().getBatteryCapacity()/powerEstimate/100;
+        double hours = batteryCapacityNeedToCharge/powerEstimate;
         //=> thời gian ước tính dựa trên công suất thực tế (87%)
-        return (int) (hours * 60 + 1);
+        return (int) (hours * 60 + 1);//tránh để số 0
         //=> thời gian để sạc đến goal (phút)
     }
 
@@ -213,6 +218,7 @@ public class ChargingSessionService {
             int estimateTimeRemain = getEstimateTime(c.getCar().getInitBattery(), c.getGoalBattery(), c.getChargerPoint(), c.getCar());
             int currentBatteryPercent = (int) Math.round(c.getCar().getInitBattery() / c.getCar().getCarBranch().getBatteryCapacity() * 100);
             double feeCharged = getFeeCharge(c.getInitBattery(),c.getCar().getInitBattery(),c.getChargerPoint());
+            double estimateFee = getFeeCharge(c.getInitBattery(),c.getGoalBattery(),c.getChargerPoint());
             double energyDeliverd = c.getCar().getInitBattery()-c.getInitBattery();
             int initBatteryPercent= (int) Math.round(c.getInitBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
             int goalBatteryPercent= (int) Math.round(c.getGoalBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
@@ -224,9 +230,9 @@ public class ChargingSessionService {
                 feeCharged = t.getTotalAmount();
                 energyDeliverd = c.getGoalBattery()-c.getInitBattery();
             }
-            long duration = durationMs / (1000 * 60);//phút
+            int duration = (int) Math.round(durationMs / (1000 * 60));//phút
             ChargingResponse r = new ChargingResponse(c.getId(),c.getChargerPoint(),c.getCar(),
-                    c.getPaymentMethod(),c.getStatus(),estimateTimeRemain,feeCharged,energyDeliverd,initBatteryPercent,
+                    c.getPaymentMethod(),c.getStatus(),estimateTimeRemain,feeCharged,estimateFee,energyDeliverd,initBatteryPercent,
                     goalBatteryPercent,currentBatteryPercent,c.getStartTime(),c.getEndTime(),duration);
             rsList.add(r);
         }
@@ -271,17 +277,27 @@ public class ChargingSessionService {
         List<ChargingSession> list = chargingSessionRepository.findChargingSessionByStationId(s.getId());
         List<ChargingResponse> rsList = new ArrayList<>();
         Transaction tranNew=null;
-        for(ChargingSession x: list){
-            tranNew = transactionRepository.findTransactionByChargingSessionId(x.getId());
-            //thời gian còn lại để sạc đến goal
-            int minute = getEstimateTime(x.getCar().getInitBattery(),x.getGoalBattery(),x.getChargerPoint(),x.getCar());
-            double energyDeliverd = x.getCar().getInitBattery()-x.getInitBattery();
-            rsList.add(new ChargingResponse(x.getId(),x.getChargerPoint(),x.getCar(),
-                    x.getPaymentMethod(),x.getStatus(),minute,tranNew.getTotalAmount(), energyDeliverd,
-                    (int) Math.round(x.getInitBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
-                    (int) Math.round(x.getGoalBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
-                    (int) Math.round(x.getCar().getInitBattery()/x.getCar().getCarBranch().getBatteryCapacity()*100),
-                    x.getStartTime(),x.getEndTime()));
+        for(ChargingSession c : list) {
+            int estimateTimeRemain = getEstimateTime(c.getCar().getInitBattery(), c.getGoalBattery(), c.getChargerPoint(), c.getCar());
+            int currentBatteryPercent = (int) Math.round(c.getCar().getInitBattery() / c.getCar().getCarBranch().getBatteryCapacity() * 100);
+            double feeCharged = getFeeCharge(c.getInitBattery(),c.getCar().getInitBattery(),c.getChargerPoint());
+            double estimateFee = getFeeCharge(c.getInitBattery(),c.getGoalBattery(),c.getChargerPoint());
+            double energyDeliverd = c.getCar().getInitBattery()-c.getInitBattery();
+            int initBatteryPercent= (int) Math.round(c.getInitBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
+            int goalBatteryPercent= (int) Math.round(c.getGoalBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
+            long durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            if(c.getStatus().equals("COMPLETED")){
+                estimateTimeRemain = 0;
+                durationMs=c.getEndTime().getTime() - c.getStartTime().getTime();
+                Transaction t = transactionRepository.findTransactionByChargingSessionId(c.getId());
+                feeCharged = t.getTotalAmount();
+                energyDeliverd = c.getGoalBattery()-c.getInitBattery();
+            }
+            int duration = (int) Math.round(durationMs / (1000 * 60));//phút
+            ChargingResponse r = new ChargingResponse(c.getId(),c.getChargerPoint(),c.getCar(),
+                    c.getPaymentMethod(),c.getStatus(),estimateTimeRemain,feeCharged,estimateFee,energyDeliverd,initBatteryPercent,
+                    goalBatteryPercent,currentBatteryPercent,c.getStartTime(),c.getEndTime(),duration);
+            rsList.add(r);
         }
         return rsList;
     }
