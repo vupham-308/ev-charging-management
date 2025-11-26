@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class ChargingSessionService {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-    public ChargingSession charge(int sessionId) {
+    public ChargingSession charge(int sessionId) throws MessagingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ChargingSession c = chargingSessionRepository.findChargingSessionById(sessionId);
         if(c.getStatus().equals("COMPLETED")) {
@@ -73,6 +74,9 @@ public class ChargingSessionService {
         c.setStartTime(new Date());
         int minutes = getEstimateTime(c.getCar().getInitBattery(),c.getGoalBattery(),c.getChargerPoint(),c.getCar());
         c.setEndTime(new Date(new Date().getTime() + minutes * 60 * 1000));//dự kiến
+
+        sendEmailIfHaveSession(c);
+
         return chargingSessionRepository.save(c);
     }
 
@@ -99,6 +103,35 @@ public class ChargingSessionService {
             chargingSessionRepository.save(c);
         }
 
+    }
+
+    //30p trước giờ đặt, gửi mail thông báo nếu có người đặt
+    //sạc xe trùng với thời gian đặt chỗ
+    public void sendEmailIfHaveSession(ChargingSession chargingSession) throws MessagingException {
+        Date current = new Date(System.currentTimeMillis());
+        List<Reservation> reservations = reservationRepository.findAll().stream()
+                .filter(reservation -> reservation.getStatus().equals("PENDING"))
+                .filter(reservation -> reservation.getChargerPoint().getId()==chargingSession.getChargerPoint().getId())
+                .filter(reservation -> reservation.getStartDate().getDate() == current.getDate()&&
+                        reservation.getStartDate().getMonth() == current.getMonth()&&
+                        reservation.getStartDate().getYear()==current.getYear())
+                .toList();
+        for(Reservation r: reservations){
+            Date thirty = new Date(r.getStartDate().getTime() - 30*60*1000);
+            if(thirty.before(current)&&
+                    r.getStartDate().after(current)&&
+                    chargingSession.getEndTime().after(r.getStartDate())){
+                String template = emailService.loadTemplate("mail/ReservationNoti.html");
+                String html = template
+                        .replace("{{userName}}",r.getUser().getFullName())
+                        .replace("{{stationName}}",r.getChargerPoint().getStation().getName())
+                        .replace("{{chargerPoint}}",r.getChargerPoint().getName())
+                        .replace("{{reservationStartTime}}", sdf.format(r.getStartDate()))
+                        .replace("{{reservationEndTime}}",sdf.format(r.getEndDate()))
+                        .replace("{{endTime}}",sdf.format(chargingSession.getEndTime()));
+                emailService.sendMail(r.getUser().getEmail(),"EV Charging: Cảnh báo trùng lịch sạc",html);
+            }
+        }
     }
 
     public ChargingResponse createSession(ChargingSessionRequest rq) {

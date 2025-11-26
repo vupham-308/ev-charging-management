@@ -4,6 +4,7 @@ import com.ev.evchargingsystem.entity.ChargingSession;
 import com.ev.evchargingsystem.model.request.*;
 import com.ev.evchargingsystem.service.ChargingSessionService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
@@ -50,7 +51,7 @@ public class ChargingSessionController {
         try {
             chargingSessionService.charge(sessionId);
             return ResponseEntity.ok("Đang sạc, vui lòng kiểm tra chi tiết tại 'Phiên sạc của tôi'");
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | MessagingException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

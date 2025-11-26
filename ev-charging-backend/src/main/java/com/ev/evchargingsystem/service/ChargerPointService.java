@@ -43,26 +43,13 @@ public class ChargerPointService {
             //thiếu check role AD?
             throw new RuntimeException("StationID not found: "+stationID);
         }
-        ChargerCost cost = chargerCostRepository.findChargerCostByPortType(rq.getPortType());
+        ChargerCost cost = chargerCostRepository.findChargerCostById(rq.getChargerCostId());
         ChargerPoint p = new ChargerPoint();
         p.setStation(station);
         p.setName(rq.getName());
         p.setChargerCost(cost);
         p.setStatus(rq.getStatus());
         return chargerPointRepository.save(p);
-    }
-
-    //dựa vào Porttype để trả về Capacity tương ứng
-    public int getCapacity(String portType){
-        if(portType.equals("AC")){
-            return 22;
-        }
-        else if(portType.equals("CHAdeMO")){
-            return 75;
-        } else if (portType.equals("CCS")) {
-            return 120;
-        }
-        return 0;
     }
 
     public boolean delete(int id){
@@ -85,7 +72,7 @@ public class ChargerPointService {
         if(p.getName().length()>30){
             throw new RuntimeException("Length of name must be less than 30 characters!");
         }
-        ChargerCost cost = chargerCostRepository.findChargerCostByPortType(p.getPortType());
+        ChargerCost cost = chargerCostRepository.findChargerCostById(p.getChargerCostId());
         c.setName(p.getName());
         c.setChargerCost(cost);
         c.setStatus(p.getStatus());
