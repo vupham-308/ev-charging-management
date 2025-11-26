@@ -132,6 +132,8 @@ public class ReservationService {
         }
     }
 
+    //30p trước giờ đặt, gửi mail thông báo nếu có người đặt, thời
+
 
     public List<ReservationResponse> getUserReservations(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);

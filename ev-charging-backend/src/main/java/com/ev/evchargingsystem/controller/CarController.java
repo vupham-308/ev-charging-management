@@ -19,7 +19,7 @@ public class CarController {
     private CarService carService;
 
     @PostMapping
-    public Car addCar(@RequestBody @Valid CarCreateRequest request) {
+    public CarResponse addCar(@RequestBody @Valid CarCreateRequest request) {
         return carService.addCar(request);
     }
 
@@ -52,5 +52,10 @@ public class CarController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("getAlls/{portType}")
+    public ResponseEntity getCarsByPortType(@PathVariable("portType") String portType) {
+        return ResponseEntity.ok(carService.getAllCarsByPortType(portType));
     }
 }

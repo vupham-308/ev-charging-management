@@ -15,9 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,10 +54,11 @@ public class CarService {
     }
 
     // Thêm xe
-    public Car addCar(CarCreateRequest req) {
-        //check biển số trong database
+    public CarResponse addCar(CarCreateRequest req) {
+        //check biển số trong database, nếu active=true thì throw lỗi
         Car car = carRepository.findByLicensePlate(req.getLicensePlate());
         if(car==null) car= new Car();
+        else if(car.isActive()) throw new RuntimeException("Xe đã tồn tại trong hệ thống!");
         User currentUser = getCurrentUser();
         List<CarBranch> list = carBranchRepository.findAll();
         for(CarBranch branch : list) {
@@ -79,7 +78,8 @@ public class CarService {
 
         car.setUser(currentUser);
         car.setActive(true);
-        return carRepository.save(car);
+        carRepository.save(car);
+        return toCarResponse(car);
     }
 
     // Lấy danh sách xe của người dùng hiện tại
@@ -145,5 +145,19 @@ public class CarService {
     public int convertBatteryToPercent(Car car){
         return (int) Math.round(car.getInitBattery()/car.getCarBranch().getBatteryCapacity()*100);
 
+    }
+
+    public Set<String> getAllCarsByPortType(String portType) {
+        User currentUser = getCurrentUser();
+        List<Car> list= carRepository.findAll().stream()
+                .filter(car -> car.getCarBranch().getPortType().equalsIgnoreCase(portType))
+                .filter(car -> car.getUser().getId() == currentUser.getId())
+                .filter(car -> car.isActive())
+                .collect(Collectors.toList());
+        Set<String> rs = new HashSet<>();
+        for(Car c : list){
+            rs.add(c.getCarBranch().getBrand());
+        }
+        return rs;
     }
 }
