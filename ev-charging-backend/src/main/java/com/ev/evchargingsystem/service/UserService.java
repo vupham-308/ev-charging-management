@@ -6,7 +6,6 @@ import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
 import com.ev.evchargingsystem.model.request.UpdatePasswordRequest;
-import com.ev.evchargingsystem.model.request.UserCreateRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
 import com.ev.evchargingsystem.model.response.UserResponse;
@@ -180,8 +179,8 @@ public class UserService {
     }
 
 
-    public User createUser(UserCreateRequest rq) throws MessagingException {
-        String temp = generatePassword(10);
+    public User createUser(User rq) throws MessagingException {
+        String temp = rq.getPassword();
         User user = new User(passwordEncoder.encode(temp),
                 rq.getFullName(),
                 rq.getEmail(),
