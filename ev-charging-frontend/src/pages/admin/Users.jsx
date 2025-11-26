@@ -59,7 +59,11 @@ const Users = () => {
     try {
       const res = await api.get("admin/users/user-stats");
       setStats(res.data);
-    } catch {}
+    } catch {
+      message.error("Không thể tải danh sách người dùng!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
