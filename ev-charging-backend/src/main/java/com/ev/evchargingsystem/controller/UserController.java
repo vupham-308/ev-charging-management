@@ -4,7 +4,6 @@ import com.ev.evchargingsystem.entity.Staff;
 import com.ev.evchargingsystem.entity.Station;
 import com.ev.evchargingsystem.entity.User;
 import com.ev.evchargingsystem.model.request.AdminUpdateUserRequest;
-import com.ev.evchargingsystem.model.request.UserCreateRequest;
 import com.ev.evchargingsystem.model.request.UserUpdateRequest;
 import com.ev.evchargingsystem.model.response.StaffStationResponse;
 import com.ev.evchargingsystem.model.response.UserInfoResponse;
@@ -69,7 +68,7 @@ public class UserController {
 
 
     @PostMapping("/create-user")
-    public ResponseEntity createUser(@RequestBody @Valid UserCreateRequest user) throws MessagingException {
+    public ResponseEntity createUser(@RequestBody @Valid User user) throws MessagingException {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
