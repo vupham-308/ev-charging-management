@@ -9,11 +9,13 @@ import {
   FaPowerOff,
 } from "react-icons/fa";
 import api from "../../config/axios";
+import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { Tooltip } from "antd";
 
 const ManageMyBooking = () => {
   const [bookings, setBookings] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("PENDING"); // trạng thái lọc
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,26 +26,26 @@ const ManageMyBooking = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const filteredBookings = response.data.filter(
-          (b) => b.status !== "CANCELLED"
-        );
-
-        const sortedBookings = filteredBookings.sort(
+        const filtered = response.data.filter((b) => b.status !== "CANCELLED");
+        const sorted = filtered.sort(
           (a, b) => new Date(a.startDate) - new Date(b.startDate)
         );
 
-        setBookings(sortedBookings);
+        setBookings(sorted);
       } catch (error) {
-        console.error("❌ Lỗi khi tải danh sách đặt chỗ:", error);
+        console.error("❌ Lỗi tải đặt chỗ:", error);
       }
     };
     fetchMyBookings();
   }, []);
 
   const handleStart = (booking) => {
-    navigate(`/driver/startChargingBooking/${booking.stationId}`, {
-      state: { booking },
-    });
+    navigate(
+      `/driver/startChargingBooking/${booking.chargerPoint.station.id}`,
+      {
+        state: { booking },
+      }
+    );
   };
 
   const handleCancel = async (id) => {
@@ -53,28 +55,41 @@ const ManageMyBooking = () => {
         await api.put(`/reservations/cancel/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         setBookings((prev) => prev.filter((b) => b.id !== id));
-        toast.success("Đã hủy đặt chỗ thành công!");
+        toast.success("Đã hủy đặt chỗ!");
       } catch (error) {
-        console.error("❌ Lỗi khi hủy đặt chỗ:", error);
-        toast.error("Không thể hủy đặt chỗ. Vui lòng thử lại!");
+        console.error("❌ Lỗi khi hủy:", error);
+        toast.error("Không thể hủy đặt chỗ!");
       }
     }
   };
 
-  const getStatusLabel = (status) => {
+  const getStatus = (status) => {
     switch (status) {
       case "PENDING":
-        return { text: "Đặt thành công", color: "text-emerald-600" };
-      case "COMPLETE":
-        return { text: "Đã sạc xong", color: "text-blue-600" };
+        return { text: "Đặt thành công", class: "text-emerald-600" };
+      case "COMPLETED":
+        return { text: "Đã sạc xong", class: "text-blue-600" };
       default:
-        return { text: status, color: "text-gray-500" };
+        return { text: status, class: "text-gray-500" };
     }
   };
 
+  // lọc booking theo nút chọn và sắp xếp
+  const filteredBookings = bookings
+    .filter((b) => b.status === filterStatus)
+    .sort((a, b) => {
+      // nếu là COMPLETED thì sort ngược, gần nhất lên đầu
+      if (filterStatus === "COMPLETED") {
+        return new Date(b.startDate) - new Date(a.startDate);
+      }
+      // PENDING giữ nguyên sort tăng dần theo thời gian
+      return new Date(a.startDate) - new Date(b.startDate);
+    });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       {/* Header */}
       <div className="mb-6 text-center">
         <h2 className="text-3xl font-bold text-gray-800 flex justify-center items-center gap-2">
@@ -82,77 +97,119 @@ const ManageMyBooking = () => {
           Đặt chỗ của tôi
         </h2>
         <p className="text-gray-500 mt-2">Quản lý lịch hẹn sạc xe của bạn</p>
+
+        {/* Nút lọc */}
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            onClick={() => setFilterStatus("PENDING")}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              filterStatus === "PENDING"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Chỗ đã đặt
+          </button>
+          <button
+            onClick={() => setFilterStatus("COMPLETED")}
+            className={`px-4 py-2 rounded-lg font-medium transition ${
+              filterStatus === "COMPLETED"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Chỗ đã sạc xong
+          </button>
+        </div>
       </div>
 
-      {/* Empty state */}
-      {bookings.length === 0 ? (
+      {/* Empty State */}
+      {filteredBookings.length === 0 ? (
         <div className="text-center mt-20">
           <FaMapMarkerAlt className="text-5xl text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-lg">Bạn chưa có đặt chỗ nào.</p>
+          <p className="text-gray-500 text-lg">Không có đặt chỗ nào.</p>
         </div>
       ) : (
         <div className="space-y-5 max-w-3xl mx-auto">
-          {bookings.map((booking) => {
-            const { text, color } = getStatusLabel(booking.status);
+          {filteredBookings.map((b) => {
+            const status = getStatus(b.status);
+            const canStart = new Date() >= new Date(b.startDate);
 
-            const canStart = new Date() >= new Date(booking.startDate);
+            const start = dayjs(b.startDate);
+            const end = dayjs(b.endDate);
 
             return (
               <div
-                key={booking.id}
-                className="bg-white rounded-2xl shadow-md p-6 transition hover:shadow-lg border border-gray-100"
+                key={b.id}
+                className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition"
               >
-                {/* Station Info */}
+                {/* Station */}
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                       <FaMapMarkerAlt className="text-blue-600" />
-                      {booking.stationName}
+                      {b.chargerPoint.station.name}
                     </h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      {b.chargerPoint.station.address}
+                    </p>
 
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mt-3">
-                      <span className="flex items-center gap-1">
+                    {/* Time row */}
+                    <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                      <span className="flex items-center gap-1 text-gray-700">
                         <FaCalendarAlt className="text-emerald-500" />
-                        {new Date(booking.startDate).toLocaleDateString(
-                          "vi-VN"
-                        )}
+                        {start.format("DD/MM/YYYY")}
                       </span>
-                      <span className="flex items-center gap-1">
+
+                      <span className="flex items-center gap-1 text-gray-700">
                         <FaClock className="text-indigo-500" />
-                        {new Date(booking.startDate).toLocaleTimeString(
-                          "vi-VN",
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
+                        {start.format("HH:mm")}
                       </span>
-                      <span className="flex items-center gap-1">
+
+                      <span className="flex items-center gap-1 text-gray-700">
                         <FaBolt className="text-yellow-500" />
-                        {booking.chargerPointName}
+                        {b.chargerPoint.name} •{" "}
+                        {b.chargerPoint.chargerCost.portType} •{" "}
+                        {b.chargerPoint.chargerCost.power} kW
                       </span>
                     </div>
-                    <p className={`mt-3 font-medium ${color}`}>{text}</p>
+
+                    {/* compatible */}
+                    {b.compatibleNote && (
+                      <p className="text-xs text-gray-500 italic mt-1">
+                        {b.compatibleNote}
+                      </p>
+                    )}
+
+                    {/* Status */}
+                    <p className={`${status.class} mt-3 font-medium`}>
+                      Trạng thái: {status.text}
+                    </p>
+
+                    {/* Khung giờ */}
+                    <p className="text-gray-700 text-sm">
+                      Khung giờ: {start.format("HH:mm")} → {end.format("HH:mm")}
+                    </p>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex justify-end gap-3 mt-5">
-                  {booking.status === "PENDING" && (
+                  {b.status === "PENDING" && (
                     <>
                       <Tooltip
                         title={
                           canStart
-                            ? "Đến giờ, bạn có thể bắt đầu sạc"
-                            : "Chưa đến giờ bắt đầu, vui lòng chờ đến đúng thời gian đặt"
+                            ? "Bạn có thể bắt đầu sạc"
+                            : "Chưa đến thời gian đặt"
                         }
                       >
                         <button
-                          onClick={() => canStart && handleStart(booking)}
+                          onClick={() => canStart && handleStart(b)}
                           disabled={!canStart}
                           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-medium transition ${
                             canStart
-                              ? "bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+                              ? "bg-blue-600 hover:bg-blue-700"
                               : "bg-gray-400 cursor-not-allowed"
                           }`}
                         >
@@ -162,19 +219,13 @@ const ManageMyBooking = () => {
                       </Tooltip>
 
                       <button
-                        onClick={() => handleCancel(booking.id)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition shadow-sm"
+                        onClick={() => handleCancel(b.id)}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition"
                       >
                         <FaBolt />
                         Hủy
                       </button>
                     </>
-                  )}
-
-                  {booking.status === "COMPLETE" && (
-                    <span className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium">
-                      ✅ Đã sạc xong
-                    </span>
                   )}
                 </div>
               </div>

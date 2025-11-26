@@ -15,8 +15,8 @@ const ManageTopup = () => {
 
   const handleTopup = async () => {
     // ✅ Kiểm tra số tiền nạp tối thiểu
-    if (!amount || amount < 5000) {
-      toast.warning("💰 Số tiền nạp tối thiểu là 5.000 VND!");
+    if (!amount || amount < 20000) {
+      toast.warning(" Số tiền nạp tối thiểu là 20.000 VND!");
       return; // ❌ Không gọi API, không chuyển trang
     }
 

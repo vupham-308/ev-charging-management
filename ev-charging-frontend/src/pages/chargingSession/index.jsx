@@ -10,10 +10,12 @@ import {
 
 const ManageChargingSession = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [chargingSessions, setChargingSessions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
   const [filter, setFilter] = useState(location.state?.defaultFilter || "ALL");
+
   useEffect(() => {
     let intervalId;
 
@@ -44,291 +46,271 @@ const ManageChargingSession = () => {
     }
   };
 
-  if (loading)
+  const getPaymentMethodText = (method) => {
+    switch (method) {
+      case "BALANCE":
+        return "Số dư tài khoản";
+      case "CASH":
+        return "Tiền mặt";
+      default:
+        return "Chưa xác định";
+    }
+  };
+
+  if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "70vh",
-        }}
-      >
+      <div className="flex items-center justify-center min-h-[70vh] bg-white">
         <Spin tip="Đang tải thông tin..." size="large" />
       </div>
     );
+  }
 
   const filteredSessions = chargingSessions
     .filter((session) => {
       if (filter === "CHARGING") return session.status !== "COMPLETED";
       if (filter === "COMPLETED") return session.status === "COMPLETED";
-      return true;
+      return true; // ALL
     })
     .sort((a, b) => {
+      // Đặt phiên đang sạc lên trước
       if (a.status !== "COMPLETED" && b.status === "COMPLETED") return -1;
       if (a.status === "COMPLETED" && b.status !== "COMPLETED") return 1;
+
+      // Nếu đều là COMPLETED, sắp xếp theo startDate gần nhất lên đầu
+      if (a.status === "COMPLETED" && b.status === "COMPLETED") {
+        return new Date(b.startDate) - new Date(a.startDate); // mới -> cũ
+      }
+
       return 0;
     });
 
-  return (
-    <div
-      style={{
-        padding: "50px 120px",
-        backgroundColor: "#fff",
-        minHeight: "100vh",
-      }}
-    >
-      <h2
-        style={{
-          fontWeight: 700,
-          fontSize: 24,
-          color: "#00021f",
-          marginBottom: 30,
-        }}
-      >
-        Phiên sạc của tôi
-      </h2>
+  const renderEmptyText = () => {
+    if (filter === "CHARGING")
+      return "Hiện tại bạn không có phiên sạc đang hoạt động.";
+    if (filter === "COMPLETED")
+      return "Hiện tại bạn chưa có phiên sạc nào đã hoàn thành.";
+    return "Hiện tại không có phiên sạc nào.";
+  };
 
-      {/* NÚT LỌC */}
-      <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
-        <Button
-          type={filter === "CHARGING" ? "primary" : "default"}
-          onClick={() => setFilter("CHARGING")}
-        >
-          Đang sạc
-        </Button>
-        <Button
-          type={filter === "COMPLETED" ? "primary" : "default"}
-          onClick={() => setFilter("COMPLETED")}
-        >
-          Đã sạc xong
-        </Button>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 px-8 py-10">
+      {/* Header */}
+      <div className="max-w-6xl mx-auto mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2">
+            <CarOutlined className="text-blue-600" />
+            Phiên sạc của tôi
+          </h2>
+          <p className="text-slate-500 mt-1">
+            Theo dõi trạng thái các phiên sạc đang hoạt động và đã hoàn tất.
+          </p>
+        </div>
+
+        {/* Filter buttons */}
+        <div className="flex gap-2">
+          <Button
+            type={filter === "ALL" ? "primary" : "default"}
+            onClick={() => setFilter("ALL")}
+            className="rounded-full"
+          >
+            Tất cả
+          </Button>
+          <Button
+            type={filter === "CHARGING" ? "primary" : "default"}
+            onClick={() => setFilter("CHARGING")}
+            className="rounded-full"
+          >
+            Đang sạc
+          </Button>
+          <Button
+            type={filter === "COMPLETED" ? "primary" : "default"}
+            onClick={() => setFilter("COMPLETED")}
+            className="rounded-full"
+          >
+            Đã sạc xong
+          </Button>
+        </div>
       </div>
 
-      {/* Trường hợp không có phiên sạc */}
+      {/* Empty state */}
       {filteredSessions.length === 0 && (
-        <p
-          style={{
-            textAlign: "center",
-            marginTop: 50,
-            color: "#000",
-            fontSize: 22,
-          }}
-        >
-          Hiện tại không có phiên sạc nào.
-        </p>
+        <div className="flex flex-col items-center justify-center mt-20 text-center">
+          <ThunderboltOutlined className="text-5xl text-slate-300 mb-4" />
+          <p className="text-slate-500 text-lg">{renderEmptyText()}</p>
+        </div>
       )}
 
-      {filteredSessions.map((session) => (
-        <Card
-          key={session.id}
-          style={{
-            borderRadius: 16,
-            border: "1px solid #eee",
-            padding: 28,
-            maxWidth: 1000,
-            margin: "0 auto 40px",
-          }}
-          bodyStyle={{ padding: 0 }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "#f8f9fa",
-              borderRadius: 12,
-              padding: "20px 28px",
-              marginBottom: 30,
-            }}
+      {/* List sessions */}
+      <div className="max-w-6xl mx-auto space-y-6">
+        {filteredSessions.map((session) => (
+          <Card
+            key={session.id}
+            className="shadow-sm rounded-2xl border border-slate-100 hover:shadow-md transition"
+            bodyStyle={{ padding: 0 }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <CarOutlined style={{ fontSize: 28 }} />
-              <div>
-                <p style={{ color: "#64748b", marginBottom: 4 }}>
-                  {session.status === "COMPLETED"
-                    ? "Xe đã sạc xong"
-                    : "Xe đang sạc"}
-                </p>
-                <h2 style={{ fontWeight: 700, fontSize: 20 }}>
-                  {session.car.licensePlate}
-                </h2>
+            {/* Header */}
+            <div className="flex items-center justify-between bg-slate-50 rounded-t-2xl px-6 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 flex items-center justify-center rounded-full bg-slate-900 text-white">
+                  <CarOutlined />
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">
+                    {session.status === "COMPLETED"
+                      ? "Xe đã sạc xong"
+                      : "Xe đang sạc"}
+                  </p>
+                  <p className="text-lg font-semibold text-slate-900">
+                    {session.car?.licensePlate}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Charging Status */}
-          {session.status === "COMPLETED" ? (
-            <div style={{ padding: "0 30px 30px" }}>
-              <h1
-                style={{
-                  fontSize: 32,
-                  fontWeight: 800,
-                  color: "#0ea5e9",
-                  textAlign: "center",
-                  marginBottom: 20,
-                }}
-              >
-                Phiên sạc đã hoàn thành
-              </h1>
-              <div
-                style={{
-                  borderTop: "1px solid #ddd",
-                  borderBottom: "1px solid #ddd",
-                  padding: "20px 10px",
-                  fontSize: 16,
-                  color: "#000",
-                  lineHeight: "1.9em",
-                }}
-              >
-                <div>
-                  <b>Mức pin:</b> {session.initBattery}% → {session.goalBattery}
-                  %
-                </div>
-                <div>
-                  <b>Năng lượng đã nạp:</b> {session.energyDelivered.toFixed(2)}{" "}
-                  kWh
-                </div>
-                <div>
-                  <b>Thời gian sạc:</b> {session.duration} phút
-                </div>
-                <div>
-                  <b>Bắt đầu:</b>{" "}
-                  {new Date(session.startDate).toLocaleString("vi-VN")}
-                </div>
-                <div>
-                  <b>Kết thúc:</b>{" "}
-                  {new Date(session.endDate).toLocaleString("vi-VN")}
-                </div>
-                <div>
-                  <b>Chi phí:</b> {session.fee.toLocaleString("vi-VN")} đ
-                </div>
-              </div>
-              <div style={{ marginTop: 20, color: "#000", fontSize: 16 }}>
-                <div>
-                  <b>Trạm:</b> {session.point.station.name} –{" "}
-                  {session.point.name} – {session.point.chargerCost.power} kW
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 40,
-                marginBottom: 40,
-              }}
-            >
-              <div style={{ flex: 1, textAlign: "center" }}>
-                <h1
-                  style={{
-                    fontSize: 38,
-                    fontWeight: 800,
-                    color: "#16a34a",
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 10,
-                  }}
-                >
-                  <ThunderboltOutlined
-                    style={{ fontSize: 34, color: "#facc15" }}
-                  />
-                  Đang sạc {session.currentBattery}%
+            {/* CONTENT */}
+            {session.status === "COMPLETED" ? (
+              // ========== PHIÊN ĐÃ HOÀN THÀNH ==========
+              <div className="px-8 py-6 space-y-5">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-sky-500 text-center">
+                  Phiên sạc đã hoàn thành
                 </h1>
-                <Progress
-                  percent={session.currentBattery}
-                  strokeColor="#16a34a"
-                  trailColor="#e5e7eb"
-                  style={{ maxWidth: 300, margin: "20px auto" }}
-                  showInfo={false}
-                />
-                <div
-                  style={{ color: "#000", fontSize: 15, lineHeight: "1.9em" }}
-                >
+
+                <div className="border-y border-slate-200 py-4 text-[15px] leading-relaxed text-slate-900 space-y-1">
                   <div>
-                    <b>Công suất hiện tại:</b> {session.point.powerRealTime} kW
+                    <b>Mức pin:</b> {session.initBattery}% →{" "}
+                    {session.goalBattery}%
                   </div>
                   <div>
-                    <b>Năng lượng đã nhận:</b>{" "}
+                    <b>Năng lượng đã nạp:</b>{" "}
                     {session.energyDelivered.toFixed(2)} kWh
                   </div>
                   <div>
-                    <b>Thời gian bắt đầu:</b>{" "}
+                    <b>Thời gian sạc:</b> {session.duration} phút
+                  </div>
+                  <div>
+                    <b>Bắt đầu:</b>{" "}
                     {new Date(session.startDate).toLocaleString("vi-VN")}
                   </div>
                   <div>
-                    <b>Thời gian đã sạc:</b> {session.duration} phút
+                    <b>Kết thúc:</b>{" "}
+                    {new Date(session.endDate).toLocaleString("vi-VN")}
                   </div>
                   <div>
-                    <b>Thời gian còn lại:</b> {session.minute} phút
+                    <b>Chi phí tổng:</b>{" "}
+                    {Math.round(session.fee).toLocaleString("vi-VN")} đ
                   </div>
                   <div>
-                    <b>Chi phí:</b> {session.fee.toLocaleString("vi-VN")} đ
+                    <b>Phương thức thanh toán:</b>{" "}
+                    {getPaymentMethodText(session.paymentMethod)}
                   </div>
+                </div>
+
+                <div className="text-[15px] text-slate-900">
                   <div>
-                    <b>Mục tiêu:</b> {session.goalBattery}%
-                  </div>
-                  <div>
-                    <b>Trạm:</b> {session.point.station.name} –{" "}
-                    {session.point.name} – {session.point.chargerCost.power} kW
+                    <b>Trạm:</b> {session.point?.station?.name} –{" "}
+                    {session.point?.name} – {session.point?.chargerCost?.power}{" "}
+                    kW
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            ) : (
+              // ========== PHIÊN ĐANG SẠC ==========
+              <div className="px-8 py-6 flex flex-col lg:flex-row gap-8 justify-between">
+                <div className="flex-1 text-center">
+                  <h1 className="flex items-center justify-center gap-2 text-2xl md:text-3xl font-extrabold text-emerald-600">
+                    <ThunderboltOutlined className="text-yellow-400 text-3xl" />
+                    Đang sạc {session.currentBattery}%
+                  </h1>
 
-          {/* ACTION BUTTONS CHỈ HIỂN THỊ KHI ĐANG SẠC */}
-          {session.status !== "COMPLETED" && (
-            <div
-              style={{
-                display: "flex",
-                gap: 16,
-                justifyContent: "center",
-                paddingBottom: 10,
-              }}
-            >
-              <Button
-                danger
-                size="large"
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  fontWeight: 700,
-                  backgroundColor: "#c70024",
-                  color: "#fff",
-                  height: 50,
-                }}
-                onClick={() => handleStopCharging(session.id)}
-              >
-                Dừng sạc
-              </Button>
+                  <div className="max-w-xs mx-auto mt-5">
+                    <Progress
+                      percent={session.currentBattery}
+                      strokeColor="#16a34a"
+                      trailColor="#e5e7eb"
+                      showInfo={false}
+                    />
+                  </div>
 
-              <Button
-                size="large"
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  fontWeight: 700,
-                  backgroundColor: "#fff7e6",
-                  border: "1px solid #faad14",
-                  color: "#fa8c16",
-                  height: 50,
-                }}
-                icon={<WarningOutlined />}
-                onClick={() =>
-                  navigate(
-                    `/driver/chargingSession/stationReport/${session.point.station.id}`
-                  )
-                }
-              >
-                Báo cáo sự cố
-              </Button>
-            </div>
-          )}
-        </Card>
-      ))}
+                  <div className="mt-4 text-[15px] text-slate-900 space-y-1 leading-relaxed">
+                    <div>
+                      <b>Công suất hiện tại:</b> {session.point?.powerRealTime}{" "}
+                      kW
+                    </div>
+                    <div>
+                      <b>Năng lượng đã nhận:</b>{" "}
+                      {session.energyDelivered.toFixed(2)} kWh
+                    </div>
+                    <div>
+                      <b>Thời gian bắt đầu:</b>{" "}
+                      {new Date(session.startDate).toLocaleString("vi-VN")}
+                    </div>
+                    <div>
+                      <b>Thời gian đã sạc:</b> {session.duration} phút
+                    </div>
+                    <div>
+                      <b>Thời gian ước tính còn lại:</b> {session.minute} phút
+                    </div>
+                    <div>
+                      <b>Chi phí hiện tại:</b>{" "}
+                      {Math.round(session.fee).toLocaleString("vi-VN")} đ
+                    </div>
+                    <div>
+                      <b>Chi phí ước tính:</b>{" "}
+                      {Math.round(session.estimatedFee).toLocaleString("vi-VN")}{" "}
+                      đ
+                    </div>
+                    <div>
+                      <b>Phương thức thanh toán:</b>{" "}
+                      {getPaymentMethodText(session.paymentMethod)}
+                    </div>
+                    <div>
+                      <b>Mục tiêu:</b> {session.goalBattery}%
+                    </div>
+                    <div>
+                      <b>Trạm:</b> {session.point?.station?.name} –{" "}
+                      {session.point?.name} –{" "}
+                      {session.point?.chargerCost?.power} kW
+                      {session.paymentMethod === "CASH" && (
+                        <div className="mt-2 text-[#c70024] font-semibold">
+                          Thanh toán bằng tiền mặt, nếu rút sạc giữa chừng sẽ
+                          không được hoàn tiền.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ACTION BUTTONS – chỉ hiển thị khi đang sạc */}
+            {session.status !== "COMPLETED" && (
+              <div className="flex flex-col md:flex-row gap-4 md:gap-3 justify-center px-8 pb-6">
+                <Button
+                  danger
+                  size="large"
+                  className="flex-1 font-bold h-12 rounded-xl bg-[#c70024] text-white border-none hover:bg-red-700"
+                  onClick={() => handleStopCharging(session.id)}
+                >
+                  Dừng sạc
+                </Button>
+
+                <Button
+                  size="large"
+                  className="flex-1 font-bold h-12 rounded-xl bg-amber-50 border border-amber-400 text-amber-600 flex items-center justify-center gap-2"
+                  icon={<WarningOutlined />}
+                  onClick={() =>
+                    navigate(
+                      `/driver/chargingSession/stationReport/${session.point.station.id}`
+                    )
+                  }
+                >
+                  Báo cáo sự cố
+                </Button>
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

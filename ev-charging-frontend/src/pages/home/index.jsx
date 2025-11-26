@@ -104,19 +104,12 @@ const EVChargeHomePage = () => {
       questions: [
         {
           q: "Hệ thống hỗ trợ sạc cho xe điện hãng nào?",
-          a: "Hệ thống hiện hỗ trợ sạc xe cho Vinfast, Hyundai, Nissan.",
+          a: "Hệ thống hiện hỗ trợ sạc xe cho Vinfast",
         },
-        {
-          q: "Hệ thống hỗ trợ những loại cổng sạc nào?",
-          a: "Hệ thống hiện hỗ trợ các chuẩn sạc phổ biến gồm AC cho xe Vinfast, CHAdeMo cho xe Nissan, CCS cho xe Hyundai.",
-        },
-        {
-          q: "Có thể sạc xe ở trạm khác hãng không?",
-          a: "Không, hiện tại chúng tôi chỉ hỗ trợ sạc xe cho Vinfast, Hyundai, Nissan.",
-        },
+
         {
           q: "Mất bao lâu để sạc đầy pin từ 1%?",
-          a: "• Sạc AC (22kW): khoảng 3-4h\n• Sạc CHAdeMo (75kW): 60-90 phút\n• Sạc CCS (120kW): khoảng 40 phút\n\nỨng dụng sẽ hiển thị thời gian dự kiến trước khi bạn bắt đầu.",
+          a: "Thời gian sạc đầy pin sẽ phụ thuộc vào dung lượng pin và công suất trụ sạc bạn sử dụng. Ứng dụng sẽ hiển thị thời gian dự kiến trước khi bạn bắt đầu.",
         },
       ],
     },
@@ -133,7 +126,7 @@ const EVChargeHomePage = () => {
         },
         {
           q: "Nếu tôi bị dừng sạc giữa chừng, tôi bị trừ tiền như thế nào?",
-          a: "Bạn chỉ bị trừ phí tương ứng với thời gian sạc thực tế, tính đến thời điểm kết thúc phiên sạc.",
+          a: "Bạn chỉ bị trừ phí tương ứng với thời gian sạc thực tế, tính đến thời điểm kết thúc phiên sạc. Tuy nhiên nếu bạn thanh toán bằng tiền mặt với nhân viên trạm sạc thì khi rút sạc số tiền sẽ không được hoàn lại.",
         },
       ],
     },

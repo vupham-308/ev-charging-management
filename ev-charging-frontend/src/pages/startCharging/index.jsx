@@ -57,7 +57,13 @@ const ManageStartCharging = () => {
         setStation(stationRes.data);
         setCars(Array.isArray(carRes.data) ? carRes.data : []);
         setChargers(Array.isArray(chargerRes.data) ? chargerRes.data : []);
-        setReviews(Array.isArray(reviewRes.data) ? reviewRes.data : []);
+        setReviews(
+          Array.isArray(reviewRes.data)
+            ? reviewRes.data.sort(
+                (a, b) => new Date(b.reviewDate) - new Date(a.reviewDate)
+              )
+            : []
+        );
 
         if (Array.isArray(reviewRes.data) && reviewRes.data.length > 0) {
           const avg =
@@ -286,7 +292,7 @@ const ManageStartCharging = () => {
               >
                 {cars.map((car) => (
                   <Select.Option key={car.id} value={car.id}>
-                    {car.brand} ({car.initBattery}%)
+                    {car.brand} • {car.licensePlate} ({car.initBattery}%)
                   </Select.Option>
                 ))}
               </Select>
@@ -457,7 +463,7 @@ const ManageStartCharging = () => {
                     {confirmData.selectedCharger.chargerCost?.cost?.toLocaleString(
                       "vi-VN"
                     ) || "—"}
-                    đ/phút
+                    đ/kWh
                   </span>
                 </p>
               </div>
@@ -518,7 +524,10 @@ const ManageStartCharging = () => {
                   <div>
                     <p className="text-xs text-gray-500">Tổng ước tính</p>
                     <p className="text-2xl font-bold text-blue-700">
-                      {confirmData.chargeData.fee.toLocaleString("vi-VN")}đ
+                      {confirmData.chargeData.estimatedFee.toLocaleString(
+                        "vi-VN"
+                      )}
+                      đ
                     </p>
                   </div>
                   <div className="text-right">
