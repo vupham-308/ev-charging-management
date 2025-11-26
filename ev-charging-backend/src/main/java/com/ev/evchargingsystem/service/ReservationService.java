@@ -198,6 +198,7 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
+    //để lock trụ
     public List<ReservationResponse> getAllReservations() {
         List<ReservationResponse> result = new ArrayList<>();
         List<Reservation> reservations = reservationRepository.findAllByStatus("PENDING");
@@ -212,6 +213,17 @@ public class ReservationService {
             if (r.getChargerPoint() != null) {
                 dto.setChargerPoint(r.getChargerPoint());
             }
+            result.add(dto);
+        }
+        //lấy cả session đang ongoing
+        List<ChargingSession> sessions = chargingSessionRepository.findAllByStatus("ONGOING");
+        for(ChargingSession s: sessions){
+            ReservationResponse dto = new ReservationResponse();
+            dto.setId(-s.getId()); // Đánh dấu ID âm để phân biệt với reservation
+            dto.setStatus(s.getStatus());
+            dto.setStartDate(s.getStartTime());
+            dto.setEndDate(s.getEndTime());
+            dto.setChargerPoint(s.getChargerPoint());
             result.add(dto);
         }
         return result;

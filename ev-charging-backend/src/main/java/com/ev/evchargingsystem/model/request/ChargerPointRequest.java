@@ -16,7 +16,7 @@ public class ChargerPointRequest {
     @NotEmpty (message = "Name cannot be empty!")
     @Column(columnDefinition = "NVARCHAR(30)")
     private String name;
-    @NotEmpty
+    @NotNull
     private int chargerCostId;
     @NotEmpty
     private String status;
