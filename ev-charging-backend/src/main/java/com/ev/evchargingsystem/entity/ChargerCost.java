@@ -20,7 +20,7 @@ public class ChargerCost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NotNull(message = "Không được để trống loại cổng sạc")
-    @Column(name="port_type")
+    @Column(name="port_type",unique = true)
     private String portType;
     @NotNull(message = "Không được để trống công suất")//kW
     private int power;

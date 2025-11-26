@@ -105,4 +105,6 @@ public interface ChargingSessionRepository extends JpaRepository<ChargingSession
             @Param("start") Date start,
             @Param("end") Date end
     );
+
+    List<ChargingSession> findAllByStatus(String ongoing);
 }
