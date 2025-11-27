@@ -8,10 +8,12 @@ import { useProblems } from "./../../hooks/useProblems";
 import { useCreateProblem } from "../../hooks/useCreateProblem";
 import { useReportedProblems } from "../../hooks/useReportedProblems";
 import { useState } from "react"; 
+import { useProfile } from "../../contexts/ProfileContext";
 
 const { TextArea } = Input;
 
 export const IssuesTab = () => {
+  const { profile } = useProfile(); // LẤY PROFILE TỪ CONTEXT
   const { problems, isLoading, refetch, setProblems } = useProblems();
   const { reportedProblems, isLoading: isLoadingReported, fetchReportedProblems, setReportedProblems } = useReportedProblems();
   const { handleCreateProblem, loading: creatingProblem } = useCreateProblem();
@@ -20,12 +22,22 @@ export const IssuesTab = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
+  // LẤY STATION INFO TỪ PROFILE
+  const stationId = profile?.station?.id;
+  const stationName = profile?.station?.name;
+  const stationLocation = profile?.station?.location;
+
   // --- Phân loại sự cố ---
   const customerProblems = problems;
   const reportedProblemsList = reportedProblems;
 
   // Hàm xử lý mở modal báo cáo sự cố
   const handleOpenReportModal = () => {
+    // Kiểm tra xem profile có station không trước khi mở modal
+    if (!stationId) {
+      message.error("Tài khoản của bạn chưa được gán với trạm nào. Vui lòng liên hệ quản trị viên!");
+      return;
+    }
     setIsModalVisible(true);
   };
 
@@ -37,19 +49,19 @@ export const IssuesTab = () => {
 
   // Hàm thêm problem mới vào local state với data đầy đủ
   const addProblemToLocalState = (newProblem) => {
-    // Tạo object problem hoàn chỉnh với tất cả các trường cần thiết
     const completeProblem = {
       ...newProblem,
-      id: newProblem.id || Date.now(), // Fallback ID nếu API không trả về
-      status: "PENDING", // Mặc định khi mới tạo
+      id: newProblem.id || Date.now(),
+      status: "PENDING",
       createdAt: new Date().toISOString(),
       user: {
-        fullName: "Nhân viên", // Hoặc lấy từ user context
+        fullName: profile?.fullName || "Nhân viên",
         role: "staff"
       },
       station: {
-        name: "Trạm hiện tại", // Hoặc lấy từ station context
-        location: "Địa chỉ trạm"
+        id: stationId,
+        name: stationName || "Trạm hiện tại",
+        location: stationLocation || "Địa chỉ trạm"
       },
       reportedBy: "staff"
     };
@@ -59,8 +71,12 @@ export const IssuesTab = () => {
 
   const handleSubmitProblemToAdmin = async (values) => {
     try {
-      const stationId = 1; // Thay bằng stationId từ context/global state
-      
+      // KIỂM TRA STATION ID TỪ PROFILE
+      if (!stationId) {
+        message.error("Tài khoản của bạn chưa được gán với trạm nào. Vui lòng liên hệ quản trị viên!");
+        return;
+      }
+
       const problemData = {
         title: values.title,
         description: values.description,
@@ -70,20 +86,19 @@ export const IssuesTab = () => {
       // Gửi request tạo problem
       const newProblem = await handleCreateProblem(stationId, problemData);
       
-      // CẬP NHẬT NGAY LẬP TỨC VÀO STATE mà không cần chờ refetch
+      // CẬP NHẬT NGAY LẬP TỨC VÀO STATE
       if (newProblem) {
         addProblemToLocalState(newProblem);
         message.success("Báo cáo sự cố đã được gửi thành công đến quản trị viên!");
         
-        // Đóng modal và reset form ngay lập tức
+        // Đóng modal và reset form
         setIsModalVisible(false);
         form.resetFields();
         
-        // Tự động chuyển sang tab "Sự cố đã báo cáo" để user thấy kết quả
+        // Tự động chuyển sang tab "Sự cố đã báo cáo"
         setActiveTabKey("reported");
         
-        // Refetch dữ liệu mới nhất từ server trong background (optional)
-        // Không cần chờ kết quả, chỉ để đồng bộ hóa
+        // Refetch dữ liệu mới nhất từ server
         setTimeout(() => {
           fetchReportedProblems().catch(console.error);
         }, 500);
@@ -95,7 +110,7 @@ export const IssuesTab = () => {
     }
   };
 
-  // Hàm render nội dung cho từng tab
+  // Hàm render nội dung cho từng tab (giữ nguyên)
   const renderProblemList = (list, tabType, loading) => {
     // Sắp xếp theo ngày tạo (mới nhất trước)
     const sortedList = [...list].sort(
@@ -155,6 +170,17 @@ export const IssuesTab = () => {
   const customerCount = customerProblems.length;
   const reportedCount = reportedProblemsList.length;
 
+  // Hiển thị loading nếu profile đang tải
+  if (!profile && isLoading) {
+    return (
+      <div className="w-full bg-gray-50 min-h-screen flex justify-center items-center py-5">
+        <div className="text-center">
+          <p className="text-gray-500 text-lg">Đang tải thông tin tài khoản...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-gray-50 min-h-screen flex justify-center py-5">
         {/* Container chính */}
@@ -164,6 +190,12 @@ export const IssuesTab = () => {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-semibold text-gray-800">Quản lý sự cố</h2>
+            {/* Hiển thị tên trạm nếu có */}
+            {stationName && (
+              <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                Trạm: {stationName}
+              </span>
+            )}
           </div>
           
           <div className="flex items-center gap-3">
@@ -176,6 +208,7 @@ export const IssuesTab = () => {
               icon={<ExclamationCircleOutlined />}
               onClick={handleOpenReportModal}
               className="bg-blue-600 hover:bg-blue-700 border-blue-600"
+              disabled={!stationId} // Vô hiệu hóa nút nếu không có stationId
             >
               Báo cáo sự cố lên Admin
             </Button>
@@ -183,7 +216,8 @@ export const IssuesTab = () => {
         </div>
         
         <p className="text-gray-500 mb-4">
-            Xem và xử lý báo cáo sự cố từ khách hàng và nhân viên tại trạm này
+            Xem và xử lý báo cáo sự cố từ khách hàng và nhân viên tại{" "}
+            <strong>{stationName || "trạm của bạn"}</strong>
           </p>
         
 
@@ -244,7 +278,9 @@ export const IssuesTab = () => {
         destroyOnClose
       >
         <p className="text-gray-600 mb-4">
-          Mô tả chi tiết sự cố bạn gặp phải. Báo cáo này sẽ được gửi trực tiếp đến đội ngũ quản trị để xử lý.
+          Mô tả chi tiết sự cố bạn gặp phải tại{" "}
+          <strong>{stationName || "trạm của bạn"}</strong>. 
+          Báo cáo này sẽ được gửi trực tiếp đến đội ngũ quản trị để xử lý.
         </p>
         
         <Form
