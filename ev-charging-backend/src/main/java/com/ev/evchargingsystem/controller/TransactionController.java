@@ -46,5 +46,4 @@ public class TransactionController {
     public ResponseEntity getTransactionById(@PathVariable int id){
         return ResponseEntity.ok(transactionService.getTransactionById(id));
     }
-
 }

@@ -15,7 +15,6 @@ import org.hibernate.annotations.Check;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Check(constraints = "port_type IN ('AC', 'CCS', 'CHAdeMO')")
 public class CarBranch {
         @Id
         @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

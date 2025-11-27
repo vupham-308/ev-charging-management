@@ -29,8 +29,12 @@ public class CarBranchController {
 
     @PostMapping("/admin/create")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<CarBranch> create(@RequestBody @Valid CarBranch carBranch){
-        return ResponseEntity.ok(carBranchService.addNewCarBranch(carBranch));
+    public ResponseEntity create(@RequestBody @Valid CarBranch carBranch){
+        CarBranch createdCarBranch = carBranchService.addNewCarBranch(carBranch);
+        if (createdCarBranch == null) {
+            return ResponseEntity.badRequest().body("Cổng sạc không phù hợp với bất kỳ trụ sạc nào hiện có.");
+        }
+        return ResponseEntity.ok(createdCarBranch);
     }
 
     @PutMapping("/admin/edit/{id}")

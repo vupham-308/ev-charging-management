@@ -11,7 +11,6 @@ import org.hibernate.annotations.Check;
 import java.util.List;
 
 @Entity
-@Check(constraints = "port_type IN ('AC', 'CCS', 'CHAdeMO')")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -184,7 +184,8 @@ public class ChargingSessionService {
             throw new RuntimeException("Trụ sạc này đang được đặt trước bởi 1 người khác.");
         }
         //check pin
-        if(rq.getGoalBattery()<=car.getInitBattery()){
+        double goalBatteryRequest = rq.getGoalBattery()*car.getCarBranch().getBatteryCapacity()/100;//kWh
+        if(goalBatteryRequest<=car.getInitBattery()){
             throw new RuntimeException("Không thể sạc với mục tiêu sạc thấp hơn pin của bạn!");
         }
         //===============LOGIC===========================
@@ -255,7 +256,10 @@ public class ChargingSessionService {
             double energyDeliverd = c.getCar().getInitBattery()-c.getInitBattery();
             int initBatteryPercent= (int) Math.round(c.getInitBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
             int goalBatteryPercent= (int) Math.round(c.getGoalBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
-            long durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            long durationMs = 0;
+            if(c.getStartTime()!=null) {
+                durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            }
             if(c.getStatus().equals("COMPLETED")){
                 estimateTimeRemain = 0;
                 durationMs=c.getEndTime().getTime() - c.getStartTime().getTime();
@@ -318,7 +322,10 @@ public class ChargingSessionService {
             double energyDeliverd = c.getCar().getInitBattery()-c.getInitBattery();
             int initBatteryPercent= (int) Math.round(c.getInitBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
             int goalBatteryPercent= (int) Math.round(c.getGoalBattery()/c.getCar().getCarBranch().getBatteryCapacity()*100);
-            long durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            long durationMs = 0;
+            if(c.getStartTime()!=null) {
+                durationMs = System.currentTimeMillis() - c.getStartTime().getTime();
+            }
             if(c.getStatus().equals("COMPLETED")){
                 estimateTimeRemain = 0;
                 durationMs=c.getEndTime().getTime() - c.getStartTime().getTime();

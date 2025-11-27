@@ -18,7 +18,7 @@ const StationDetail = () => {
     const navigate = useNavigate();
     const [station, setStation] = useState(null);
     const [chargers, setChargers] = useState([]);
-    const [stats, setStats] = useState({ // Khởi tạo state
+    const [stats, setStats] = useState({
         available: 0,
         inUse: 0,
         maintenance: 0,
@@ -30,46 +30,60 @@ const StationDetail = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editingCharger, setEditingCharger] = useState(null);
     const [form] = Form.useForm();
+    const [deleteModal, setDeleteModal] = useState({ open: false, id: null });
 
-    // ==================== FETCH API ====================
     const token = localStorage.getItem("token");
 
+    // ================== Charger Cost API ==================
+    const [chargerCosts, setChargerCosts] = useState([]);
+
+    const fetchChargerCosts = async () => {
+        try {
+            const res = await fetch(`http://222.255.214.35:8080/api/charger-cost`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            setChargerCosts(data);
+        } catch (e) {
+            console.error("Failed to fetch charger-cost:", e);
+            message.error("Không thể tải danh sách loại cổng sạc");
+        }
+    };
+
+    // ==================== FETCH STATION DETAIL ====================
     const fetchStationDetail = async () => {
-    const res = await fetch(`http://222.255.214.35:8080/api/station/admin/detail/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setStation(data);
+        const res = await fetch(`http://222.255.214.35:8080/api/station/admin/detail/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setStation(data);
 
-    // ✅ Cập nhật stats từ API station
-    setStats(prevStats => ({
-        ...prevStats,
-        available: data.availableChargers,
-        inUse: data.occupiedChargers,
-        maintenance: data.outOfServiceChargers
-    }));
-};
+        setStats(prev => ({
+            ...prev,
+            available: data.availableChargers,
+            inUse: data.occupiedChargers,
+            maintenance: data.outOfServiceChargers
+        }));
+    };
 
-
+    // ==================== FETCH CHARGERS ====================
     const fetchChargers = async () => {
         const res = await fetch(`http://222.255.214.35:8080/api/chargerPoint/getAll/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        
-        // ================== GIẢ LẬP DỮ LIỆU ĐỂ GIỐNG ẢNH (User/Time) ==================
-        // GHI CHÚ: API thật của bạn cần trả về currentUser và sessionStartTime
-        const simulatedData = data.map((charger) => {
+
+        const simulatedData = data.map(charger => {
             if (charger.name === "Trụ #1") {
                 return { ...charger, status: "IN_USE", currentUser: "Nguyễn Văn A", sessionStartTime: "2025-11-02T14:30:00" };
             }
             if (charger.name === "Trụ #3") {
                 return { ...charger, status: "IN_USE", currentUser: "Trần Thị B", sessionStartTime: "2025-11-02T15:00:00" };
             }
-             if (charger.name === "Trụ #7") {
+            if (charger.name === "Trụ #7") {
                 return { ...charger, status: "IN_USE", currentUser: "Lê Văn C", sessionStartTime: "2025-11-02T13:45:00" };
             }
-             if (charger.name === "Trụ #8") {
+            if (charger.name === "Trụ #8") {
                 return { ...charger, status: "IN_USE", currentUser: "Phạm Thị D", sessionStartTime: "2025-11-02T14:15:00" };
             }
             if (charger.name === "Trụ #5") {
@@ -77,26 +91,22 @@ const StationDetail = () => {
             }
             return charger;
         });
-        setChargers(simulatedData || []);
-        // =================================================================
-        
-        // ================== TÍNH TOÁN TRẠNG THÁI TỪ DỮ LIỆU TRỤ SẠC ==================
-        // Tự động đếm số lượng trụ sạc dựa trên trạng thái
+
+        setChargers(simulatedData);
+
         const available = simulatedData.filter(c => c.status?.toUpperCase() === 'AVAILABLE').length;
         const inUse = simulatedData.filter(c => c.status?.toUpperCase() === 'IN_USE').length;
         const maintenance = simulatedData.filter(c => c.status?.toUpperCase() === 'OUT_OF_SERVICE').length;
-        
-        // Cập nhật state 'stats' với số liệu đếm
-        setStats(prevStats => ({
-            ...prevStats,
+
+        setStats(prev => ({
+            ...prev,
             available,
             inUse,
             maintenance
         }));
-        // ========================================================================
     };
 
-    // ================== CẬP NHẬT API THỐNG KÊ MỚI ==================
+    // ==================== FETCH STATION STATS ====================
     const fetchStationStats = async () => {
         try {
             const res = await fetch(`http://222.255.214.35:8080/api/station/admin/dashboard-status/${id}`, {
@@ -104,29 +114,31 @@ const StationDetail = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                // Cập nhật state 'stats' với doanh thu, khách hàng, phiên sạc
-                setStats(prevStats => ({
-                    ...prevStats,
-                    revenue: data.revenueToday, // Doanh thu tuần
-                    customers: data.customersToday, // Khách hàng tuần
-                    sessions: data.chargingSessionsToday // Phiên sạc tuần
+                setStats(prev => ({
+                    ...prev,
+                    revenue: data.revenueToday,
+                    customers: data.customersToday,
+                    sessions: data.chargingSessionsToday
                 }));
             } else {
-                 message.error("Không thể tải thống kê doanh thu.");
+                message.error("Không thể tải thống kê doanh thu.");
             }
         } catch (e) {
-            console.error("Failed to fetch dashboard stats: ", e);
-            message.error("Lỗi khi tải thống kê doanh thu.");
+            console.error("Failed to fetch dashboard stats:", e);
         }
     };
-    // =================================================================
 
+    // ==================== LOAD ALL DATA ====================
     useEffect(() => {
         const load = async () => {
             try {
                 setLoading(true);
-                // Cả hai hàm fetchChargers và fetchStationStats sẽ cùng cập nhật state 'stats'
-                await Promise.all([fetchStationDetail(), fetchChargers(), fetchStationStats()]);
+                await Promise.all([
+                    fetchStationDetail(),
+                    fetchChargers(),
+                    fetchStationStats(),
+                    fetchChargerCosts(),
+                ]);
             } catch (e) {
                 message.error("Không thể tải dữ liệu trạm!");
             } finally {
@@ -134,9 +146,9 @@ const StationDetail = () => {
             }
         };
         load();
-    }, [id]); // Thêm id vào dependency array để re-fetch khi id thay đổi
+    }, [id]);
 
-    // ==================== POPUP (Thêm/Sửa) ====================
+    // ==================== HANDLES POPUP ====================
     const handleAdd = () => {
         setEditingCharger(null);
         form.resetFields();
@@ -147,7 +159,7 @@ const StationDetail = () => {
         setEditingCharger(charger);
         form.setFieldsValue({
             chargerName: charger.name,
-            type: charger.chargerCost?.portType,
+            chargerCostId: charger.chargerCost?.id,
             status: charger.status,
         });
         setIsModalVisible(true);
@@ -162,7 +174,7 @@ const StationDetail = () => {
         const values = await form.validateFields();
         const bodyData = {
             name: values.chargerName,
-            portType: values.type,
+            chargerCostId: values.chargerCostId,
             status: values.status,
         };
 
@@ -182,15 +194,20 @@ const StationDetail = () => {
             });
 
             if (!res.ok) throw new Error("Thao tác thất bại!");
+
             message.success(editingCharger ? "Cập nhật thành công!" : "Thêm mới thành công!");
             setIsModalVisible(false);
-            fetchChargers(); // Tải lại danh sách trụ sạc (và cập nhật lại số liệu đếm)
+            fetchChargers();
         } catch (e) {
             message.error(e.message);
         }
     };
+    const handleDelete = (chargerId) => {
+        setDeleteModal({ open: true, id: chargerId });
+    };
 
-    // ==================== HELPERS (Hàm hỗ trợ) ====================
+
+    // ==================== HELPERS ====================
     const getStationStatus = (s) => {
         if (s === "ACTIVE") return <Tag color="green">Hoạt động</Tag>;
         if (s === "INACTIVE") return <Tag color="default">Ngưng hoạt động</Tag>;
@@ -203,20 +220,44 @@ const StationDetail = () => {
         if (status === "IN_USE") return <Tag color="gold">Đang sử dụng</Tag>;
         return <Tag color="red">Bảo trì</Tag>;
     };
-    
-    // Format thời gian sang HH:mm
+
     const formatTime = (isoString) => {
         if (!isoString) return "";
         try {
             const date = new Date(isoString);
-            return date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' }); // vd: "14:30"
-        } catch (e) {
+            return date.toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' });
+        } catch {
             return "";
         }
     };
+    const confirmDelete = async () => {
+        try {
+            const res = await fetch(
+                `http://222.255.214.35:8080/api/chargerPoint/admin/delete?chargerPointId=${deleteModal.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-    // Loading screen
-    if (loading || !station) { // Thêm kiểm tra !station
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(err || "Xóa thất bại!");
+            }
+
+            message.success("Xóa trụ sạc thành công!");
+            setDeleteModal({ open: false, id: null });
+            fetchChargers();
+        } catch (e) {
+            message.error("Không thể xóa trụ sạc!");
+        }
+    };
+
+
+    // ==================== LOADING ====================
+    if (loading || !station) {
         return (
             <div style={{ textAlign: "center", paddingTop: 100 }}>
                 <Spin size="large" tip="Đang tải dữ liệu..." />
@@ -224,15 +265,15 @@ const StationDetail = () => {
         );
     }
 
-    // ==================== UI (Giao diện) ====================
+    // ==================== UI ====================
     return (
         <div style={{ padding: 24, maxWidth: 1100, margin: "auto" }}>
-            {/* TIÊU ĐỀ TRANG VÀ NÚT QUAY LẠI */}
+            {/* HEADER */}
             <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-                <Button 
-                    type="text" 
-                    icon={<ArrowLeftOutlined />} 
-                    onClick={() => navigate(-1)} // Nút quay lại
+                <Button
+                    type="text"
+                    icon={<ArrowLeftOutlined />}
+                    onClick={() => navigate(-1)}
                     style={{ marginRight: 16 }}
                 />
                 <div>
@@ -241,7 +282,7 @@ const StationDetail = () => {
                 </div>
             </div>
 
-            {/* POPUP THÊM/SỬA TRỤ SẠC */}
+            {/* POPUP */}
             <Modal
                 title={editingCharger ? "Sửa trụ sạc" : "Thêm trụ sạc"}
                 open={isModalVisible}
@@ -258,17 +299,21 @@ const StationDetail = () => {
                     >
                         <Input />
                     </Form.Item>
+
                     <Form.Item
-                        name="type"
+                        name="chargerCostId"
                         label="Loại cổng sạc"
                         rules={[{ required: true, message: "Vui lòng chọn loại" }]}
                     >
-                        <Select>
-                            <Select.Option value="AC">AC</Select.Option>
-                            <Select.Option value="CCS">CCS</Select.Option>
-                            <Select.Option value="CHAdeMO">CHAdeMO</Select.Option>
+                        <Select placeholder="Chọn loại cổng">
+                            {chargerCosts.map(cost => (
+                                <Select.Option key={cost.id} value={cost.id}>
+                                    {cost.portType} - {cost.power} kW - {cost.cost.toLocaleString()} đ/kWh
+                                </Select.Option>
+                            ))}
                         </Select>
                     </Form.Item>
+
                     <Form.Item
                         name="status"
                         label="Trạng thái"
@@ -281,10 +326,21 @@ const StationDetail = () => {
                     </Form.Item>
                 </Form>
             </Modal>
+            <Modal
+                open={deleteModal.open}
+                title="Xác nhận xóa trụ sạc"
+                okText="Xóa"
+                cancelText="Hủy"
+                okType="danger"
+                onOk={confirmDelete}
+                onCancel={() => setDeleteModal({ open: false, id: null })}
+            >
+                Bạn có chắc chắn muốn xóa trụ sạc này? Hành động không thể hoàn tác.
+            </Modal>
 
-            {/* THÔNG TIN TRẠM VÀ THỐNG KÊ */}
+
+            {/* STATION CARD */}
             <Card style={{ borderRadius: 10, marginBottom: 24 }}>
-                {/* Thông tin trạm */}
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                     <div>
                         <h2>{station.name}</h2>
@@ -292,16 +348,15 @@ const StationDetail = () => {
                         <div style={{ display: "flex", gap: 24, marginTop: 12, color: "#555" }}>
                             <div><PhoneOutlined /> {station.phone}</div>
                             <div><MailOutlined /> {station.email}</div>
-<div>⚡ {station.totalChargers} trụ</div>
+                            <div>⚡ {station.totalChargers} trụ</div>
                         </div>
                     </div>
                     <div>{getStationStatus(station.status)}</div>
                 </div>
 
-                {/* Khối thống kê */}
                 {stats && (
                     <>
-                        {/* HÀNG 1: Trạng thái trụ sạc (Tính toán từ fetchChargers) */}
+                        {/* STATUS ROW */}
                         <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
                             <Card style={{ background: "#f6ffed", border: "1px solid #b7eb8f" }} bodyStyle={{ padding: 16 }}>
                                 <h3 style={{ color: "#52c41a", margin: 0, fontSize: 24 }}>{stats.available}</h3>
@@ -316,10 +371,10 @@ const StationDetail = () => {
                                 <div style={{ color: "#555" }}>Bảo trì</div>
                             </Card>
                         </div>
-                        
-                        {/* HÀNG 2: Thống kê doanh thu (Từ API .../dashboard-status/{id}) */}
+
+                        {/* REVENUE */}
                         <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                             <Card bodyStyle={{ padding: 16 }}>
+                            <Card bodyStyle={{ padding: 16 }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                     <div>
                                         <div style={{ color: "#666", marginBottom: 4 }}>Doanh thu tuần này</div>
@@ -351,7 +406,7 @@ const StationDetail = () => {
                 )}
             </Card>
 
-            {/* DANH SÁCH TRỤ SẠC */}
+            {/* CHARGER LIST */}
             <div
                 style={{
                     border: "1px solid #e8e8e8",
@@ -365,32 +420,34 @@ const StationDetail = () => {
                         <h3 style={{ margin: 0 }}>Danh sách trụ sạc</h3>
                         <p style={{ color: "#888", margin: 0 }}>Quản lý và điều khiển các trụ sạc</p>
                     </div>
-                    <Button type="primary" onClick={handleAdd} style={{ backgroundColor: "#222" }}>+ Thêm trụ sạc</Button>
+                    <Button type="primary" onClick={handleAdd} style={{ backgroundColor: "#222" }}>
+                        + Thêm trụ sạc
+                    </Button>
                 </div>
 
-                {/* Lưới danh sách các trụ */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-                    {chargers.map((c) => (
+                    {chargers.map(c => (
                         <Card key={c.id} style={{ borderRadius: 8 }} bodyStyle={{ padding: 16 }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                                {/* Bên trái: Tên và loại */}
                                 <div>
                                     <b style={{ fontSize: 16 }}>{c.name}</b>
                                     <div style={{ color: "#555", marginTop: 4 }}>
-{c.chargerCost?.portType || "?"} - {c.chargerCost?.power ? `${c.chargerCost.power}kW` : "?kW"}
+                                        {c.chargerCost?.portType || "?"} - {c.chargerCost?.power ? `${c.chargerCost.power}kW` : "?kW"}
                                     </div>
                                 </div>
-                                {/* Bên phải: Trạng thái và nút */}
+
                                 <div style={{ textAlign: "right", minWidth: 90 }}>
                                     {getChargerStatus(c.status)}
                                     <div style={{ marginTop: 8 }}>
                                         <EditOutlined style={{ color: "#1677ff", marginRight: 12, cursor: 'pointer' }} onClick={() => handleEdit(c)} />
-                                        <DeleteOutlined style={{ color: "#ff4d4f", cursor: 'pointer' }} /* onClick={() => handleDelete(c.id)} */ />
+                                        <DeleteOutlined
+                                            style={{ color: "#ff4d4f", cursor: 'pointer' }}
+                                            onClick={() => handleDelete(c.id)}
+                                        />
                                     </div>
                                 </div>
                             </div>
-                            
-                            {/* Thông tin thêm (nếu đang sử dụng) */}
+
                             {c.status?.toUpperCase() === "IN_USE" && (
                                 <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #f0f0f0", color: "#666" }}>
                                     <div style={{ marginBottom: 4 }}>

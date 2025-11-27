@@ -38,6 +38,10 @@ public class ProblemReportService {
     public ProblemReport create(ProblemRequest rq, int stationID) {
         User user= (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Station s = stationRepository.findStationsById(stationID);
+        if(s==null&&user.getRole().equals("STAFF")){
+            Staff staff = staffRepository.findStaffByUser(user);
+            s = staff.getStation();
+        }
         ProblemReport problemReport = new ProblemReport();
         problemReport.setTitle(rq.getTitle());
         problemReport.setDescription(rq.getDescription());
