@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StaffChargerPointResponse {
     private int id;
+    private String pointName;
     private String portType;
     private int capacity;
     private double price;
@@ -17,8 +18,9 @@ public class StaffChargerPointResponse {
     private Reservation reservation;
 
     //constructor cho AVAILABLE
-    public StaffChargerPointResponse(int id, String portType, int capacity, double price, String status) {
+    public StaffChargerPointResponse(int id, String pointName, String portType, int capacity, double price, String status) {
         this.id = id;
+        this.pointName = pointName;
         this.portType = portType;
         this.capacity = capacity;
         this.price = price;
@@ -26,8 +28,9 @@ public class StaffChargerPointResponse {
     }
 
     //constructor cho ONGOING
-    public StaffChargerPointResponse(int id, String portType, int capacity, double price, String status, ChargingSession chargingSession) {
+    public StaffChargerPointResponse(int id, String pointName, String portType, int capacity, double price, String status, ChargingSession chargingSession) {
         this.id = id;
+        this.pointName = pointName;
         this.portType = portType;
         this.capacity = capacity;
         this.price = price;
@@ -36,8 +39,9 @@ public class StaffChargerPointResponse {
     }
 
     //constructor cho Reservation
-    public StaffChargerPointResponse(int id, String portType, int capacity, double price, String status, Reservation reservation) {
+    public StaffChargerPointResponse(int id, String pointName, String portType, int capacity, double price, String status, Reservation reservation) {
         this.id = id;
+        this.pointName = pointName;
         this.portType = portType;
         this.capacity = capacity;
         this.price = price;

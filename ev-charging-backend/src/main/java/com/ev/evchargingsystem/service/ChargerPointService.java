@@ -43,7 +43,7 @@ public class ChargerPointService {
             //thiếu check role AD?
             throw new RuntimeException("StationID not found: "+stationID);
         }
-        ChargerCost cost = chargerCostRepository.findChargerCostById(rq.getChargerCostId());
+        ChargerCost cost = chargerCostRepository.findChargerCostByPortType(rq.getPortType());
         ChargerPoint p = new ChargerPoint();
         p.setStation(station);
         p.setName(rq.getName());
@@ -57,7 +57,8 @@ public class ChargerPointService {
         if (chargerPoint == null) {
             throw new RuntimeException("ChargerPoint with id "+id+" not found!");
         }
-        chargerPointRepository.delete(chargerPoint);
+        chargerPoint.setActive(false);
+        chargerPointRepository.save(chargerPoint);
         if(chargerPointRepository.findById(id).isPresent()){
             return false;
         }
@@ -72,7 +73,7 @@ public class ChargerPointService {
         if(p.getName().length()>30){
             throw new RuntimeException("Length of name must be less than 30 characters!");
         }
-        ChargerCost cost = chargerCostRepository.findChargerCostById(p.getChargerCostId());
+        ChargerCost cost = chargerCostRepository.findChargerCostByPortType(p.getPortType());
         c.setName(p.getName());
         c.setChargerCost(cost);
         c.setStatus(p.getStatus());
@@ -80,9 +81,10 @@ public class ChargerPointService {
     }
 
     public List<ChargerPoint> getAllByStation(int stationId){
-        List<ChargerPoint> list = new ArrayList<>();
-        chargerPointRepository.findChargerPointsByStationId(stationId).forEach(list::add);
-        return list;
+        return chargerPointRepository.findChargerPointsByStationId(stationId)
+                .stream()
+                .filter(ChargerPoint::isActive)
+                .toList();
     }
 
     //lấy tất cả trụ sạc đang Available của trạm sạc đó
@@ -94,10 +96,11 @@ public class ChargerPointService {
         List<ChargerPoint> avai = new ArrayList<>();
         chargerPointRepository.findChargerPointsByStationId(stationId).forEach(list::add);
         for(ChargerPoint x: list){
-            if(x.getStatus().equals("AVAILABLE")){
+            if(x.getStatus().equals("AVAILABLE")&&x.isActive()){
                 avai.add(x);
             }
         }
+
         return avai;
     }
 
@@ -120,11 +123,14 @@ public class ChargerPointService {
         Staff staff = staffRepository.findStaffByUser(user);
         Station s = staff.getStation();
         List<StaffChargerPointResponse> list = new ArrayList<>();
-        List<ChargerPoint> points = chargerPointRepository.findChargerPointsByStationId(s.getId());
+        List<ChargerPoint> points = chargerPointRepository.findChargerPointsByStationId(s.getId())
+                .stream()
+                .filter(ChargerPoint::isActive)
+                .toList();
         for(ChargerPoint p: points){
             StaffChargerPointResponse r = null;
             if(p.getStatus().equals("AVAILABLE")){
-                r = new StaffChargerPointResponse(p.getId(),
+                r = new StaffChargerPointResponse(p.getId(),p.getName(),
                         p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus());
             }
@@ -138,7 +144,7 @@ public class ChargerPointService {
                         cs = css;
                     }
                 }
-                r = new StaffChargerPointResponse(p.getId(),
+                r = new StaffChargerPointResponse(p.getId(),p.getName(),
                         p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus(),cs);
             }
@@ -152,12 +158,12 @@ public class ChargerPointService {
                         rv = res;
                     }
                 }
-                r = new StaffChargerPointResponse(p.getId(),
+                r = new StaffChargerPointResponse(p.getId(),p.getName(),
                         p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus(),rv);
             }
             if(p.getStatus().equals("OUT_OF_SERVICE")){
-                r = new StaffChargerPointResponse(p.getId(),
+                r = new StaffChargerPointResponse(p.getId(), p.getName(),
                         p.getChargerCost().getPortType(), p.getChargerCost().getPower(),
                         p.getChargerCost().getCost(), p.getStatus());
             }

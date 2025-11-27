@@ -33,4 +33,7 @@ public class ChargerPoint {
     @ManyToOne
     @JoinColumn(name="charger_cost_id", referencedColumnName = "id", nullable = false)
     private ChargerCost chargerCost;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

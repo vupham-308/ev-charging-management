@@ -12,16 +12,16 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
 
     List<ChargerPoint> findChargerPointsByStationId(int stationId);
 
-    @Query("SELECT DISTINCT c.chargerCost.portType FROM ChargerPoint c WHERE c.station.id = :stationID")
+    @Query("SELECT DISTINCT c.chargerCost.portType FROM ChargerPoint c WHERE c.station.id = :stationID and c.active=true")
     List<String> findPortTypesByStationID(@Param("stationID") int stationID);
 
-    @Query("SELECT COUNT(c) FROM ChargerPoint c")
+    @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.active=true")
     long countTotalPoints();
 
-    @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.status = 'AVAILABLE'")
+    @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.status = 'AVAILABLE' and c.active=true")
     long countAvailablePoints();
 
-    @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.status = 'OCCUPIED'")
+    @Query("SELECT COUNT(c) FROM ChargerPoint c WHERE c.status = 'OCCUPIED' and c.active=true")
     long countOccupiedPoints();
 
     List<ChargerPoint> findByStationId(int stationId);
@@ -30,20 +30,20 @@ public interface ChargerPointRepository extends JpaRepository<ChargerPoint, Inte
     List<ChargerPoint> findByStationIdAndStatus(int stationId, String status);
 
     //tất cả trụ sạc của trạm
-    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId")
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId and cp.active=true")
     int countTotalByStationId(@Param("stationId") int stationId);
 
     //trụ sạc AVAILABLE của trạm
-    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'AVAILABLE'")
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'AVAILABLE' and cp.active=true")
     int countAvailableByStationId(@Param("stationId") int stationId);
 
-    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OCCUPIED'")
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OCCUPIED' and cp.active=true")
     int countOccupiedByStationId(@Param("stationId") int stationId);
 
-    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'RESERVED'")
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'RESERVED' and cp.active=true")
     int countReservedByStationId(@Param("stationId") int stationId);
 
-    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OUT_OF_SERVICE'")
+    @Query("SELECT COUNT(cp) FROM ChargerPoint cp WHERE cp.station.id = :stationId AND cp.status = 'OUT_OF_SERVICE' and cp.active=true")
     int countOutOfServiceByStationId(@Param("stationId") int stationId);
 
     boolean existsByChargerCostId(int chargerCostId);

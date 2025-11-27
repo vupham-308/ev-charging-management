@@ -120,12 +120,13 @@ public class StationService {
     }
 
     public int getPointChargerTotalByStation(int stationID){
-        return chargerPointRepository.findChargerPointsByStationId(stationID).size();
+        return chargerPointRepository.findChargerPointsByStationId(stationID).stream().filter(ChargerPoint::isActive).toList().size();
     }
 
     public int getPointChargerAvailableByStation(int stationID){
         int count=0;
-        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID);
+        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID)
+                .stream().filter(ChargerPoint::isActive).toList();
         for(ChargerPoint x: list){
             if(x.getStatus().equals("AVAILABLE")){
                 count++;
@@ -136,7 +137,8 @@ public class StationService {
 
     public int getPointChargerOutOfServiceByStation(int stationID){
         int count=0;
-        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID);
+        List<ChargerPoint> list = chargerPointRepository.findChargerPointsByStationId(stationID)
+                .stream().filter(ChargerPoint::isActive).toList();
         for(ChargerPoint x: list){
             if(x.getStatus().equals("OUT_OF_SERVICE")){
                 count++;
@@ -184,15 +186,19 @@ public class StationService {
         // Đếm số lượng theo trạng thái
         long available = chargerPoints.stream()
                 .filter(cp -> "AVAILABLE".equalsIgnoreCase(cp.getStatus()))
+                .filter(cp -> cp.isActive())
                 .count();
         long occupied = chargerPoints.stream()
                 .filter(cp -> "OCCUPIED".equalsIgnoreCase(cp.getStatus()))
+                .filter(cp -> cp.isActive())
                 .count();
         long reserved = chargerPoints.stream()
                 .filter(cp -> "RESERVED".equalsIgnoreCase(cp.getStatus()))
+                .filter(cp -> cp.isActive())
                 .count();
         long outOfService = chargerPoints.stream()
                 .filter(cp -> "OUT_OF_SERVICE".equalsIgnoreCase(cp.getStatus()))
+                .filter(cp -> cp.isActive())
                 .count();
 
         CPointStatusResponseForStaff response = new CPointStatusResponseForStaff(

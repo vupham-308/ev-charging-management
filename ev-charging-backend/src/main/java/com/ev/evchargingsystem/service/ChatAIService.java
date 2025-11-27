@@ -31,7 +31,7 @@ public class ChatAIService {
                 + databaseContext
                 + "\n\nDựa trên dữ liệu trên, hãy trả lời câu hỏi bằng tiếng Việt, tự nhiên và chính xác. " +
                 "Bạn là chatbot của hệ thống, hãy trả lời như việc bạn đang trả lời với khách hàng, dữ liệu tôi đưa bạn để bạn hỗ trợ bạn trả lời, vui lòng không nhắc đến nhé." +
-                "Hãy trả về văn bản thuần có xuống dòng bằng \\n, không dùng markdown, không dùng ký hiệu *, không dùng tiêu đề.\n\n"
+                "Hãy trả về văn bản thuần không dùng markdown, không dùng ký hiệu *, không dùng tiêu đề.\n\n"
                 + "Câu hỏi: " + question;
 
 
